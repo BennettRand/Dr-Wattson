@@ -1,0 +1,19 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{F857412E-DCB6-4712-B9E8-ED28F6CD1211}") = "Rcb231_ATmega1281_Rf231", "Rcb231_ATmega1281_Rf231.cproj", "{BEF1FFCE-1587-4553-9E83-9B5FE42BFC78}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BEF1FFCE-1587-4553-9E83-9B5FE42BFC78}.Debug|AVR.ActiveCfg = Debug|AVR
+		{BEF1FFCE-1587-4553-9E83-9B5FE42BFC78}.Debug|AVR.Build.0 = Debug|AVR
+		{BEF1FFCE-1587-4553-9E83-9B5FE42BFC78}.Release|AVR.ActiveCfg = Release|AVR
+		{BEF1FFCE-1587-4553-9E83-9B5FE42BFC78}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,19 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{8B8C417B-EB0B-4588-A4D8-EC056088D56C}") = "ATmega128rfa1", "ATmega128rfa1.cproj", "{9AC33BAE-17E4-459D-B37F-3BCB8717A475}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9AC33BAE-17E4-459D-B37F-3BCB8717A475}.Debug|AVR.ActiveCfg = Debug|AVR
+		{9AC33BAE-17E4-459D-B37F-3BCB8717A475}.Debug|AVR.Build.0 = Debug|AVR
+		{9AC33BAE-17E4-459D-B37F-3BCB8717A475}.Release|AVR.ActiveCfg = Release|AVR
+		{9AC33BAE-17E4-459D-B37F-3BCB8717A475}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
