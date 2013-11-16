@@ -5,6 +5,8 @@ CONFIG = Debug
 ##############################################################################
 .PHONY: all directory clean size
 
+DEVICE = atmega256rfr2
+
 STACK_PATH = ../../..
 APP_PATH = ..
 
@@ -15,7 +17,7 @@ SIZE = avr-size
 CFLAGS += -W -Wall --std=gnu99 -Os
 CFLAGS += -fdata-sections -ffunction-sections -fpack-struct -fshort-enums
 CFLAGS += -funsigned-char -funsigned-bitfields
-CFLAGS += -mmcu=atmega256rfr2
+CFLAGS += -mmcu=$(DEVICE)
 CFLAGS += -MD -MP -MT $(CONFIG)/$(*F).o -MF $(CONFIG)/$(@F).d
 
 ifeq ($(CONFIG), Debug)
@@ -24,6 +26,10 @@ endif
 
 LDFLAGS += -Wl,--gc-sections
 LDFLAGS += -mmcu=atmega256rfr2
+
+ATPROGRAM = "C:\Program Files (x86)\Atmel\Atmel Studio 6.1\atbackend\atprogram.exe"
+PROG_INTERFACE = edbg
+PROG_PROTOCOL = jtag
 
 
 INCLUDES += \
@@ -91,5 +97,9 @@ size: $(CONFIG)/Peer2Peer.elf
 clean:
 	@echo clean
 	@-rm -rf $(CONFIG)
+
+program: $(CONFIG)/Peer2Peer.hex
+	@echo programming
+	$(ATPROGRAM) -t $(PROG_INTERFACE) -i $(PROG_PROTOCOL) -d $(DEVICE) program --flash --format hex -f $(CURDIR)/$(CONFIG)/Peer2Peer.hex
 
 -include $(wildcard $(CONFIG)/*.d)
