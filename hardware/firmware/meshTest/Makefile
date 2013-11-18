@@ -46,7 +46,7 @@ SRCS += \
   $(STACK_PATH)/sys/src/sys.c \
   $(STACK_PATH)/sys/src/sysTimer.c \
   $(STACK_PATH)/sys/src/sysEncrypt.c \
-  $(APP_PATH)/template.c 
+  $(APP_PATH)/main.c 
 
 DEFINES += \
   -DPHY_ATMEGA256RFR2 \
