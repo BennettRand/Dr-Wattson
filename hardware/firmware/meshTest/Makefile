@@ -2,8 +2,15 @@ CONFIG = Release
 
 .PHONY: all directory clean size
 
+DEVICE = atmega256rfr2
+TARGET = meshTest
+
 STACK_PATH = ../LwMesh_1_1_1/
 APP_PATH = .
+
+ATPROGRAM = "C:\Program Files (x86)\Atmel\Atmel Studio 6.1\atbackend\atprogram.exe"
+PROG_INTERFACE = edbg
+PROG_PROTOCOL = jtag
 
 CC = avr-gcc
 OBJCOPY = avr-objcopy
@@ -58,17 +65,17 @@ CFLAGS += $(INCLUDES) $(DEFINES)
 
 OBJS = $(addprefix $(CONFIG)/, $(notdir %/$(subst .c,.o, $(SRCS))))
 
-all: directory $(CONFIG)/Template.elf $(CONFIG)/Template.hex $(CONFIG)/Template.bin size
+all: directory $(CONFIG)/$(TARGET).elf $(CONFIG)/$(TARGET).hex $(CONFIG)/$(TARGET).bin size
 
-$(CONFIG)/Template.elf: $(OBJS)
+$(CONFIG)/$(TARGET).elf: $(OBJS)
 	@echo LD $@
 	@$(CC) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
 
-$(CONFIG)/Template.hex: $(CONFIG)/Template.elf
+$(CONFIG)/$(TARGET).hex: $(CONFIG)/$(TARGET).elf
 	@echo OBJCOPY $@
 	@$(OBJCOPY) -O ihex -R .eeprom $^ $@
 
-$(CONFIG)/Template.bin: $(CONFIG)/Template.elf
+$(CONFIG)/$(TARGET).bin: $(CONFIG)/$(TARGET).elf
 	@echo OBJCOPY $@
 	@$(OBJCOPY) -O binary -R .eeprom $^ $@
 
@@ -79,12 +86,16 @@ $(CONFIG)/Template.bin: $(CONFIG)/Template.elf
 directory:
 	@gmkdir -p $(CONFIG)
 
-size: $(CONFIG)/Template.elf
+size: $(CONFIG)/$(TARGET).elf
 	@echo size:
 	@$(SIZE) -t $^
 
 clean:
 	@echo clean
 	@-rm -rf $(CONFIG)
+	
+program: $(CONFIG)/$(TARGET).hex
+	@echo programming
+	$(ATPROGRAM) -t $(PROG_INTERFACE) -i $(PROG_PROTOCOL) -d $(DEVICE) program --flash --format hex -f $(CURDIR)/$(CONFIG)/$(TARGET).hex
 
 -include $(wildcard $(CONFIG)/*.d)

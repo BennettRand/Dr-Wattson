@@ -47,6 +47,9 @@
 #include "phy.h"
 #include "sys.h"
 #include "nwk.h"
+#include "sysTimer.h"
+
+#include <util/delay.h>
 
 /*- Definitions ------------------------------------------------------------*/
 // Put your preprocessor definitions here
@@ -63,7 +66,7 @@
 /*- Implementations --------------------------------------------------------*/
 
 // Put your function implementations here
-
+static SYS_Timer_t hrtbtTimer;
 /*************************************************************************//**
 *****************************************************************************/
 static void APP_TaskHandler(void)
@@ -71,12 +74,23 @@ static void APP_TaskHandler(void)
   // Put your application code here
 }
 
+static void hrtbtTimerHandler(SYS_Timer_t *timer)
+{
+	HAL_GPIO_LED_toggle();  //Toggle LED
+}
+
 /*************************************************************************//**
 *****************************************************************************/
 int main(void)
 {
+  HAL_Init();
   SYS_Init();
+  DDRB |= 1<<4;
 
+  hrtbtTimer.interval = 1000; //ms
+  hrtbtTimer.mode = SYS_TIMER_PERIODIC_MODE;
+  hrtbtTimer.handler = hrtbtTimerHandler;
+  SYS_TimerStart(&hrtbtTimer);
   while (1)
   {
     SYS_TaskHandler();
