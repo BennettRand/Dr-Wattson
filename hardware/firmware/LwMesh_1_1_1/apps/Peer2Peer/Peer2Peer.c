@@ -184,10 +184,10 @@ static void appInit(void)
 #if defined(PLATFORM_XPLAINED_PRO) && defined(HAL_ATMEGA256RFR2)
   // Enable chip antenna
   DDRG = (1 << 1);
-  PORTG = (1 << 1);
+  PORTG = (0 << 1);
 
   DDRF = (1 << 2);
-  PORTF = (0 << 2);
+  PORTF = (1 << 2);
 #endif
 
 hrtbtTimer.interval = 1000; //ms

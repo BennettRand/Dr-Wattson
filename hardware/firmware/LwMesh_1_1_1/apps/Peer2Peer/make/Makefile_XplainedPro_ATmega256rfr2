@@ -100,6 +100,6 @@ clean:
 
 program: $(CONFIG)/Peer2Peer.hex
 	@echo programming
-	$(ATPROGRAM) -t $(PROG_INTERFACE) -i $(PROG_PROTOCOL) -d $(DEVICE) program --flash --format hex -f $(CURDIR)/$(CONFIG)/Peer2Peer.hex
+	$(ATPROGRAM) -t $(PROG_INTERFACE) -i $(PROG_PROTOCOL) -d $(DEVICE) program -c -fl -f $(CURDIR)/$(CONFIG)/Peer2Peer.elf
 
 -include $(wildcard $(CONFIG)/*.d)

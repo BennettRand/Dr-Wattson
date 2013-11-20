@@ -38,6 +38,7 @@ INCLUDES += \
   -I$(APP_PATH) 
 
 SRCS += \
+  $(APP_PATH)/main.c \
   $(STACK_PATH)/hal/atmega256rfr2/src/hal.c \
   $(STACK_PATH)/hal/atmega256rfr2/src/halTimer.c \
   $(STACK_PATH)/phy/atmega256rfr2/src/phy.c \
@@ -53,7 +54,6 @@ SRCS += \
   $(STACK_PATH)/sys/src/sys.c \
   $(STACK_PATH)/sys/src/sysTimer.c \
   $(STACK_PATH)/sys/src/sysEncrypt.c \
-  $(APP_PATH)/main.c 
 
 DEFINES += \
   -DPHY_ATMEGA256RFR2 \
@@ -96,6 +96,6 @@ clean:
 	
 program: $(CONFIG)/$(TARGET).hex
 	@echo programming
-	$(ATPROGRAM) -t $(PROG_INTERFACE) -i $(PROG_PROTOCOL) -d $(DEVICE) program --flash --format hex -f $(CURDIR)/$(CONFIG)/$(TARGET).hex
+	$(ATPROGRAM) -t $(PROG_INTERFACE) -i $(PROG_PROTOCOL) -d $(DEVICE) program -c -fl -f $(CURDIR)/$(CONFIG)/$(TARGET).elf
 
 -include $(wildcard $(CONFIG)/*.d)
