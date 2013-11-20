@@ -106,7 +106,7 @@ static void APP_TaskHandler(void)
 		txPacket.dstAddr = 0;
 		txPacket.dstEndpoint = APP_ENDPOINT;
 		txPacket.srcEndpoint = APP_ENDPOINT;
-		txPacket.options = NWK_OPT_ENABLE_SECURITY | NWK_IND_OPT_ACK_REQUESTED;
+		txPacket.options = NWK_OPT_ENABLE_SECURITY;
 		txPacket.data = transmitString;
 		txPacket.size = sizeof(transmitString);
 		txPacket.confirm = appDataConf;
@@ -127,7 +127,7 @@ int main(void)
   DDRB |= 1<<4;
   PORTB |= 1<<4;
   
-  config_antenna(ANT_CHIP);
+  config_antenna(ANT_EXT);
   
   SYS_TaskHandler(); // Call the system task handler once before we configure the radio
   NWK_SetAddr(APP_ADDR);

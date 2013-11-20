@@ -145,6 +145,25 @@ static void appTimerHandler(SYS_Timer_t *timer)
 *****************************************************************************/
 static bool appDataInd(NWK_DataInd_t *ind)
 {
+	
+	char buf[10];
+	int counta = 0;
+	itoa(ind->rssi, buf, 10);
+	HAL_UartWriteByte('R');
+	HAL_UartWriteByte('S');
+	HAL_UartWriteByte('S');
+	HAL_UartWriteByte('I');
+	HAL_UartWriteByte(':');
+	HAL_UartWriteByte(' ');
+	while (buf[counta] != 0) {
+		HAL_UartWriteByte(buf[counta]);
+		counta++;
+	}
+	HAL_UartWriteByte(' ');
+	HAL_UartWriteByte('-');
+	HAL_UartWriteByte('-');
+	HAL_UartWriteByte(' ');
+	
   for (uint8_t i = 0; i < ind->size; i++)
     HAL_UartWriteByte(ind->data[i]);
   return true;
@@ -184,10 +203,10 @@ static void appInit(void)
 #if defined(PLATFORM_XPLAINED_PRO) && defined(HAL_ATMEGA256RFR2)
   // Enable chip antenna
   DDRG = (1 << 1);
-  PORTG = (0 << 1);
+  PORTG = (1 << 1);
 
   DDRF = (1 << 2);
-  PORTF = (1 << 2);
+  PORTF = (0 << 2);
 #endif
 
 hrtbtTimer.interval = 1000; //ms
