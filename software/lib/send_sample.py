@@ -50,6 +50,19 @@ class send_sample:
 
 def main(argc = len(sys.argv), args = sys.argv):
 	x = send_sample(4)
+	
+	data_pdpd = 60*60*24 #data per day per device
+	
+	print time.asctime()
+	start = time.time()
+	
+	for i in xrange(data_pdpd):
+		x.sample(i,i,i,i)
+	
+	print time.asctime()
+	print time.time()-start
+	print (time.time()-start)/data_pdpd
+	
 	return
 
 if __name__ == "__main__":
