@@ -49,7 +49,9 @@ class send_sample:
 		self.trycommit()
 
 def main(argc = len(sys.argv), args = sys.argv):
-	x = send_sample(4)
+	n = int(args[1])
+	
+	x = send_sample(n)
 	
 	data_pdpd = 60*60*24 #data per day per device
 	
