@@ -39,7 +39,7 @@ class send_sample:
 		
 		self.cursors[self.nextcur].execute(measure_insert,(power, voltage, current, frequency))
 		mid = self.cursors[self.nextcur].fetchone()[0]
-		self.cursors[self.nextcur].execute(sample_insert,(timefrom, timetill, mid))
+		self.cursors[self.nextcur].execute(sample_insert,(timefrom, timetill, mid, 1))
 		
 		self.nextcur += 1
 		
