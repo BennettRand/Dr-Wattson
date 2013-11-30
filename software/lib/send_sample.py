@@ -29,10 +29,10 @@ class send_sample:
 			c.close()
 			
 	def trycommit(self):
-		if time.time() - lastcommit > 1:
+		if time.time() - selflastcommit > 1:
 			for c in self.connections:
 				c.commit()
-			lastcommit = time.time()
+			self.lastcommit = time.time()
 			
 		
 	def sample(self, power, voltage, current, frequency, timefrom = time.asctime(), timetill = time.asctime()):
