@@ -29,7 +29,7 @@ class send_sample:
 			c.close()
 			
 	def trycommit(self):
-		if time.time() - selflastcommit > 1:
+		if time.time() - self.lastcommit > 1:
 			for c in self.connections:
 				c.commit()
 			self.lastcommit = time.time()
