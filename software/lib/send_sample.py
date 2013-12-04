@@ -22,6 +22,7 @@ class send_sample:
 		self.nextcur = 0
 		
 	def __del__(self):
+		print self.multicommit()
 		for c in self.cursors:
 			c.close()
 			
@@ -54,11 +55,11 @@ class send_sample:
 		self.trycommit()
 
 def main(argc = len(sys.argv), args = sys.argv):
-	n = int(args[1])
+	n = 1
 	
 	x = send_sample(n)
 	
-	data_pdpd = int(args[2]) #60*60*24 #data per day per device
+	data_pdpd = 60*60*24 #data per day per device
 	
 	# print time.asctime()
 	start = time.time()
