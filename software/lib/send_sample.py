@@ -62,8 +62,8 @@ def main(argc = len(sys.argv), args = sys.argv):
 		x.sample(i,i,i,i)
 	
 	# print time.asctime()
-	print time.time()-start
-	# print (time.time()-start)/data_pdpd
+	# print time.time()-start
+	print n,(time.time()-start)/data_pdpd
 	
 	return
 
