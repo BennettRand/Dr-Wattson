@@ -55,15 +55,15 @@ def main(argc = len(sys.argv), args = sys.argv):
 	
 	data_pdpd = int(argv[2]) #60*60*24 #data per day per device
 	
-	print time.asctime()
+	# print time.asctime()
 	start = time.time()
 	
 	for i in xrange(data_pdpd):
 		x.sample(i,i,i,i)
 	
-	print time.asctime()
+	# print time.asctime()
 	print time.time()-start
-	print (time.time()-start)/data_pdpd
+	# print (time.time()-start)/data_pdpd
 	
 	return
 
