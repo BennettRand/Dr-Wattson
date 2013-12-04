@@ -53,7 +53,7 @@ def main(argc = len(sys.argv), args = sys.argv):
 	
 	x = send_sample(n)
 	
-	data_pdpd = int(argv[2]) #60*60*24 #data per day per device
+	data_pdpd = int(args[2]) #60*60*24 #data per day per device
 	
 	# print time.asctime()
 	start = time.time()
