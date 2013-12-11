@@ -81,11 +81,11 @@ void config_antenna(int ant) {
 	DDRG |= 1<<1;
 	DDRF |= 1<<2;
 
-	if (ant == ANT_CHIP) {
+	if (ant == ANT_EXT) {
 		PORTG &= ~(1<<1);
 		PORTF |= 1<<2;
 	}
-	else if (ant == ANT_EXT) {
+	else if (ant == ANT_CHIP) {
 		PORTG |= 1<<1;
 		PORTF &= ~(1<<2);
 	}
@@ -106,7 +106,7 @@ static void APP_TaskHandler(void)
 		txPacket.dstAddr = 0;
 		txPacket.dstEndpoint = APP_ENDPOINT;
 		txPacket.srcEndpoint = APP_ENDPOINT;
-		txPacket.options = NWK_OPT_ENABLE_SECURITY;
+		txPacket.options = 0;
 		txPacket.data = transmitString;
 		txPacket.size = sizeof(transmitString);
 		txPacket.confirm = appDataConf;
@@ -114,7 +114,7 @@ static void APP_TaskHandler(void)
 		
 		counter = 0;
 	}
-	counter = (counter+((uint16_t)1))%0xFFF;
+	counter = (counter+((uint16_t)1))%100;
   // Put your application code here
 }
 
@@ -122,10 +122,10 @@ static void APP_TaskHandler(void)
 *****************************************************************************/
 int main(void)
 {
-  HAL_Init();
   SYS_Init();
   DDRB |= 1<<4;
   PORTB |= 1<<4;
+  DDRE |= 1<<2;
   
   config_antenna(ANT_EXT);
   
@@ -134,10 +134,14 @@ int main(void)
   NWK_SetPanId(APP_PANID);
   PHY_SetChannel(APP_CHANNEL);
   PHY_SetRxState(true);
+  PHY_SetTxPower(0);
 
   while (1)
   {
+	PORTE |= 1<<2;
     SYS_TaskHandler();
+	PORTE &= ~(1<<2);
     APP_TaskHandler();
+	_delay_ms(1);
   }
 }

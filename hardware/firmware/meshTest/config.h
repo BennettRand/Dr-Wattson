@@ -51,7 +51,7 @@
 #define APP_SECURITY_KEY          "TestSecurityKey0"
 #define APP_FLUSH_TIMER_INTERVAL  20
 
-#define APP_CHANNEL             0x0fi
+#define APP_CHANNEL             0x08i
 
 #define SYS_SECURITY_MODE                   0
 
