@@ -4,6 +4,7 @@ CONFIG = Release
 
 DEVICE = atmega256rfr2
 TARGET = meshTest
+SERIAL_NUMBER = ATML1784030200003343
 
 STACK_PATH = ../LwMesh_1_1_1/
 APP_PATH = .
@@ -96,6 +97,6 @@ clean:
 	
 program: $(CONFIG)/$(TARGET).hex
 	@echo programming
-	$(ATPROGRAM) -t $(PROG_INTERFACE) -i $(PROG_PROTOCOL) -d $(DEVICE) program -c -fl -f $(CURDIR)/$(CONFIG)/$(TARGET).elf
+	$(ATPROGRAM) -t $(PROG_INTERFACE) -i $(PROG_PROTOCOL) -d $(DEVICE) -s $(SERIAL_NUMBER) program -c -fl -f $(CURDIR)/$(CONFIG)/$(TARGET).elf
 
 -include $(wildcard $(CONFIG)/*.d)
