@@ -13,9 +13,14 @@ ATPROGRAM = "C:\Program Files (x86)\Atmel\Atmel Studio 6.1\atbackend\atprogram.e
 PROG_INTERFACE = edbg
 PROG_PROTOCOL = jtag
 
+AVRDUDE = avrdude
+AVRDUDE_PORT = usb
+AVRDUDE_PROGRAMMER = avrisp2
+
 CC = avr-gcc
 OBJCOPY = avr-objcopy
 SIZE = avr-size
+MM_DIR = mkdir
 
 CFLAGS += -W -Wall --std=gnu99 -Os
 CFLAGS += -fdata-sections -ffunction-sections -fpack-struct -fshort-enums
@@ -85,7 +90,7 @@ $(CONFIG)/$(TARGET).bin: $(CONFIG)/$(TARGET).elf
 	@$(CC) $(CFLAGS) $(filter %$(subst .o,.c,$(notdir $@)), $(SRCS)) -c -o $@
 
 directory:
-	@gmkdir -p $(CONFIG)
+	@mkdir -p $(CONFIG)
 
 size: $(CONFIG)/$(TARGET).elf
 	@echo size:
@@ -93,10 +98,11 @@ size: $(CONFIG)/$(TARGET).elf
 
 clean:
 	@echo clean
-	@-rm -rf $(CONFIG)
+	@rm -rf $(CONFIG)
 	
 program: $(CONFIG)/$(TARGET).hex
 	@echo programming
-	$(ATPROGRAM) -t $(PROG_INTERFACE) -i $(PROG_PROTOCOL) -d $(DEVICE) -s $(SERIAL_NUMBER) program -c -fl -f $(CURDIR)/$(CONFIG)/$(TARGET).elf
+	#$(ATPROGRAM) -t $(PROG_INTERFACE) -i $(PROG_PROTOCOL) -d $(DEVICE) -s $(SERIAL_NUMBER) program -c -fl -f $(CURDIR)/$(CONFIG)/$(TARGET).elf
+	$(AVRDUDE) -p $(DEVICE) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) -U flash:w:$(CONFIG)/$(TARGET).hex
 
 -include $(wildcard $(CONFIG)/*.d)

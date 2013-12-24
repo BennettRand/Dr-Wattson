@@ -62,11 +62,8 @@ void uart_init_port(uart_baud_t baud_rate, void *tx_buf, uint16_t tx_buf_len, vo
 	
 	#ifdef USE_STDIO
 	// If this port is to be used as the standard IO port for printf/scanf, then we need to set the _uart_stdio_port pointer
-	if (use_for_stdio) {
-		_uart_stdio_port = port;
-		stdout = &_uart_stdio_file;
-		stdin = &_uart_stdio_file;
-	}
+	stdout = &_uart_stdio_file;
+	stdin = &_uart_stdio_file;
 	#endif
 }
 
@@ -166,10 +163,6 @@ static int _uart_stdio_put_char(char c, FILE *stream) {
 }
 
 static int _uart_stdio_get_char(FILE *stream) {
-	if (_uart_stdio_port == 0)
-		// No uart port setup for stdio, return error
-		return _FDEV_ERR;
-
 	static uint8_t rx_data;
 	if (uart_rx_data(&rx_data,1) == 0)
 		// The buffer was empty, so return an end of file
