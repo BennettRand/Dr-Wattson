@@ -18,7 +18,7 @@ typedef enum {
 	uart_baud_14400 = 138,
 	uart_baud_19200 = 103,
 	uart_baud_28800 = 68,
-	uart_baud_38400 = 25,
+	uart_baud_38400 = 51,
 	uart_baud_57600 = 34,
 	uart_baud_76800 = 25,
 	uart_baud_115200 = 16,

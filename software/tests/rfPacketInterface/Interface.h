@@ -30,6 +30,8 @@ private slots:
     void on_recanPortsButton_clicked();
     void dataReceived();
 
+    void on_transmitButton_clicked();
+
 private:
     Ui::Widget *ui;
     QSerialPort *port;

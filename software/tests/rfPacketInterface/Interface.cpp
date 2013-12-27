@@ -25,19 +25,17 @@ Widget::~Widget()
 
 void Widget::dataReceived()
 {
-//    qDebug()<<port->readAll();
-
     inbuffer.append(port->readAll());
 
     if (inbuffer.at(0) == 0)
         inbuffer = inbuffer.right(inbuffer.size() - 1);
 
-    if (inbuffer.at(0) <= inbuffer.size()) {
+    if ((inbuffer.at(0) + sizeof(rxHeader_t)) <= inbuffer.size()) {
         rxHeader_t packetHeader;
-        memcpy(&packetHeader, inbuffer.data(), RX_HEADER_SIZE);
-        inbuffer = inbuffer.right(inbuffer.size()-RX_HEADER_SIZE);
-        QByteArray data = inbuffer.left(packetHeader.size - RX_HEADER_SIZE);
-        inbuffer = inbuffer.right((inbuffer.size() - packetHeader.size + RX_HEADER_SIZE));
+        memcpy(&packetHeader, inbuffer.data(), sizeof(rxHeader_t));
+        inbuffer = inbuffer.right(inbuffer.size());
+        QByteArray data = inbuffer.left(packetHeader.size);
+        inbuffer = inbuffer.right(inbuffer.size() - packetHeader.size);
 
         tableModel.addData(packetHeader, data);
         ui->tableView->scrollToBottom();
@@ -79,4 +77,13 @@ void Widget::on_recanPortsButton_clicked()
     portList = QSerialPortInfo::availablePorts();
     for (int i = 0; i < portList.length(); i++) // popluate the port list
         ui->portCombo->addItem(portList.at(i).portName());
+}
+
+void Widget::on_transmitButton_clicked()
+{
+    txHeader_t packetHeader;
+    packetHeader.destAddr = ui->addressEdit->text().toInt(0,10);
+    packetHeader.size = ui->dataEdit->toPlainText().length();
+    port->write((char*)(&packetHeader), sizeof(packetHeader));
+    port->write(ui->dataEdit->toPlainText().toLocal8Bit());
 }
