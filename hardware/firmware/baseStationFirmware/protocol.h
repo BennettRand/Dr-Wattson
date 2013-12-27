@@ -3,8 +3,7 @@
 
 #include <stdint.h>
 
-#define RX_HEADER_SIZE (5)
-typedef struct {
+typedef struct __attribute__((packed)) {
 	uint16_t size;
 	uint16_t sourceAddr;
 	int8_t rssi;
