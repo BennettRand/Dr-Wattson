@@ -83,7 +83,22 @@ void Widget::on_transmitButton_clicked()
 {
     txHeader_t packetHeader;
     packetHeader.destAddr = ui->addressEdit->text().toInt(0,16);
-    packetHeader.size = ui->dataEdit->toPlainText().length();
-    port->write((char*)(&packetHeader), sizeof(packetHeader));
-    port->write(ui->dataEdit->toPlainText().toLocal8Bit());
+
+    if (ui->asciiRadioButton->isChecked()) {
+        packetHeader.size = ui->dataEdit->toPlainText().length();
+        port->write((char*)(&packetHeader), sizeof(packetHeader));
+        port->write(ui->dataEdit->toPlainText().toLocal8Bit());
+    }
+    else if (ui->hexRadioButton->isChecked()) {
+        QString str = ui->dataEdit->toPlainText().toUpper().remove(QRegExp("[^0123456789ABCDEF]"));
+        QByteArray bytes;
+        while (str.length() > 0)
+        {
+            bytes.append(str.left(2).toInt(0,16));
+            str = str.right((str.length()-2) > 0 ? str.length()-2 : 0);
+        }
+        packetHeader.size = bytes.size();
+        port->write((char*)(&packetHeader), sizeof(txHeader_t));
+        port->write(bytes);
+    }
 }
