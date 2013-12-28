@@ -46,7 +46,6 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 }
 
 int main(void) {
-
 	SYS_Init(); // Init Atmel Lightweight Mesh stack
 
 	// Load MAC address from user signature row
@@ -79,7 +78,6 @@ int main(void) {
 	PORTG |= 1<<1;
 	PORTF &= ~(1<<2);
 
-
 	while (1) {
 		SYS_TaskHandler();
 		APP_TaskHandler();
@@ -88,10 +86,7 @@ int main(void) {
 		if (uart_received_bytes() == 0) /* no bytes, just continue */
 			continue;
 
-//		if (uart_rx_peek(0) == 0)
-//			uart_rx_byte(); // Throw out the first byte if it's a null, we shouldn't need this, but it seemed to help on the PC side
-		
-		if ((uart_received_bytes() > 0) && (uart_rx_peek(0) + sizeof(txHeader_t)) >= uart_received_bytes()) {
+		if ((uart_received_bytes() > 0) && ((uart_rx_peek(0) + sizeof(txHeader_t)) <= uart_received_bytes())) {
 			txHeader_t packetHeader;
 			uart_rx_data(&packetHeader, sizeof(txHeader_t));
 			uart_rx_data(packet_buf, packetHeader.size);
@@ -103,6 +98,8 @@ int main(void) {
 			txPacket.data = packet_buf;
 			txPacket.size = packetHeader.size;
 			txPacket.confirm = packetTxConf;
+
+
 			NWK_DataReq(&txPacket);
 		}
 	}
