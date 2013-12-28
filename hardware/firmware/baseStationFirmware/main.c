@@ -46,6 +46,9 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 }
 
 int main(void) {
+
+	SYS_Init(); // Init Atmel Lightweight Mesh stack
+
 	// Load MAC address from user signature row
 	IEEE_ADDR_0 = boot_signature_byte_get(0x0100);	
 	IEEE_ADDR_1 = boot_signature_byte_get(0x0101);	
@@ -56,9 +59,8 @@ int main(void) {
 	IEEE_ADDR_6 = boot_signature_byte_get(0x0106);	
 	IEEE_ADDR_7 = boot_signature_byte_get(0x0107);
 
-	SYS_Init(); // Init Atmel Lightweight Mesh stack
 	SYS_TaskHandler(); // Call the system task handler once before we configure the radio
-	NWK_SetAddr(IEEE_ADDR_0 | ( ((uint16_t)IEEE_ADDR_1) << 8)); // Set network address based upon the MAC address
+	NWK_SetAddr(IEEE_ADDR_0 | (((uint16_t)IEEE_ADDR_1) << 8)); // Set network address based upon the MAC address
 	NWK_SetPanId(APP_PANID);
 	PHY_SetChannel(APP_CHANNEL);
 	PHY_SetRxState(true);
@@ -78,20 +80,18 @@ int main(void) {
 	PORTF &= ~(1<<2);
 
 
-	printf("MAC: %X:%X:%X:%X:%X:%X:%X:%X\n", IEEE_ADDR_7,  IEEE_ADDR_6, IEEE_ADDR_5, IEEE_ADDR_4, IEEE_ADDR_3, IEEE_ADDR_2, IEEE_ADDR_1, IEEE_ADDR_0);
-	
 	while (1) {
 		SYS_TaskHandler();
 		APP_TaskHandler();
 
 		// Parse received uart packets, if we get one, then transmit it to the RF network
-		if (uart_received_bytes() == 0) /* no new bytes, just continue */
+		if (uart_received_bytes() == 0) /* no bytes, just continue */
 			continue;
 
-		if (uart_rx_peek(0) == 0)
-			uart_rx_byte(); // Throw out the first byte if it's a null, we shouldn't need this, but it seemed to help on the PC side
+//		if (uart_rx_peek(0) == 0)
+//			uart_rx_byte(); // Throw out the first byte if it's a null, we shouldn't need this, but it seemed to help on the PC side
 		
-		if ((uart_rx_peek(0) + sizeof(txHeader_t)) >= uart_received_bytes()) {
+		if ((uart_received_bytes() > 0) && (uart_rx_peek(0) + sizeof(txHeader_t)) >= uart_received_bytes()) {
 			txHeader_t packetHeader;
 			uart_rx_data(&packetHeader, sizeof(txHeader_t));
 			uart_rx_data(packet_buf, packetHeader.size);
