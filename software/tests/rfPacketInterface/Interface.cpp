@@ -33,7 +33,7 @@ void Widget::dataReceived()
     if ((inbuffer.at(0) + sizeof(rxHeader_t)) <= inbuffer.size()) {
         rxHeader_t packetHeader;
         memcpy(&packetHeader, inbuffer.data(), sizeof(rxHeader_t));
-        inbuffer = inbuffer.right(inbuffer.size());
+        inbuffer = inbuffer.right(inbuffer.size() - sizeof(rxHeader_t));
         QByteArray data = inbuffer.left(packetHeader.size);
         inbuffer = inbuffer.right(inbuffer.size() - packetHeader.size);
 
@@ -82,7 +82,7 @@ void Widget::on_recanPortsButton_clicked()
 void Widget::on_transmitButton_clicked()
 {
     txHeader_t packetHeader;
-    packetHeader.destAddr = ui->addressEdit->text().toInt(0,10);
+    packetHeader.destAddr = ui->addressEdit->text().toInt(0,16);
     packetHeader.size = ui->dataEdit->toPlainText().length();
     port->write((char*)(&packetHeader), sizeof(packetHeader));
     port->write(ui->dataEdit->toPlainText().toLocal8Bit());

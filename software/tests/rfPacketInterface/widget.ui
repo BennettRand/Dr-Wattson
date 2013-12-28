@@ -108,7 +108,17 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="addressEdit"/>
+       <widget class="QLineEdit" name="addressEdit">
+        <property name="inputMask">
+         <string>HHHH</string>
+        </property>
+        <property name="text">
+         <string>0</string>
+        </property>
+        <property name="placeholderText">
+         <string/>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0" colspan="2">
        <widget class="QLabel" name="dataLabel">
