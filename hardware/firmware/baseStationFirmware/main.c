@@ -81,13 +81,14 @@ int main(void) {
 			uart_rx_data(&packetHeader, sizeof(txHeader_t));
 			uart_rx_data(packet_buf, packetHeader.size);
 		
-			if (packetHeader.command == setPAN)
-				PHY_SetPanId(*((uint16_t*)packet_buf));
+			if (packetHeader.command == 2) {
+				NWK_SetPanId(*((uint16_t*)packet_buf));
+			}
 			else {
 				if (packetHeader.command == sendPacket)
 					txPacket.options = 0;
 				else
-					txPacket.options |= NWK_OPT_BROADCAST_PAN_ID;
+					txPacket.options = NWK_OPT_BROADCAST_PAN_ID;
 
 				txPacket.dstAddr = packetHeader.destAddr;
 				txPacket.dstEndpoint = APP_ENDPOINT;
