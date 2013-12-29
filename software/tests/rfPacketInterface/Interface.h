@@ -33,7 +33,6 @@ private slots:
     void on_transmitButton_clicked();
 
     void on_rxASCIIButton_toggled(bool checked);
-
 private:
     Ui::Widget *ui;
     QSerialPort *port;

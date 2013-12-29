@@ -16,6 +16,7 @@ Widget::Widget(QWidget *parent) :
     connect(port,SIGNAL(readyRead()),this,SLOT(dataReceived()));
 
     ui->tableView->setModel(&tableModel);
+    qDebug()<<setPAN;
 }
 
 Widget::~Widget()
@@ -56,6 +57,14 @@ void Widget::on_connectButton_clicked(bool checked)
             port->setParity(QSerialPort::NoParity);
             port->setStopBits(QSerialPort::OneStop);
             ui->connectButton->setText("Close Port");
+            uint16_t pan_id = ui->panLineEdit->text().toInt(0,16);
+            txHeader_t packetHeader;
+            packetHeader.destAddr = 0;
+            packetHeader.command = setPAN;
+            packetHeader.size = 2;
+
+            port->write((char*)(&packetHeader), sizeof(txHeader_t));
+            port->write((char*)(&pan_id),2);
         }
         else
         {
@@ -83,6 +92,11 @@ void Widget::on_transmitButton_clicked()
 {
     txHeader_t packetHeader;
     packetHeader.destAddr = ui->addressEdit->text().toInt(0,16);
+
+    if (ui->panBroadcastCheckbox->isChecked())
+        packetHeader.command = broadcastPacket;
+    else
+        packetHeader.command = sendPacket;
 
     if (ui->asciiRadioButton->isChecked()) {
         packetHeader.size = ui->dataEdit->toPlainText().length();
