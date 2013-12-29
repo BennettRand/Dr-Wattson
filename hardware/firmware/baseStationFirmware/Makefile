@@ -24,7 +24,7 @@ MM_DIR = mkdir
 
 CFLAGS += -W -Wall --std=gnu99 -Os
 CFLAGS += -fdata-sections -ffunction-sections -fpack-struct -fshort-enums
-CFLAGS += -funsigned-char -funsigned-bitfields
+CFLAGS += -funsigned-char -funsigned-bitfields -fno-strict-aliasing
 CFLAGS += -mmcu=atmega256rfr2
 CFLAGS += -MD -MP -MT $(BUILD_DIR)/$(*F).o -MF $(BUILD_DIR)/$(@F).d
 

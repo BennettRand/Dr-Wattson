@@ -48,19 +48,9 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 int main(void) {
 	SYS_Init(); // Init Atmel Lightweight Mesh stack
 
-	// Load MAC address from user signature row
-	IEEE_ADDR_0 = boot_signature_byte_get(0x0100);	
-	IEEE_ADDR_1 = boot_signature_byte_get(0x0101);	
-	IEEE_ADDR_2 = boot_signature_byte_get(0x0102);	
-	IEEE_ADDR_3 = boot_signature_byte_get(0x0103);	
-	IEEE_ADDR_4 = boot_signature_byte_get(0x0104);	
-	IEEE_ADDR_5 = boot_signature_byte_get(0x0105);	
-	IEEE_ADDR_6 = boot_signature_byte_get(0x0106);	
-	IEEE_ADDR_7 = boot_signature_byte_get(0x0107);
-
 	SYS_TaskHandler(); // Call the system task handler once before we configure the radio
-	NWK_SetAddr(IEEE_ADDR_0 | (((uint16_t)IEEE_ADDR_1) << 8)); // Set network address based upon the MAC address
-	NWK_SetPanId(APP_PANID);
+	NWK_SetAddr(boot_signature_byte_get(0x0100) | (((uint16_t)boot_signature_byte_get(0x0101)) << 8)); // Set network address based upon the MAC address
+	NWK_SetPanId(0); // Default PAN ID will be 0, can be changed using the set PAN command
 	PHY_SetChannel(APP_CHANNEL);
 	PHY_SetRxState(true);
 	NWK_OpenEndpoint(APP_ENDPOINT, rfReceivePacket);
@@ -90,17 +80,23 @@ int main(void) {
 			txHeader_t packetHeader;
 			uart_rx_data(&packetHeader, sizeof(txHeader_t));
 			uart_rx_data(packet_buf, packetHeader.size);
-			
-			txPacket.dstAddr = packetHeader.destAddr;
-			txPacket.dstEndpoint = APP_ENDPOINT;
-			txPacket.srcEndpoint = APP_ENDPOINT;
-			txPacket.options = 0;
-			txPacket.data = packet_buf;
-			txPacket.size = packetHeader.size;
-			txPacket.confirm = packetTxConf;
+		
+			if (packetHeader.command == setPAN)
+				PHY_SetPanId(*((uint16_t*)packet_buf));
+			else {
+				if (packetHeader.command == sendPacket)
+					txPacket.options = 0;
+				else
+					txPacket.options |= NWK_OPT_BROADCAST_PAN_ID;
 
-
-			NWK_DataReq(&txPacket);
+				txPacket.dstAddr = packetHeader.destAddr;
+				txPacket.dstEndpoint = APP_ENDPOINT;
+				txPacket.srcEndpoint = APP_ENDPOINT;
+				txPacket.data = packet_buf;
+				txPacket.size = packetHeader.size;
+				txPacket.confirm = packetTxConf;
+				NWK_DataReq(&txPacket);
+			}
 		}
 	}
 }
