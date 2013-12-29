@@ -16,7 +16,8 @@ Widget::Widget(QWidget *parent) :
     connect(port,SIGNAL(readyRead()),this,SLOT(dataReceived()));
 
     ui->tableView->setModel(&tableModel);
-    qDebug()<<setPAN;
+    ui->tableView->setColumnWidth(0, 140);
+    ui->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 Widget::~Widget()
@@ -38,7 +39,7 @@ void Widget::dataReceived()
         QByteArray data = inbuffer.left(packetHeader.size);
         inbuffer = inbuffer.right(inbuffer.size() - packetHeader.size);
 
-        tableModel.addData(packetHeader, data);
+        tableModel.addData(packetHeader, data, QDateTime::currentDateTime());
         ui->tableView->scrollToBottom();
     }
 }

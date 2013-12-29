@@ -6,9 +6,10 @@ PacketTableModel::PacketTableModel(QObject *parent) :
     currentEncoding = ASCII;
 }
 
-void PacketTableModel::addData(rxHeader_t header, QByteArray data)
+void PacketTableModel::addData(rxHeader_t header, QByteArray data, QDateTime time)
 {
     beginInsertRows(QModelIndex(),header_list.size(),header_list.size());
+    time_list.append(time);
     header_list.append(header);
     data_list.append(data);
     endInsertRows();
@@ -27,7 +28,7 @@ int PacketTableModel::rowCount(const QModelIndex &parent) const
 
 int PacketTableModel::columnCount(const QModelIndex &parent) const
 {
-    return 4;
+    return 5;
 }
 
 Qt::ItemFlags PacketTableModel::flags(const QModelIndex &index) const
@@ -42,12 +43,14 @@ QVariant PacketTableModel::data(const QModelIndex &index, int role) const
         switch(index.column())
         {
         case 0:
-            return QString().setNum(header_list.at(index.row()).sourceAddr);
+            return time_list.at(index.row()).toString(QString("yyyy-M-d h:mm AP"));
         case 1:
-            return QString().setNum(header_list.at(index.row()).rssi);
+            return QString().setNum(header_list.at(index.row()).sourceAddr);
         case 2:
-            return QString().setNum(header_list.at(index.row()).size);
+            return QString().setNum(header_list.at(index.row()).rssi);
         case 3:
+            return QString().setNum(header_list.at(index.row()).size);
+        case 4:
             if (currentEncoding == ASCII)
                 return QString(data_list.at(index.row()));
             else if (currentEncoding == HEX)
@@ -68,12 +71,14 @@ QVariant PacketTableModel::headerData(int section, Qt::Orientation orientation, 
         {
             switch(section) {
             case 0:
-                return "Source Address";
+                return "Time";
             case 1:
-                return "RSSI";
+                return "Source Address";
             case 2:
-                return "Length";
+                return "RSSI";
             case 3:
+                return "Length";
+            case 4:
                 return "Data";
             default: return "ERROR";
             }

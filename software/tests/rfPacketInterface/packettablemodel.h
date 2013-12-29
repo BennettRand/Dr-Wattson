@@ -6,6 +6,7 @@
 #include <QByteArray>
 #include <stdint.h>
 #include <QDebug>
+#include <QDateTime>
 
 #include "protocol.h"
 
@@ -22,7 +23,7 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
-    void addData(rxHeader_t header, QByteArray data);
+    void addData(rxHeader_t header, QByteArray data, QDateTime time);
     void encodingChanged(enum dataEncoding encoding);
 
 signals:
@@ -32,6 +33,7 @@ public slots:
 private:
     QList<rxHeader_t> header_list;
     QList<QByteArray> data_list;
+    QList<QDateTime> time_list;
     enum dataEncoding currentEncoding;
 
 };
