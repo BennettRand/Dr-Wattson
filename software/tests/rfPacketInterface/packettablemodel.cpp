@@ -3,6 +3,7 @@
 PacketTableModel::PacketTableModel(QObject *parent) :
     QAbstractTableModel(parent)
 {
+    currentEncoding = ASCII;
 }
 
 void PacketTableModel::addData(rxHeader_t header, QByteArray data)
@@ -11,6 +12,12 @@ void PacketTableModel::addData(rxHeader_t header, QByteArray data)
     header_list.append(header);
     data_list.append(data);
     endInsertRows();
+}
+
+void PacketTableModel::encodingChanged(enum dataEncoding encoding)
+{
+    currentEncoding = encoding;
+    emit dataChanged(createIndex(0,3),createIndex(header_list.size(),3));
 }
 
 int PacketTableModel::rowCount(const QModelIndex &parent) const
@@ -41,7 +48,10 @@ QVariant PacketTableModel::data(const QModelIndex &index, int role) const
         case 2:
             return QString().setNum(header_list.at(index.row()).size);
         case 3:
-            return QString(data_list.at(index.row()));
+            if (currentEncoding == ASCII)
+                return QString(data_list.at(index.row()));
+            else if (currentEncoding == HEX)
+                return QString(data_list.at(index.row()).toHex()).toUpper();
         default:
             return QVariant();
         }

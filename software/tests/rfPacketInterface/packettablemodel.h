@@ -15,12 +15,15 @@ class PacketTableModel : public QAbstractTableModel
 public:
     explicit PacketTableModel(QObject *parent = 0);
 
+    enum dataEncoding {ASCII, HEX};
+
     int rowCount(const QModelIndex &parent) const;
     int columnCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;
     void addData(rxHeader_t header, QByteArray data);
+    void encodingChanged(enum dataEncoding encoding);
 
 signals:
 
@@ -29,6 +32,7 @@ public slots:
 private:
     QList<rxHeader_t> header_list;
     QList<QByteArray> data_list;
+    enum dataEncoding currentEncoding;
 
 };
 

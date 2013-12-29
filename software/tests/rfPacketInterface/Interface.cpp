@@ -102,3 +102,12 @@ void Widget::on_transmitButton_clicked()
         port->write(bytes);
     }
 }
+
+
+void Widget::on_rxASCIIButton_toggled(bool checked)
+{
+    if (checked)
+        tableModel.encodingChanged(PacketTableModel::ASCII);
+    else
+        tableModel.encodingChanged(PacketTableModel::HEX);
+}
