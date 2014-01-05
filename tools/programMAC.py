@@ -1,27 +1,29 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 import os
 import sys
 import getopt
 import re
 import string
-import subprocess
 
-options, args = getopt.getopt(sys.argv[1:],"m:o:p",["mac", "output", "program"])
+options, args = getopt.getopt(sys.argv[1:],"m:o:h",["mac", "output"])
 
-program = False
 output_fd = sys.stdout
 mac_str = "";
 
 for opt, val in options:
-	if opt in ("-p", "--program"):
-		program = True
 	if opt in ("-m", "--mac"):
 		mac_str = val
 	if opt in ("-o", "--output"):
 		output_fd = open(val, 'w')
+	if opt in ("-h") :
+		print("Usage : " + sys.argv[0] + " [-m MAC address] <-o output file>")
+		print("      -m  --mac        MAC address to generate signature segment for")
+		print("      -o  --output     Output file for generated segment")
 
-if program is True:
-	output_fd = open(".mac_output.hex", "w")
+if (mac_str == "") :
+	print("Usage : " + sys.argv[0] + " [-m MAC address] <-o output file>")
+	print("      -m  --mac        MAC address to generate signature segment for")
+	print("      -o  --output     Output file for generated segment")
 
 mac_str = re.sub(r"[^ABCDEF0123456789]", "", string.upper(mac_str))[:16]
 if len(mac_str) != 16:
@@ -87,7 +89,3 @@ output_fd.write(":10011000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEF\n" +
                 ":00000001FF")
 output_fd.close();
 
-if program is True:
-	proc = subprocess.Popen(["avrdude", "-patmega256rfr2", "-Pusb", "-cavrisp2", "-Uusersig:w:.mac_output.hex"], stdin=sys.stdin, stdout=sys.stdout)
-	proc.wait()
-	os.unlink(".mac_output.hex")
