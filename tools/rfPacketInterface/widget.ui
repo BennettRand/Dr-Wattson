@@ -201,14 +201,14 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="dataLabel">
         <property name="text">
          <string>Data:</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="3">
+      <item row="4" column="0" colspan="3">
        <widget class="QPlainTextEdit" name="dataEdit">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -218,7 +218,7 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0" colspan="3">
+      <item row="5" column="0" colspan="3">
        <widget class="QGroupBox" name="dataEncodingBox">
         <property name="title">
          <string>Data Encoding</string>
@@ -259,17 +259,24 @@
         </layout>
        </widget>
       </item>
-      <item row="5" column="1" colspan="2">
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="panBroadcastCheckbox">
+        <property name="text">
+         <string>PAN Broadcast</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1" colspan="2">
        <widget class="QPushButton" name="transmitButton">
         <property name="text">
          <string>Transmit</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QCheckBox" name="panBroadcastCheckbox">
+      <item row="2" column="1">
+       <widget class="QCheckBox" name="autoRespCheckBox">
         <property name="text">
-         <string>PAN Broadcast</string>
+         <string>Auto Respond</string>
         </property>
        </widget>
       </item>

@@ -41,6 +41,17 @@ void Widget::dataReceived()
 
         tableModel.addData(packetHeader, data, QDateTime::currentDateTime());
         ui->tableView->scrollToBottom();
+
+        if (ui->autoRespCheckBox->isChecked())
+        {
+            txHeader_t txPacketHeader;
+            txPacketHeader.destAddr = packetHeader.sourceAddr;
+            txPacketHeader.command = sendPacket;
+            txPacketHeader.size = 13 + packetHeader.size;
+            port->write((char*)(&txPacketHeader), sizeof(txPacketHeader));
+            port->write("Got message: ", 13);
+            port->write(data);
+        }
     }
 }
 
