@@ -67,8 +67,9 @@ DEFINES += \
   -DPHY_ATMEGA256RFR2 \
   -DHAL_ATMEGA256RFR2 \
   -DPLATFORM_XPLAINED_PRO \
-  -DF_CPU=16000000 \
-  -DUSE_STDIO
+  -DF_CPU=16000000
+
+#DEFINES += -DUSE_STDIO
 
 CFLAGS += $(INCLUDES) $(DEFINES)
 
@@ -105,7 +106,7 @@ clean:
 	
 program: $(BUILD_DIR)/$(TARGET).hex
 	@echo programming
-	$(ATPROGRAM) -t $(PROG_INTERFACE) -i $(PROG_PROTOCOL) -d $(DEVICE) -s $(SERIAL_NUMBER) program -c -fl -f $(CURDIR)/$(BUILD_DIR)/$(TARGET).elf
-	#$(AVRDUDE) -p $(DEVICE) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) -U flash:w:$(BUILD_DIR)/$(TARGET).hex
+	#$(ATPROGRAM) -t $(PROG_INTERFACE) -i $(PROG_PROTOCOL) -d $(DEVICE) -s $(SERIAL_NUMBER) program -c -fl -f $(CURDIR)/$(BUILD_DIR)/$(TARGET).elf
+	$(AVRDUDE) -p $(DEVICE) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) -U flash:w:$(BUILD_DIR)/$(TARGET).hex
 
 -include $(wildcard $(BUILD_DIR)/*.d)

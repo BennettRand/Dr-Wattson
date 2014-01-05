@@ -21,11 +21,15 @@ uint8_t uart_tx_buf[100];
 uint8_t uart_rx_buf[100];
 uint8_t packet_buf[100];
 
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter" // Ignore the unused parameter warning here, the function has to have this prototype.
 static void packetTxConf(NWK_DataReq_t *req) {
 	// We don't really care about if a packet was received or not
 	// But we have to have a function here, because the library does not
 	// handle null function pointers for the confirm callback.
 }
+#pragma GCC diagnostic pop
 		
 static void APP_TaskHandler(void) {
 	if (counter == 0) { 
