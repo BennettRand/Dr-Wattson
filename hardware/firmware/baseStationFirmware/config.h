@@ -1,11 +1,14 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
-/*- Definitions ------------------------------------------------------------*/
-#define APP_ADDR                  3
-#define APP_PANID                 0x4567
+/* file: config.h
+ * This file provides the configuration provides the configuration definitions
+ * for the Atmel Lightweight Mesh stack. The majority of these parameters are
+ * compiled into the stack library at compile time, although a few are used by
+ * the application program as well.
+ */
+
 #define APP_ENDPOINT              1
-#define APP_SECURITY_KEY          "TestSecurityKey0"
 #define APP_FLUSH_TIMER_INTERVAL  20
 
 #define APP_CHANNEL             0x08i
