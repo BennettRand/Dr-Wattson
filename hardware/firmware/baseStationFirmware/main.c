@@ -14,7 +14,6 @@
 
 #include "protocol.h"
 
-static uint16_t counter = 0;
 static NWK_DataReq_t txPacket;
 
 uint8_t uart_tx_buf[100];
@@ -31,14 +30,6 @@ static void packetTxConf(NWK_DataReq_t *req) {
 }
 #pragma GCC diagnostic pop
 		
-static void APP_TaskHandler(void) {
-	if (counter == 0) { 
-		PORTB = (~PORTB)&(1<<4);
-	}
-	counter = (counter+((uint16_t)1))%400;
-  // Put your application code here
-}
-
 static bool rfReceivePacket(NWK_DataInd_t *ind) {
 	rxHeader_t packetHeader;
 	packetHeader.size = ind->size;
@@ -50,6 +41,8 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 }
 
 int main(void) {
+	uint16_t counter = 0;
+
 	SYS_Init(); // Init Atmel Lightweight Mesh stack
 
 	SYS_TaskHandler(); // Call the system task handler once before we configure the radio
@@ -74,7 +67,15 @@ int main(void) {
 
 	while (1) {
 		SYS_TaskHandler();
-		APP_TaskHandler();
+		
+		// Flash the LED so we can tell if something has frozen up
+		if (counter == 4092) {
+			PORTB ^= (1<<4);
+			counter = 0;
+		}
+		else
+			counter ++;
+			
 
 		// Parse received uart packets, if we get one, then transmit it to the RF network
 		if (uart_received_bytes() == 0) /* no bytes, just continue */
