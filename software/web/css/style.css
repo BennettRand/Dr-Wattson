@@ -1,0 +1,18 @@
+body
+{
+	margin: 0;
+	padding: 0;
+}
+
+.device
+{
+	float: left;
+	width: 160px;
+	height: 90px;
+	border: 1px solid black;
+	margin: 1px;
+}
+.device *
+{
+	margin: 2px;
+}
