@@ -13,7 +13,8 @@
 
 #define APP_CHANNEL             0x08i
 
-#define SYS_SECURITY_MODE                   0
+#define APP_SECURITY_KEY          ((uint8_t*) "Dr.WattspmtyKey0")
+#define SYS_SECURITY_MODE                   1
 
 #define NWK_BUFFERS_AMOUNT                  3
 #define NWK_DUPLICATE_REJECTION_TABLE_SIZE  10
@@ -23,5 +24,6 @@
 #define NWK_ACK_WAIT_TIME                   1000 // ms
 
 #define NWK_ENABLE_ROUTING
+#define NWK_ENABLE_SECURITY
 
 #endif // _CONFIG_H_
