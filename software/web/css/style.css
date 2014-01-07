@@ -1,14 +1,25 @@
 body
 {
+	font-family: 'Open Sans', sans-serif;
 	margin: 0;
 	padding: 0;
+}
+
+h1
+{
+	font-family: 'Michroma', sans-serif;
+}
+
+h2,h3,h4,h5
+{
+	font-family: 'Ubuntu', sans-serif;
 }
 
 .device
 {
 	float: left;
-	width: 160px;
-	height: 90px;
+	width: 224px;
+	height: 126px;
 	border: 1px solid black;
 	margin: 1px;
 }
@@ -16,3 +27,7 @@ body
 {
 	margin: 2px;
 }
+
+/*font-family: 'Michroma', sans-serif;
+font-family: 'Open Sans', sans-serif;
+font-family: 'Ubuntu', sans-serif;*/
