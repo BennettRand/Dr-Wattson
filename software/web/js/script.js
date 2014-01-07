@@ -1,10 +1,10 @@
-var the_body = document.getElementsByTagName("body")[0];
+var devices = document.getElementById("devices");
 
-// console.log(the_body.innerHTML);
+console.log(devices.innerHTML);
 
 function appendDevice(name)
 {
-	the_body.innerHTML += "<div class=\"device\"><h3>" + name + "</h3></div>";
+	devices.innerHTML += "<div class=\"device\"><h3>" + name + "</h3></div>";
 }
 
 appendDevice("Lorem");
