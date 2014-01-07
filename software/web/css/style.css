@@ -8,27 +8,11 @@ body
 h1
 {
 	font-family: 'Michroma', sans-serif;
-	margin: 0px;
-	padding: 0px;
 }
 
 h2,h3,h4,h5
 {
 	font-family: 'Ubuntu', sans-serif;
-}
-
-#title-bar
-{
-	border-bottom: 1px solid black;
-	/*height: 1em;*/
-}
-
-#devices
-{
-}
-
-#details
-{
 }
 
 .device
