@@ -3,6 +3,7 @@ body
 	font-family: 'Open Sans', sans-serif;
 	margin: 0;
 	padding: 0;
+	overflow: scroll;
 }
 
 h1
@@ -20,7 +21,7 @@ h2,h3,h4,h5
 #title-bar
 {
 	border-bottom: 1px solid black;
-	/*height: 1em;*/
+	width: 100%;
 }
 
 #devices
