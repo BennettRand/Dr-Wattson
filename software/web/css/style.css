@@ -20,16 +20,31 @@ h2,h3,h4,h5
 
 #title-bar
 {
+	background-color: #FFF;
 	border-bottom: 1px solid black;
 	width: 100%;
+	position:fixed;
+	z-index:1;
+	height:50px;
+	top: 0px;
 }
 
 #devices
 {
+	margin-top:50px;
+	padding-bottom:50%;
+	padding-top:1px;
 }
 
 #details
 {
+	background-color: #FFF;
+	width: 100%;
+	position: fixed;
+	bottom: 0px;
+	height: 50%;
+	border-top: 1px solid black;
+	z-index: 1;
 }
 
 .device
