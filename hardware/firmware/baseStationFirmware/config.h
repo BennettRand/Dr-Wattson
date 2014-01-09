@@ -13,8 +13,8 @@
 
 #define APP_CHANNEL             0x08i
 
-#define APP_SECURITY_KEY          ((uint8_t*) "Dr.WattspmtyKey0")
-#define SYS_SECURITY_MODE                   1
+#define APP_SECURITY_KEY          ((uint8_t*) "Dr.Wattson Key 0")
+#define SYS_SECURITY_MODE                   0
 
 #define NWK_BUFFERS_AMOUNT                  3
 #define NWK_DUPLICATE_REJECTION_TABLE_SIZE  10

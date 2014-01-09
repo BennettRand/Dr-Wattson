@@ -26,6 +26,7 @@ static void packetTxConf(NWK_DataReq_t *req) {
 #pragma GCC diagnostic pop
 
 static bool rfReceivePacket(NWK_DataInd_t *ind) {
+	return true;
 }
 
 int main(void) {
@@ -35,6 +36,7 @@ int main(void) {
 	NWK_SetAddr(boot_signature_byte_get(0x0100) | (((uint16_t)boot_signature_byte_get(0x0101)) << 8)); // Set network address based upon the MAC address
 	NWK_SetPanId(0); // Default PAN ID will be 0, can be changed using the set PAN command
 	PHY_SetChannel(APP_CHANNEL);
+	//NWK_SetSecurityKey(APP_SECURITY_KEY);
 	PHY_SetRxState(true);
 	NWK_OpenEndpoint(APP_ENDPOINT, rfReceivePacket);
 	PHY_SetTxPower(0);
@@ -52,8 +54,5 @@ int main(void) {
 	PORTF &= ~(1<<2);
 
 	while (1) {
-		SYS_TaskHandler();
-		PORTB ^= 1<<4;
-
 	}
 }
