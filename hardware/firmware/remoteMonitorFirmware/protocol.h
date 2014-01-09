@@ -15,15 +15,15 @@ typedef enum __attribute__((packed)) {
 typedef struct __attribute__((packed)) {
 	packetType_t type;
 	uint16_t PAN_ID;
-	char[16] name;
+	char name[16];
 } baconPacket_t;
 
 typedef struct __attribute__((packed)) {
 	packetType_t type;
-	uint16_t chennel1VoltageScaling;
+	uint16_t channel1VoltageScaling;
 	uint16_t channel1CurrentScaling;
 	uint16_t channel2VoltageScaling;
-	uint16_t channel2VoltageScaling;
+	uint16_t channel2CurrentScaling;
 	uint16_t linePeriodScalingFactor;
 } connectionRequestPacket_t;
 

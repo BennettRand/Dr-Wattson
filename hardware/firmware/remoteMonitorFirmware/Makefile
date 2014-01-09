@@ -46,6 +46,7 @@ INCLUDES += \
 
 SRCS += \
   main.c \
+  basestation.c \
   ../megaDrivers/uart.c \
   $(STACK_PATH)/hal/atmega256rfr2/src/hal.c \
   $(STACK_PATH)/hal/atmega256rfr2/src/halTimer.c \

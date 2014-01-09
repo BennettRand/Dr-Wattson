@@ -1,12 +1,24 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
+#include <stdint.h>
+
 /* file: config.h
  * This file provides the configuration provides the configuration definitions
  * for the Atmel Lightweight Mesh stack. The majority of these parameters are
  * compiled into the stack library at compile time, although a few are used by
  * the application program as well.
  */
+
+struct calibData {
+	uint16_t channel1VoltageScaling;
+	uint16_t channel1CurrentScaling;
+	uint16_t channel2VoltageScaling;
+	uint16_t channel2CurrentScaling;
+	uint16_t linePeriodScalingFactor;
+};
+
+#define BASESTATION_LIST_SIZE               8
 
 #define APP_ENDPOINT                        1
 #define APP_FLUSH_TIMER_INTERVAL            20
