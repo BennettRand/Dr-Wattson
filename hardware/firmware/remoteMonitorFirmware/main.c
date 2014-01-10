@@ -13,7 +13,20 @@
 #include "protocol.h"
 #include "basestation.h"
 
-static NWK_DataReq_t txPacket;
+static NWK_DataReq_t nwkPacket;
+
+static dataPacket_t dataPacket = {.type = data};
+static uint8_t dataSequence = 0;
+
+uint16_t sampleCount;
+int64_t powerSum;
+
+#ifdef EXTENDED_DATA_PACKET
+int64_t voltageSum;
+int64_t currentSum;
+uint16_t linePeriod;
+#endif
+
 struct calibData unitCal = {1, 2, 3, 4, 5};
 uint8_t uart_tx_buf[200];
 uint8_t uart_rx_buf[200];
@@ -26,6 +39,52 @@ void packetTxConf(NWK_DataReq_t *req) {
 	// handle null function pointers for the confirm callback.
 }
 #pragma GCC diagnostic pop
+
+void handleDataRequest(NWK_DataInd_t *packet) {
+	if (packet->size != sizeof(dataRequestPacket_t))
+		return; // Packet wrong size, just throw it out
+	
+	dataRequestPacket_t *reqPacket = (dataRequestPacket_t*)packet->data;
+
+	dataSequence += 1;
+
+	dataPacket.requestSequence = reqPacket->requestSequence;
+	dataPacket.dataSequence = dataSequence;
+	dataPacket.sampleCount = sampleCount;
+	dataPacket.powerData = powerSum;
+	#ifdef EXTENDED_DATA_PACKET
+	dataPacket.linePeriod = linePeriod;
+	dataPacket.squaredVoltage = voltageSum;
+	dataPacket.squaredCurrent = currentSum;
+	#endif
+
+	nwkPacket.dstAddr = baseStationList[connectedBaseStation].addr;
+	nwkPacket.dstEndpoint = APP_ENDPOINT;
+	nwkPacket.srcEndpoint = APP_ENDPOINT;
+	nwkPacket.data = (uint8_t *)(&dataPacket);
+	nwkPacket.size = sizeof(dataPacket_t);
+	nwkPacket.confirm = packetTxConf;
+	NWK_DataReq(&nwkPacket);
+}
+
+void handleDataAck(NWK_DataInd_t *packet) {
+	if (packet->size != sizeof(dataAckPacket_t))
+		return; // Not the right size for this kind of packet
+
+	dataAckPacket_t *ackPacket = (dataAckPacket_t*)packet->data;
+
+	if (ackPacket->dataSequence == dataSequence) { // This is the ack for the most recent data
+		cli(); // Don't interrupt while we are doing this. Is it really safe to do this?
+		sampleCount -= dataPacket.sampleCount;
+		powerSum -= dataPacket.powerData;
+		#ifdef EXTENDED_DATA_PACKET
+		linePeriod -= dataPacket.linePeriod;
+		voltageSum -= dataPacket.squaredVoltage;		
+		currentSum -= dataPacket.squaredCurrent;
+		#endif
+		sei();
+	}
+}
 
 static bool rfReceivePacket(NWK_DataInd_t *ind) {
 	// First figure out what kind of packet this is, and then call the appropreate function.
@@ -41,6 +100,12 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 	case connectionAck:
 		if (processConnectionAck(ind))
 			printf("Connected to network: %d\n", connectedBaseStation);
+		break;
+	case dataRequest:
+		handleDataRequest(ind);
+		break;
+	case dataAck:
+		handleDataAck(ind);
 		break;
 	default:
 		break;
@@ -83,5 +148,7 @@ int main(void) {
 				printf("Connecting to network %u\n", data_byte);
 			}
 		}
+
+		_delay_ms(1);
 	}
 }

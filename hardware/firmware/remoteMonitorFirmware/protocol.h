@@ -39,7 +39,7 @@ typedef struct __attribute__((packed)) {
 typedef struct __attribute__((packed)) {
 	packetType_t type;
 	uint8_t requestSequence;
-	uint8_t DataSequence;
+	uint8_t dataSequence;
 	uint16_t sampleCount;
 	int64_t powerData;
 	#ifdef EXTENDED_DATA_PACKET
@@ -51,7 +51,7 @@ typedef struct __attribute__((packed)) {
 
 typedef struct __attribute__((packed)) {
 	packetType_t type;
-	uint8_t ackSequence;;
+	uint8_t dataSequence;;
 } dataAckPacket_t;
 
 
