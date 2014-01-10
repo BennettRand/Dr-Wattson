@@ -6,6 +6,7 @@ int8_t connectedBaseStation = -1;
 	
 static NWK_DataReq_t nwkPacket;
 static connectionRequestPacket_t connReqPacket;
+static uint16_t current_PAN;
 
 void packetTxConf(NWK_DataReq_t *req);
 
@@ -37,6 +38,10 @@ void removeBaseStation(int8_t num) {
 // station with the lowest RSSI is replaced. If the same network with a different
 // name is detected, the old network name is replaced with the new one from the packet.
 void processBaconPacket(NWK_DataInd_t *packet) {
+	// First check that this packet is the right size of be a bacon packet
+	if (packet->size != sizeof(baconPacket_t))
+		return; // Packet is the wrong size, ignore it.
+
 	baconPacket_t *bacon = (baconPacket_t*)(packet->data);
 	int8_t rssi_min = 0;
 	int8_t rssi_min_pos = -1;
@@ -69,8 +74,13 @@ void processBaconPacket(NWK_DataInd_t *packet) {
 }
 
 bool processConnectionAck(NWK_DataInd_t *packet) {
+	// First check that this packet is the right size of be a connectionAck packet
+	if (packet->size != sizeof(connectionAckPacket_t))
+		return false; // Packet is the wrong size, ignore it.
+
 	for (int8_t count = 0; count < baseStationListLength; count++) {
-		if (packet->srcAddr == baseStationList[count].addr) {
+		if ((current_PAN == baseStationList[count].PAN_ID) && 
+		    (packet->srcAddr == baseStationList[count].addr)) {
 			// Found the source base station in our list
 			connectedBaseStation = count;
 			return true;
@@ -83,6 +93,7 @@ bool processConnectionAck(NWK_DataInd_t *packet) {
 
 void sendConnectionRequest(int8_t num, struct calibData *cal) {
 	connectedBaseStation = -1; // -1 Indicates that we are not connected to a network
+	current_PAN = baseStationList[num].PAN_ID;
 
 	connReqPacket.type = connectionRequest;
 	connReqPacket.channel1VoltageScaling = cal->channel1VoltageScaling;
