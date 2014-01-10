@@ -14,14 +14,13 @@
 #include "basestation.h"
 
 static NWK_DataReq_t txPacket;
+struct calibData unitCal = {1, 2, 3, 4, 5};
 uint8_t uart_tx_buf[200];
 uint8_t uart_rx_buf[200];
-extern struct baseStation baseStationList[BASESTATION_LIST_SIZE];
-extern int8_t baseStationListLength;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter" // Ignore the unused parameter warning here, the function has to have this prototype.
-static void packetTxConf(NWK_DataReq_t *req) {
+void packetTxConf(NWK_DataReq_t *req) {
 	// We don't really care about if a packet was received or not
 	// But we have to have a function here, because the library does not
 	// handle null function pointers for the confirm callback.
@@ -38,6 +37,10 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 			printf("   Addr: %u\n   PAN ID: %u\n   rssi: %d\n", baseStationList[cnt].addr, baseStationList[cnt].PAN_ID, baseStationList[cnt].rssi);
 		}
 		printf("\n");
+		break;
+	case connectionAck:
+		if (processConnectionAck(ind))
+			printf("Connected to network: %d\n", connectedBaseStation);
 		break;
 	default:
 		break;
@@ -72,5 +75,13 @@ int main(void) {
 
 	while (1) {
 		SYS_TaskHandler();
+
+		if (uart_received_bytes() != 0) {
+			uint8_t data_byte = uart_rx_byte() - '0';
+			if (data_byte < BASESTATION_LIST_SIZE) {
+				sendConnectionRequest(data_byte, &unitCal);
+				printf("Connecting to network %u\n", data_byte);
+			}
+		}
 	}
 }
