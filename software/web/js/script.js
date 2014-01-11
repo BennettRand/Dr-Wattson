@@ -18,7 +18,7 @@ function appendDevice(name, id)
 	theDiv.appendChild(text);
 	
 	link.setAttribute("href", "javascript:void(0)");
-	link.setAttribute("onClick", "detailsFor("+id.toString()+");");
+	link.setAttribute("onClick", "detailsFor("+id.toString()+", "+id.toString()+");");
 	
 	theDiv.setAttribute("class","device");
 	
@@ -27,10 +27,22 @@ function appendDevice(name, id)
 	text.appendChild(document.createTextNode(placeholder));
 }
 
-function detailsFor(id)
+function closeDetails()
 {
+	devices.style.height = "90%";
+	details.style.height = "0";
+}
+
+function openDetails()
+{
+	devices.style.height = "50%";
 	details.style.height = "50%";
-	console.log(id);
+}
+
+function detailsFor(name, id)
+{
+	closeDetails();
+	setTimeout("openDetails();",250);
 	return;
 }
 
