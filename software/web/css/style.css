@@ -70,11 +70,13 @@ a
 .left
 {
 	float:left;
+	padding-right: 3px;
 }
 
 .right
 {
 	float:right;
+	padding-left: 3px;
 }
 
 .device
@@ -88,6 +90,15 @@ a
 .device *
 {
 	margin: 2px;
+}
+
+.bgChart
+{
+	z-index: -1;
+	width: 99%;
+	height: 75%;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 /*font-family: 'Michroma', sans-serif;
