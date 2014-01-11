@@ -1,0 +1,95 @@
+*
+*
+G04 PADS 9.3.1 Build Number: 456998 generated Gerber (RS-274-X) file*
+G04 PC Version=2.1*
+*
+%IN "remoteMonitor.pcb"*%
+*
+%MOIN*%
+*
+%FSLAX35Y35*%
+*
+*
+*
+*
+G04 PC Standard Apertures*
+*
+*
+G04 Thermal Relief Aperture macro.*
+%AMTER*
+1,1,$1,0,0*
+1,0,$1-$2,0,0*
+21,0,$3,$4,0,0,45*
+21,0,$3,$4,0,0,135*
+%
+*
+*
+G04 Annular Aperture macro.*
+%AMANN*
+1,1,$1,0,0*
+1,0,$2,0,0*
+%
+*
+*
+G04 Odd Aperture macro.*
+%AMODD*
+1,1,$1,0,0*
+1,0,$1-0.005,0,0*
+%
+*
+*
+G04 PC Custom Aperture Macros*
+*
+*
+*
+*
+*
+*
+G04 PC Aperture Table*
+*
+%ADD010C,0.001*%
+%ADD018R,0.038X0.03*%
+%ADD038R,0.03X0.038*%
+*
+*
+*
+*
+G04 PC Circuitry*
+G04 Layer Name remoteMonitor.pcb - circuitry*
+%LPD*%
+*
+*
+G04 PC Custom Flashes*
+G04 Layer Name remoteMonitor.pcb - flashes*
+%LPD*%
+*
+*
+G04 PC Circuitry*
+G04 Layer Name remoteMonitor.pcb - circuitry*
+%LPD*%
+*
+G54D10*
+G54D18*
+G01X233400Y493500D03*
+X239600D03*
+X207900Y466500D03*
+X214100D03*
+X187900D03*
+X194100D03*
+X362600Y510000D03*
+X356400D03*
+X362600Y520500D03*
+X356400D03*
+X362600Y530500D03*
+X356400D03*
+G54D38*
+X218500Y480100D03*
+Y473900D03*
+Y487900D03*
+Y494100D03*
+X232500Y477400D03*
+Y483600D03*
+X241500D03*
+Y477400D03*
+X0Y0D02*
+M02*
