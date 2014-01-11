@@ -62,7 +62,15 @@ function detailsFor(name, id)
 
 function powerFor(id)
 {
-	return [];
+	var start = id;
+	var arr = [];
+	for (var x = 0; x<200; x++)
+	{
+		arr.push(start);
+		start += ((Math.random()*0.5)-0.25);
+	}
+	
+	return arr;
 }
 
 for (var i=0;i<dList.length;i++)
@@ -70,24 +78,31 @@ for (var i=0;i<dList.length;i++)
 	appendDevice(dList[i].name,dList[i].id);
 }
 
-graphs = document.getElementsByClassName("bgChart");
-
-//console.log($(".bgChart"));
+graphs = $(".bgChart");
 
 function drawCharts()
 {
 	for (i=0; i<graphs.length; i+=1)
 	{
-		$(graphs[i]).sparkline([5,6,7,9,9,5,3,2,2,4,6,7], {
-		width: '100%',
+		$(graphs[i]).sparkline(powerFor(dList[i].id),
+		{width: '100%',
 		height: '100%',
 		type: 'line',
-		spotColor: undefined,
-		minSpotColor: undefined,
-		maxSpotColor: undefined,
-		highlightSpotColor: undefined,
-		highlightLineColor: undefined});
+		lineColor: '#bbb',
+		fillColor: '#ddd',
+		spotColor: false,
+		minSpotColor: false,
+		maxSpotColor: false,
+		highlightSpotColor: false,
+		highlightLineColor: '#888',
+		chartRangeMin: 0,
+		chartRangeMax: 10,
+		chartRangeClip: true,
+		normalRangeColor: '#c0c0c0',
+		drawNormalOnTop: false});
 	}
 }
 
 drawCharts();
+
+setInterval(drawCharts,1000);
