@@ -36,6 +36,11 @@ a
 	top: 0px;
 }
 
+#title-bar h3
+{
+	font-weight: normal;
+}
+
 #devices
 {
 	height: 90%;
@@ -121,7 +126,10 @@ a
 {
 }
 
-
+#dateTime
+{
+	text-align:right;
+}
 
 /*font-family: 'Michroma', sans-serif;
 font-family: 'Open Sans', sans-serif;

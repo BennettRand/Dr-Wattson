@@ -12,7 +12,23 @@
 	</head>
 	<body>
 		<div id="title-bar">
-			<h1>Dr. Wattson</h1>
+			<div class="third">
+				<h1>Dr. Wattson</h1>
+			</div>
+			<div class="third">
+				<div class="third">
+					<h3 class="left" id="totalPower">Power:</h3>
+				</div>
+				<div class="third">
+					<h3 class="left" id="totalCurrent">Current:</h3>
+				</div>
+				<div class="third">
+					<h3 class="left" id="averageVoltage">Voltage:</h3>
+				</div>
+			</div>
+			<div class="third">
+				<h2 id="dateTime"></h2>
+			</div>
 		</div>
 		<div id="devices"></div>
 		<div id="details">
@@ -21,9 +37,9 @@
 				<a href = "javascript:void(0)" onClick = "closeDetails();"><h4 class = "right">X</h4></a>
 			</div>
 			<div style = "height:100%;">
-				<div class="third" id="voltGraph">a</div>
-				<div class="third" id="currentGraph">b</div>
-				<div class="third" id="powerGraph">c</div>
+				<div class="third" id="voltGraph"></div>
+				<div class="third" id="currentGraph"></div>
+				<div class="third" id="powerGraph"></div
 				
 			</div>
 		</div>

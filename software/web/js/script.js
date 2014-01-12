@@ -73,6 +73,15 @@ function powerFor(id)
 	return arr;
 }
 
+function getTotals()
+{
+	var v = 120+((Math.random()*2)-1);
+	var i = ((Math.random()*100));
+	var p = v*i;
+	
+	return {voltage:v,power:p,current:i};
+}
+
 for (var i=0;i<dList.length;i++)
 {
 	appendDevice(dList[i].name,dList[i].id);
@@ -103,6 +112,48 @@ function drawCharts()
 	}
 }
 
-drawCharts();
+var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
-setInterval(drawCharts,1000);
+function clockTick()
+{
+	var d=new Date();
+	var timeString = days[d.getDay()]+" ";
+	timeString += months[d.getMonth()]+" ";
+	timeString += d.getDate().toString()+" ";
+	timeString += d.getFullYear().toString()+" ";
+	
+	var currentHour = d.getHours()%12;
+	if (currentHour == 0){currentHour = 12;}
+	timeString += (currentHour%12).toString()+":";
+	
+	if(d.getMinutes() < 10){timeString += "0"+d.getMinutes().toString()+":";}
+	else{timeString += d.getMinutes().toString()+":";}
+	
+	if(d.getSeconds() < 10){timeString += "0"+d.getSeconds().toString()+" ";}
+	else{timeString += d.getSeconds().toString()+" ";}
+	
+	if(d.getHours() < 12){timeString += "AM";}
+	else{timeString += "PM";}
+	
+	$("#dateTime")[0].innerHTML = timeString;
+}
+
+function powerCounts()
+{
+	var tPower = getTotals();
+	
+	$("#averageVoltage")[0].innerHTML = "Voltage: "+(Math.round(tPower.voltage * 100) / 100).toString()+" V";
+	
+	$("#totalCurrent")[0].innerHTML = "Current: "+Math.round(tPower.current).toString()+" A";
+	
+	$("#totalPower")[0].innerHTML = "Power: "+Math.round(tPower.power).toString()+" W";
+}
+
+powerCounts();
+drawCharts();
+clockTick();
+
+setInterval(clockTick,1000);
+setInterval(powerCounts,1000);
+// setInterval(drawCharts,1000);
