@@ -1,6 +1,8 @@
 var devices = document.getElementById("devices");
 var details = document.getElementById("details");
 
+var detailsPlot = 0;
+
 dList =	[{"name":"Foo","id":1},
 		{"name":"Bar","id":2},
 		{"name":"Baz","id":3},
@@ -54,10 +56,66 @@ function openDetails(name,id)
 	document.getElementById("devMAC").innerHTML = "MAC: "+id.toString();
 }
 
+function getDetailsFor(id)
+{
+	var vStart = 120;
+	var iStart = 0;
+	
+	var vArr = [];
+	var pArr = [];
+	var iArr = [];
+	for (var x = 0; x<200; x++)
+	{
+		vArr.push([x,vStart]);
+		iArr.push([x,iStart]);
+		pArr.push([x,(iStart*vStart)]);
+		
+		vStart += ((Math.random()*0.5)-0.25);
+		iStart += ((Math.random()*0.5)-0.25);
+		if (vStart < 0){start = 0;}
+		if (iStart < 0){start = 0;}
+	}
+	
+	return [vArr,iArr,pArr];
+}
+
 function detailsFor(name, id)
 {
 	closeDetails();
 	setTimeout("openDetails(\""+name+"\","+id.toString()+");",250);
+	
+	$("#chartArea")[0].innerHTML =  '';
+	
+	detailsPlot = $.jqplot('chartArea', getDetailsFor(id),
+	{
+	title:'Power Data For '+name,
+	// Set default options on all series, turn on smoothing.
+	seriesDefaults: {
+		rendererOptions: {
+			smooth: true
+		}
+	},
+	// Series options are specified as an array of objects, one object
+	// for each series.
+	series:[
+		{
+			// Change our line width and use a diamond shaped marker.
+			lineWidth:2,
+			markerOptions: { style:'dimaond' }
+		},
+		{
+			// Don't show a line, just show markers.
+			// Make the markers 7 pixels with an 'x' style
+			showLine:false,
+			markerOptions: { size: 7, style:"x" }
+		},
+		{
+			// Use (open) circlular markers.
+			markerOptions: { style:"circle" }
+		}
+	]
+	});
+	
 }
 
 function powerFor(id)
