@@ -118,7 +118,8 @@ int main(void) {
 	SYS_Init(); // Init Atmel Lightweight Mesh stack
 
 	SYS_TaskHandler(); // Call the system task handler once before we configure the radio
-	NWK_SetAddr(boot_signature_byte_get(0x0100) | (((uint16_t)boot_signature_byte_get(0x0101)) << 8)); // Set network address based upon the MAC address
+	//NWK_SetAddr(boot_signature_byte_get(0x0100) | (((uint16_t)boot_signature_byte_get(0x0101)) << 8)); // Set network address based upon the MAC address
+	NWK_SetAddr(4);
 	NWK_SetPanId(0); // Default PAN ID will be 0, can be changed using the set PAN command
 	PHY_SetChannel(APP_CHANNEL);
 	//NWK_SetSecurityKey(APP_SECURITY_KEY);
@@ -126,28 +127,39 @@ int main(void) {
 	NWK_OpenEndpoint(APP_ENDPOINT, rfReceivePacket);
 	PHY_SetTxPower(0);
 
-	uart_init_port(uart_baud_38400, uart_tx_buf, 200, uart_rx_buf, 200); // Init uart
+	//uart_init_port(uart_baud_38400, uart_tx_buf, 200, uart_rx_buf, 200); // Init uart
 
 	// Configure onboard LED as output
-	DDRB |= 1<<4;
-	PORTB |= 1<<4;
+	//DDRB |= 1<<4;
+	//PORTB |= 1<<4;
 
 	// Configure analog switch for antenna
-	DDRG |= 1<<1;
-	DDRF |= 1<<2;
-	PORTG |= 1<<1;
-	PORTF &= ~(1<<2);
-
+	//DDRG |= 1<<1;
+	//DDRF |= 1<<2;
+	//PORTG |= 1<<1;
+	//PORTF &= ~(1<<2);
+	uint16_t cnt = 0;
 	while (1) {
 		SYS_TaskHandler();
+		if (cnt == 1000) {
+			nwkPacket.dstAddr = 1;
+			nwkPacket.dstEndpoint = APP_ENDPOINT;
+			nwkPacket.srcEndpoint = APP_ENDPOINT;
+			nwkPacket.data = "Hello World";
+			nwkPacket.size = 11;
+			nwkPacket.confirm = packetTxConf;
+			NWK_DataReq(&nwkPacket);
+			cnt = 0;
+		}
+		cnt = cnt+1;
 
-		if (uart_received_bytes() != 0) {
+	/*	if (uart_received_bytes() != 0) {
 			uint8_t data_byte = uart_rx_byte() - '0';
 			if (data_byte < BASESTATION_LIST_SIZE) {
 				sendConnectionRequest(data_byte, &unitCal);
 				printf("Connecting to network %u\n", data_byte);
 			}
-		}
+		}*/
 
 		_delay_ms(1);
 	}
