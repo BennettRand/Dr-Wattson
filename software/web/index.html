@@ -6,13 +6,31 @@
 		<link href='css/style.css' rel='stylesheet' type='text/css'/>
 		<script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
 		<script type="text/javascript" src="js/jquery.sparkline.min.js"></script>
-		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
-		<script type="text/javascript">google.load("visualization", "1", {packages:["corechart"]});</script>
+		<script type="text/javascript" src="jqplot/jquery.jqplot.min.js"></script>
+		<script type="text/javascript" src="jqplot/plugins/jqplot.canvasTextRenderer.min.js"></script>
+		<script type="text/javascript" src="jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="jqplot/jquery.jqplot.min.css" />
 		<title>UI</title>
 	</head>
 	<body>
 		<div id="title-bar">
-			<h1>Dr. Wattson</h1>
+			<div class="third">
+				<h1>Dr. Wattson</h1>
+			</div>
+			<div class="third">
+				<div class="third">
+					<h3 class="left" id="totalPower">Power:</h3>
+				</div>
+				<div class="third">
+					<h3 class="left" id="totalCurrent">Current:</h3>
+				</div>
+				<div class="third">
+					<h3 class="left" id="averageVoltage">Voltage:</h3>
+				</div>
+			</div>
+			<div class="third">
+				<h2 id="dateTime"></h2>
+			</div>
 		</div>
 		<div id="devices"></div>
 		<div id="details">
@@ -20,11 +38,7 @@
 				<h2 class = "left">Details</h2><div class = "left"><h4 id="devName"></h4><h4 id="devMAC"></div></h4>
 				<a href = "javascript:void(0)" onClick = "closeDetails();"><h4 class = "right">X</h4></a>
 			</div>
-			<div style = "height:100%;">
-				<div class="third" id="voltGraph">a</div>
-				<div class="third" id="currentGraph">b</div>
-				<div class="third" id="powerGraph">c</div>
-				
+			<div id = "chartArea" style = "height:100%;">
 			</div>
 		</div>
 		<script type="text/javascript" src="js/script.js"></script>
