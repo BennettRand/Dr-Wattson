@@ -127,6 +127,34 @@ int main(void) {
 	NWK_OpenEndpoint(APP_ENDPOINT, rfReceivePacket);
 	PHY_SetTxPower(0);
 
+	// Configure the ADC
+	SPCR = (1<<SPE) | (1<<MSTR) | (1<<CPHA);
+	PORTB |= 1;
+	DDRB |= 0b111;
+
+	PORTB &= ~(1);
+	_delay_us(4);
+	SPDR = 0x0A; // Send stop
+	_delay_us(4);
+	PORTB |= 1;
+	_delay_us(4);
+	PORTB &= ~(1);
+	_delay_us(4);
+	SPDR = 0x11; // Stop continous read mode
+	_delay_us(4);
+	PORTB |= 1;
+	_delay_us(4);
+	PORTB &= ~(1);
+	_delay_us(4);
+	SPDR = 0b00100000; // Read reg 0
+	_delay_us(4);
+	SPDR = 0b00000000;
+	_delay_us(4);
+	SPDR = 0;
+	_delay_us(4);
+	PORTB |= 1;
+
+
 	//uart_init_port(uart_baud_38400, uart_tx_buf, 200, uart_rx_buf, 200); // Init uart
 
 	// Configure onboard LED as output
@@ -138,6 +166,14 @@ int main(void) {
 	//DDRF |= 1<<2;
 	//PORTG |= 1<<1;
 	//PORTF &= ~(1<<2);
+	uint8_t value = SPDR;
+	nwkPacket.dstAddr = 1;
+	nwkPacket.dstEndpoint = APP_ENDPOINT;
+	nwkPacket.srcEndpoint = APP_ENDPOINT;
+	nwkPacket.data = &value;
+	nwkPacket.size = 1;
+	nwkPacket.confirm = packetTxConf;
+	NWK_DataReq(&nwkPacket);
 	uint16_t cnt = 0;
 	while (1) {
 		SYS_TaskHandler();
