@@ -100,10 +100,25 @@ a
 	margin-left: 0;
 }
 
-canvas
+.third
 {
-	padding:0;
-	margin: 0;
+	float:left;
+	width:33%;
+	height: 100%;
+}
+
+#voltGraph
+{
+	border-right: 1px solid black;
+}
+
+#currentGraph
+{
+	border-right: 1px solid black;
+}
+
+#powerGraph
+{
 }
 
 
