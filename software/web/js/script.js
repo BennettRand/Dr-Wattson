@@ -1,5 +1,5 @@
-var devices = document.getElementById("devices");
-var details = document.getElementById("details");
+var devices = $("#devices")[0];//document.getElementById("devices");
+var details = $("#details")[0];//document.getElementById("details");
 
 var detailsPlot = 0;
 
@@ -52,8 +52,8 @@ function openDetails(name,id)
 {
 	devices.style.height = "50%";
 	details.style.height = "50%";
-	document.getElementById("devName").innerHTML = "Device: "+name;
-	document.getElementById("devMAC").innerHTML = "MAC: "+id.toString();
+	$("#devName")[0].innerHTML = "Device: "+name;
+	$("#devMAC")[0].innerHTML = "MAC: "+id.toString();
 }
 
 function getDetailsFor(id)
