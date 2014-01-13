@@ -3,6 +3,11 @@ var details = $("#details")[0];//document.getElementById("details");
 
 var detailsPlot = 0;
 
+$.jqplot.config.defaultHeight = ($(window).height()/2)-50;
+
+var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
 dList =	[{"name":"Foo","id":1},
 		{"name":"Bar","id":2},
 		{"name":"Baz","id":3},
@@ -56,6 +61,25 @@ function openDetails(name,id)
 	$("#devMAC")[0].innerHTML = "MAC: "+id.toString();
 }
 
+function dateToStr(d)
+{
+	timeString = (d.getMonth()+1).toString()+" ";
+	timeString += d.getDate().toString()+" ";
+	timeString += d.getFullYear().toString()+" ";
+	
+	var currentHour = d.getHours()%12;
+	if (currentHour == 0){currentHour = 12;}
+	timeString += (currentHour%12).toString()+":";
+	
+	if(d.getMinutes() < 10){timeString += "0"+d.getMinutes().toString()+":";}
+	else{timeString += d.getMinutes().toString()+":";}
+	
+	if(d.getSeconds() < 10){timeString += "0"+d.getSeconds().toString()+" ";}
+	else{timeString += d.getSeconds().toString()+" ";}
+	
+	return timeString;
+}
+
 function getDetailsFor(id)
 {
 	var vStart = 120;
@@ -64,7 +88,8 @@ function getDetailsFor(id)
 	var vArr = [];
 	var pArr = [];
 	var iArr = [];
-	for (var x = 0; x<200; x++)
+	var start = Date.now();
+	for (var x = start - 3600000; x<start; x+=18000)
 	{
 		vArr.push([x,vStart]);
 		iArr.push([x,iStart]);
@@ -72,8 +97,8 @@ function getDetailsFor(id)
 		
 		vStart += ((Math.random()*0.5)-0.25);
 		iStart += ((Math.random()*0.5)-0.25);
-		if (vStart < 0){start = 0;}
-		if (iStart < 0){start = 0;}
+		if (vStart < 0){vStart = 0;}
+		if (iStart < 0){iStart = 0;}
 	}
 	
 	return [vArr,iArr,pArr];
@@ -93,27 +118,72 @@ function detailsFor(name, id)
 	seriesDefaults: {
 		rendererOptions: {
 			smooth: true
-		}
+		},
+		markerOptions: { 
+			lineWidth:2,
+			size:0
+		},
+		shadow:false
 	},
 	// Series options are specified as an array of objects, one object
 	// for each series.
 	series:[
 		{
 			// Change our line width and use a diamond shaped marker.
-			lineWidth:2,
-			markerOptions: { style:'dimaond' }
+			label:"Voltage",
+			yaxis:"yaxis"
 		},
 		{
 			// Don't show a line, just show markers.
 			// Make the markers 7 pixels with an 'x' style
-			showLine:false,
-			markerOptions: { size: 7, style:"x" }
+			label:"Current",
+			yaxis:"y2axis"
 		},
 		{
 			// Use (open) circlular markers.
-			markerOptions: { style:"circle" }
+			label:"Power",
+			yaxis:"y3axis"
 		}
-	]
+	],
+	legend:{
+		show:true,
+		location:'nw'
+	},
+	axesDefaults: {
+		useSeriesColor:true,
+		rendererOptions: {
+			alignTicks: true
+		},
+		shadow:false
+	},
+	axes: {
+		xaxis: {
+			label:'Time',
+			padMin:0,
+			padMax:0,
+			renderer:$.jqplot.DateAxisRenderer,
+			tickOptions:{
+				formatString:'%#m-%#d\n%I:%M:%S %p'
+			}
+		},
+		yaxis: {
+			label:'V'
+		},
+		y2axis: {
+			label:'A',
+			min:0
+		},
+		y3axis: {
+			label:'W',
+			min:0
+		}
+	},
+	highlighter: {
+		show: true,
+		sizeAdjust: 7.5,
+		tooltipFormatString:'%.2f',
+		tooltipAxes: 'y'
+	}
 	});
 	
 }
@@ -169,9 +239,6 @@ function drawCharts()
 		drawNormalOnTop: false});
 	}
 }
-
-var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
 function clockTick()
 {
