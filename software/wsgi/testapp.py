@@ -21,8 +21,8 @@ def get_data(id):
 		
 		v_start += (random.random()*.5)-.25
 		i_start += (random.random()*.5)-.25
-		v_start = if v_start<0 then 0 else v_start
-		i_start = if i_start<0 then 0 else i_start
+		v_start = 0 if v_start < 0 else v_start
+		i_start = 0 if i_start < 0 else i_start
 		
 	return [v_arr,i_arr,p_arr]
 
