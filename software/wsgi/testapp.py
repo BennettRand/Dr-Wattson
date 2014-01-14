@@ -29,9 +29,12 @@ def get_data(id):
 def application(environ, start_response):
 	status = '200 OK'
 	
-	data = get_data(0)
-	
-	output = json.dumps(data)
+	if environ['PATH_INFO'] == "/detail":
+		data = get_data(0)
+		output = json.dumps(data)
+		
+	else:
+		output = json.dumps(environ, skipkeys=True)
 	
 	response_headers = [('Content-type', 'application/json'),
 						('Content-Length', str(len(output)))]
