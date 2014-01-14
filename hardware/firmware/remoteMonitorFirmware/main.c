@@ -28,8 +28,6 @@ uint16_t linePeriod;
 #endif
 
 struct calibData unitCal = {1, 2, 3, 4, 5};
-uint8_t uart_tx_buf[200];
-uint8_t uart_rx_buf[200];
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter" // Ignore the unused parameter warning here, the function has to have this prototype.
@@ -91,15 +89,9 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 	switch ((packetType_t) (ind->data[0])) {
 	case bacon:
 		processBaconPacket(ind);
-		for (int8_t cnt = 0; cnt < baseStationListLength; cnt++) {
-			printf("%u %16s\n", cnt, baseStationList[cnt].name);
-			printf("   Addr: %u\n   PAN ID: %u\n   rssi: %d\n", baseStationList[cnt].addr, baseStationList[cnt].PAN_ID, baseStationList[cnt].rssi);
-		}
-		printf("\n");
 		break;
 	case connectionAck:
-		if (processConnectionAck(ind))
-			printf("Connected to network: %d\n", connectedBaseStation);
+		processConnectionAck(ind);
 		break;
 	case dataRequest:
 		handleDataRequest(ind);
@@ -133,29 +125,44 @@ int main(void) {
 	DDRB |= 0b111;
 
 	PORTB &= ~(1);
-	_delay_us(4);
+	_delay_us(10);
 	SPDR = 0x0A; // Send stop
-	_delay_us(4);
+	_delay_us(10);
 	PORTB |= 1;
+	
 	_delay_us(4);
+	
 	PORTB &= ~(1);
-	_delay_us(4);
+	_delay_us(10);
 	SPDR = 0x11; // Stop continous read mode
-	_delay_us(4);
+	_delay_us(10);
 	PORTB |= 1;
+	
 	_delay_us(4);
+	
 	PORTB &= ~(1);
+	_delay_us(10);
+	SPDR = 0b01000000 | 0x05; // Read reg 5
+	_delay_us(10);
+	SPDR = 7;
+	_delay_us(10);
+	SPDR = 0x10;
 	_delay_us(4);
-	SPDR = 0b00100000; // Read reg 0
+	SPDR = 0x90;
 	_delay_us(4);
-	SPDR = 0b00000000;
+	SPDR = 0x90;
 	_delay_us(4);
-	SPDR = 0;
+	SPDR = 0x90;
+	_delay_us(4);
+	SPDR = 0x90;
+	_delay_us(4);
+	SPDR = 0x90;
+	_delay_us(4);
+	SPDR = 0x90;
+	_delay_us(4);
+	SPDR = 0x90;
 	_delay_us(4);
 	PORTB |= 1;
-
-
-	//uart_init_port(uart_baud_38400, uart_tx_buf, 200, uart_rx_buf, 200); // Init uart
 
 	// Configure onboard LED as output
 	//DDRB |= 1<<4;
@@ -166,23 +173,71 @@ int main(void) {
 	//DDRF |= 1<<2;
 	//PORTG |= 1<<1;
 	//PORTF &= ~(1<<2);
-	uint8_t value = SPDR;
-	nwkPacket.dstAddr = 1;
-	nwkPacket.dstEndpoint = APP_ENDPOINT;
-	nwkPacket.srcEndpoint = APP_ENDPOINT;
-	nwkPacket.data = &value;
-	nwkPacket.size = 1;
-	nwkPacket.confirm = packetTxConf;
-	NWK_DataReq(&nwkPacket);
+	int16_t value;
 	uint16_t cnt = 0;
 	while (1) {
 		SYS_TaskHandler();
-		if (cnt == 1000) {
+		if (cnt == 100) {
+
+		PORTB &= ~(1);
+		_delay_us(10);
+		SPDR = 0x08; // Send start
+		_delay_us(10);
+		PORTB |= 1;
+
+		while (PINB & (1<<4)); // Wait for data to be ready
+		
+		PORTB &= ~(1);
+		_delay_us(10);
+		SPDR = 0x12; // Send RDATA command
+		_delay_us(10);
+		SPDR = 0;
+		_delay_us(4);
+		SPDR = 0;
+		_delay_us(4);
+		SPDR = 0;
+		_delay_us(4);
+		SPDR = 0;
+		_delay_us(4);
+		value = ((int16_t)SPDR)<<8;
+		SPDR = 0;
+		_delay_us(4);
+		value |= (int16_t)SPDR;
+		SPDR = 0;
+		_delay_us(4);
+		SPDR = 0;
+		_delay_us(4);
+		SPDR = 0;
+		_delay_us(4);
+		SPDR = 0;
+		_delay_us(4);
+		SPDR = 0;
+		_delay_us(4);
+		SPDR = 0;
+		_delay_us(4);
+		SPDR = 0;
+		_delay_us(4);
+		SPDR = 0;
+		_delay_us(4);
+		SPDR = 0;
+		_delay_us(4);
+		SPDR = 0;
+		_delay_us(4);
+		SPDR = 0;
+		_delay_us(4);
+		SPDR = 0;
+		_delay_us(4);
+		SPDR = 0;
+		_delay_us(4);
+		SPDR = 0;
+		_delay_us(4);
+		PORTB |= 1;
+
 			nwkPacket.dstAddr = 1;
 			nwkPacket.dstEndpoint = APP_ENDPOINT;
 			nwkPacket.srcEndpoint = APP_ENDPOINT;
-			nwkPacket.data = "Hello World";
-			nwkPacket.size = 11;
+			nwkPacket.data = &value;
+			nwkPacket.size = 2;
 			nwkPacket.confirm = packetTxConf;
 			NWK_DataReq(&nwkPacket);
 			cnt = 0;
