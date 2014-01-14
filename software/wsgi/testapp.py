@@ -34,7 +34,7 @@ def application(environ, start_response):
 		output = json.dumps(data)
 		
 	else:
-		output = json.dumps(environ, skipkeys=True)
+		output = json.dumps(environ, skipkeys=True, default=lambda obj: 'N/A')
 	
 	response_headers = [('Content-type', 'application/json'),
 						('Content-Length', str(len(output)))]
