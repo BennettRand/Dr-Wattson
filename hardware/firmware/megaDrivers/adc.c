@@ -12,6 +12,7 @@ static uint8_t *out_data_pntr;
 static uint8_t out_data_count = 0;
 static uint8_t *in_data_pntr;
 static uint8_t in_data_count = 0;
+static void (*complete_callback)(void);
 
 static uint8_t current_data_byte = 0;
 
@@ -30,12 +31,17 @@ ISR(SPI_STC_vect) {
 		PORTB |= 1;
 		_delay_us(1); // Enforce CS high pulse length
 		spi_busy = false;
+		if (complete_callback != 0)
+			complete_callback();
 	}
 }
 //----------------------------------------------------------------------------
 
 static uint8_t regCommand[22]; // Defined this way so that regCommand and regValue are contiguous
 static uint8_t *regValue = &(regCommand[2]);
+
+static uint8_t sample_data_buffer[19];
+struct adc_data_packet adc_data_sample;
 
 void initADC() {
 	// Configure IO port
@@ -57,6 +63,7 @@ void writeRegister(uint8_t address, uint8_t value) {
 	out_data_count = 3;
 	in_data_count = 0;
 	current_data_byte = 0;
+	complete_callback = 0;
 
 	PORTB &= 1;
 	SPDR = regCommand[0];
@@ -75,6 +82,7 @@ void writeRegisters(uint8_t address, uint8_t *data, uint8_t count) {
 	out_data_count = 2 + count;
 	in_data_count = 0;
 	current_data_byte = 0;
+	complete_callback = 0;
 
 	PORTB &= 1;
 	SPDR = regCommand[0];
@@ -93,6 +101,7 @@ void startReadRegister(uint8_t address) {
 	in_data_pntr = regCommand;
 	in_data_count = 3;
 	current_data_byte = 0;
+	complete_callback = 0;
 
 	PORTB &= 1;
 	SPDR = regCommand[0];
@@ -115,6 +124,7 @@ void startReadRegisters(uint8_t address, uint8_t count) {
 	in_data_pntr = regCommand;
 	in_data_count = count + 2;
 	current_data_byte = 0;
+	complete_callback = 0;
 
 	PORTB &= 1;
 	SPDR = regCommand[0];
@@ -136,6 +146,7 @@ void sendCommand(uint8_t command) {
 	out_data_count = 1;
 	in_data_count = 0;
 	current_data_byte = 0;
+	complete_callback = 0;
 
 	PORTB &= ~(1); // Assert CS
 	SPDR = command;

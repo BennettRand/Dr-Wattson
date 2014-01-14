@@ -16,6 +16,20 @@
 #define CMD_RDATAC  (0x10)
 #define CMD_SDATAC  (0x11)
 
+struct adc_data_packet {
+	uint32_t status;
+	int16_t channel1;
+	int16_t channel2;
+	int16_t channel3;
+	int16_t channel4;
+	int16_t channel5;
+	int16_t channel6;
+	int16_t channel7;
+	int16_t channel8;
+};
+
+extern struct adc_data_packet adc_data_sample;
+
 void initADC(); // Initializes IO and SPI peripherals for ADC communication
 void writeRegister(uint8_t address, uint8_t value);
 void writeRegisters(uint8_t address, uint8_t *data, uint8_t count);

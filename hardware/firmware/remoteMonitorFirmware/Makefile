@@ -48,6 +48,7 @@ SRCS += \
   main.c \
   basestation.c \
   ../megaDrivers/uart.c \
+  ../megaDrivers/adc.c \
   $(STACK_PATH)/hal/atmega256rfr2/src/hal.c \
   $(STACK_PATH)/hal/atmega256rfr2/src/halTimer.c \
   $(STACK_PATH)/phy/atmega256rfr2/src/phy.c \
