@@ -36,7 +36,7 @@ function appendDevice(name, id)
 	//theDiv.appendChild(text);
 	
 	link.setAttribute("href", "javascript:void(0)");
-	link.setAttribute("onClick", "detailsFor(\""+name+"\", "+id.toString()+");");
+	link.setAttribute("onClick", "getDetailsFor(\""+name+"\", "+id.toString()+");");
 	
 	theDiv.setAttribute("class","device");
 	
@@ -80,38 +80,14 @@ function dateToStr(d)
 	return timeString;
 }
 
-function getDetailsFor(id)
-{
-	var vStart = 120;
-	var iStart = 0;
-	
-	var vArr = [];
-	var pArr = [];
-	var iArr = [];
-	var start = Date.now();
-	for (var x = start - 3600000; x<start; x+=18000)
-	{
-		vArr.push([x,vStart]);
-		iArr.push([x,iStart]);
-		pArr.push([x,(iStart*vStart)]);
-		
-		vStart += ((Math.random()*0.5)-0.25);
-		iStart += ((Math.random()*0.5)-0.25);
-		if (vStart < 0){vStart = 0;}
-		if (iStart < 0){iStart = 0;}
-	}
-	
-	return [vArr,iArr,pArr];
-}
-
-function detailsFor(name, id)
+function detailsFor(name, id, arr)
 {
 	closeDetails();
 	setTimeout("openDetails(\""+name+"\","+id.toString()+");",250);
 	
 	$("#chartArea")[0].innerHTML =  '';
 	
-	detailsPlot = $.jqplot('chartArea', getDetailsFor(id),
+	detailsPlot = $.jqplot('chartArea', arr,
 	{
 	title:'Power Data For '+name,
 	// Set default options on all series, turn on smoothing.
@@ -186,6 +162,15 @@ function detailsFor(name, id)
 	}
 	});
 	
+}
+
+function getDetailsFor(name, id)
+{
+	$.getJSON("/testapp",{id:id}, function(data){
+		
+		detailsFor(name, id, data);
+		
+	});
 }
 
 function powerFor(id)
