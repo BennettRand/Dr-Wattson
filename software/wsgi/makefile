@@ -1,4 +1,7 @@
-default: copy
+default: pull copy
+
+pull:
+	git pull
 
 copy:
-	cp -fuv *.py /var/www/wsgi/
+	sudo cp -fuv *.py /var/www/wsgi/
