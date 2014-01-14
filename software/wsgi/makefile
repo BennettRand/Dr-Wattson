@@ -7,4 +7,4 @@ copy:
 	sudo cp -fuv *.py /var/www/testapp/wsgi/
 
 copy-web:
-	sudo cp -fuv ../web/* /var/www
+	sudo cp -fuvr ../web/* /var/www
