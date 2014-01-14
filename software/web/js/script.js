@@ -166,7 +166,7 @@ function detailsFor(name, id, arr)
 
 function getDetailsFor(name, id)
 {
-	$.getJSON("/testapp",{id:id}, function(data){
+	$.getJSON("/testapp/detail",{id:id}, function(data){
 		
 		detailsFor(name, id, data);
 		
