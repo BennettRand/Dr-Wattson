@@ -1,6 +1,7 @@
 import json
 import random
 import time
+import psycopg2
 
 def get_data(id):
 	
@@ -25,6 +26,23 @@ def get_data(id):
 		i_start = 0 if i_start < 0 else i_start
 		
 	return [v_arr,i_arr,p_arr]
+	
+def get_devices()
+	devs = [{"name":"Foo","id":1},{"name":"Bar","id":2}]
+	
+	query = "SELECT (mac,name) FROM device;"
+	
+	conn = psycopg2.connect(database = 'wattson', host = 'localhost', user = 'root', password = 'means swim of stream')
+	cur = conn.cursor()
+	
+	cur.execute(query)
+	
+	devs = cur.fetchall()
+	
+	cur.close()
+	conn.close()
+	
+	return devs
 
 def application(environ, start_response):
 	status = '200 OK'
