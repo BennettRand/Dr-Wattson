@@ -4,7 +4,7 @@ pull:
 	git pull
 
 copy:
-	sudo cp -fuv *.py /var/www/wsgi/
+	sudo cp -fuv *.py /var/www/testapp/wsgi/
 
 copy-web:
 	sudo cp -fuv ../web/* /var/www
