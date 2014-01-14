@@ -2,7 +2,7 @@ import json
 import random
 import time
 
-def get_data(id)
+def get_data(id):
 	
 	v_start = 120
 	i_start = 0
