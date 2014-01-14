@@ -11,7 +11,7 @@ def get_data(id):
 	i_arr = []
 	p_arr = []
 	
-	start = time.time()
+	start = int(time.time())
 	
 	for i in xrange(start, start+3600000, 18000):
 		
