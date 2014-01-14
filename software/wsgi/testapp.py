@@ -2,7 +2,7 @@ import json
 
 def application(environ, start_response):
 	status = '200 OK'
-	output = environ
+	output = json.dumps(environ)
 	
 	response_headers = [('Content-type', 'application/json'),
 						('Content-Length', str(len(output)))]
