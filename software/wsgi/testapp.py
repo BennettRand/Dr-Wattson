@@ -27,7 +27,7 @@ def get_data(id):
 		
 	return [v_arr,i_arr,p_arr]
 	
-def get_devices()
+def get_devices():
 	devs = [{"name":"Foo","id":1},{"name":"Bar","id":2}]
 	
 	query = "SELECT (mac,name) FROM device;"
