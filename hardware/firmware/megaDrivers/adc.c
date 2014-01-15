@@ -7,33 +7,25 @@
 #define CMD_WREG    (0x40)
 
 //------------ SPI Interrupt Communication Variables and ISR -----------------
-static bool spi_busy;
-static uint8_t *out_data_pntr;
-static uint8_t out_data_count = 0;
-static uint8_t *in_data_pntr;
-static uint8_t in_data_count = 0;
-static void (*complete_callback)(void);
-
+static volatile bool spi_busy;
+static volatile uint8_t spi_out_data[25];
+static volatile uint8_t spi_in_data[25];
+static volatile uint8_t spi_byte_count = 0;
+static uint8_t *spi_rx_ptr = spi_in_data;
+static uint8_t *spi_tx_ptr = spi_out_data;
 static uint8_t current_data_byte = 0;
 
 // SPI transmit complete interrupt
-ISR(SPI_STC_vect) {
-	current_data_byte++;
-
-	if (in_data_count >= current_data_byte)
-		in_data_pntr[current_data_byte-1] = SPDR;
-
-	if (out_data_count > current_data_byte)
-		SPDR = out_data_pntr[current_data_byte];
-	else if (in_data_count > current_data_byte) // if all data has been shifted out but there is more to shift in.
-		SPDR = 0;
+ISR(SPI_STC_vect, ISR_NAKED) {
+	PORTE = 1;
+	spi_in_data[current_data_byte++] = SPDR;
+	if (spi_byte_count > current_data_byte)
+		SPDR = spi_out_data[current_data_byte];
 	else {
 		PORTB |= 1;
-		_delay_us(1); // Enforce CS high pulse length
 		spi_busy = false;
-		if (complete_callback != 0)
-			complete_callback();
 	}
+	PORTE = 0;
 }
 //----------------------------------------------------------------------------
 
@@ -48,92 +40,83 @@ void initADC() {
 	PORTB |= 1;
 	DDRB |= 0b111;
 
+	DDRE = 1;
+
 	// Configure ISP port
-	SPCR = (1<<SPE) | (1<<MSTR) | (1<<CPHA);
+	SPCR = (1<<SPIE) | (1<<SPE) | (1<<MSTR) | (1<<CPHA);
+	SPSR |= (1<<SPI2X);
 }
 
 void writeRegister(uint8_t address, uint8_t value) {
-	while (spi_busy)
+	while (spi_busy);
 	spi_busy = true; // Take control of the port
 
-	regCommand[0] = CMD_WREG | (address & 0x1F);
-	regCommand[1] = 0;
-	regValue[0] = value;
-	out_data_pntr = regCommand;
-	out_data_count = 3;
-	in_data_count = 0;
+	spi_out_data[0] = CMD_WREG | (address & 0x1F);
+	spi_out_data[1] = 0;
+	spi_out_data[2] = value;
+	spi_byte_count = 3;
 	current_data_byte = 0;
-	complete_callback = 0;
 
-	PORTB &= 1;
-	SPDR = regCommand[0];
+	PORTB &= ~1;
+	SPDR = spi_out_data[0];
 
 	return;
 }
 
 void writeRegisters(uint8_t address, uint8_t *data, uint8_t count) {
-	while (spi_busy)
+	while (spi_busy);
 	spi_busy = true; // Take control of the port
 
-	regCommand[0] = CMD_WREG | (address & 0x1F);
-	regCommand[1] = count - 1;
-	memcpy(regValue, data, count);
-	out_data_pntr = regCommand;
-	out_data_count = 2 + count;
-	in_data_count = 0;
+	spi_out_data[0] = CMD_WREG | (address & 0x1F);
+	spi_out_data[1] = count - 1;
+	memcpy(spi_out_data + 2, data, count);
+	spi_byte_count = 2 + count;
 	current_data_byte = 0;
-	complete_callback = 0;
 
-	PORTB &= 1;
-	SPDR = regCommand[0];
+	PORTB &= ~1;
+	SPDR = spi_out_data[0];
 
 	return;
 }
 
 void startReadRegister(uint8_t address) {
-	while (spi_busy)
+	while (spi_busy);
 	spi_busy = true; // Take control of the port
 
-	regCommand[0] = CMD_RREG | (address & 0x1F);
-	regCommand[1] = 0;
-	out_data_pntr = regCommand;
-	out_data_count = 2;
-	in_data_pntr = regCommand;
-	in_data_count = 3;
+	spi_out_data[0] = CMD_RREG | (address & 0x1F);
+	spi_out_data[1] = 0;
+	spi_out_data[2] = 0;
+	spi_byte_count = 3;
 	current_data_byte = 0;
-	complete_callback = 0;
 
-	PORTB &= 1;
-	SPDR = regCommand[0];
+	PORTB &= ~1;
+	SPDR = spi_out_data[0];
 
 	return;
 }
 
 uint8_t getReadRegister() {
-	return regValue[0];
+	return spi_in_data[2];
 }
 
 void startReadRegisters(uint8_t address, uint8_t count) {
-	while (spi_busy)
+	while (spi_busy);
 	spi_busy = true; // Take control of the port
 
-	regCommand[0] = CMD_RREG | (address & 0x1F);
-	regCommand[1] = count - 1;
-	out_data_pntr = regCommand;
-	out_data_count = 2;
-	in_data_pntr = regCommand;
-	in_data_count = count + 2;
+	spi_out_data[0] = CMD_RREG | (address & 0x1F);
+	spi_out_data[1] = count - 1;
+	memset(spi_out_data+2, 0, count);
+	spi_byte_count = count + 2;
 	current_data_byte = 0;
-	complete_callback = 0;
 
-	PORTB &= 1;
-	SPDR = regCommand[0];
+	PORTB &= ~1;
+	SPDR = spi_out_data[0];
 
 	return;
 }
 
 void getReadRegisters(uint8_t count, uint8_t *data) {
-	memcpy(data, regValue, count);
+	memcpy(data, spi_in_data+2, count);
 	return;
 }
 
@@ -143,10 +126,8 @@ void sendCommand(uint8_t command) {
 	spi_busy = true; // Take control of the port
 
 	// Configure SPI transmit variables
-	out_data_count = 1;
-	in_data_count = 0;
+	spi_byte_count = 1;
 	current_data_byte = 0;
-	complete_callback = 0;
 
 	PORTB &= ~(1); // Assert CS
 	SPDR = command;
@@ -154,4 +135,21 @@ void sendCommand(uint8_t command) {
 	// Leave the interrupts to do the rest
 	return;
 }
+
+void readData() {
+	while (spi_busy);
+	spi_busy = true; // Take control of the port
+
+	// Configure SPI transmit variables
+	memset(spi_out_data, 0, 20);
+	spi_byte_count = 11;
+	current_data_byte = 0;
+
+	PORTB &= ~(1); // Assert CS
+	SPDR = CMD_RDATA;
+
+	// Leave the interrupts to do the rest
+	return;
+}
+
 

@@ -38,5 +38,6 @@ uint8_t getReadRegister();
 void startReadRegisters(uint8_t address, uint8_t count);
 void getReadRegisters(uint8_t count, uint8_t *data); // Retrieves read register data from input buffer
 void sendCommand(uint8_t command);
+void readData();
 
 #endif //ADC_H

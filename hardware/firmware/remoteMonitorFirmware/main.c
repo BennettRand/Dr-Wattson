@@ -12,6 +12,7 @@
 #include "uart.h"
 #include "protocol.h"
 #include "basestation.h"
+#include "adc.h"
 
 static NWK_DataReq_t nwkPacket;
 
@@ -107,66 +108,35 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 }
 
 int main(void) {
-	SYS_Init(); // Init Atmel Lightweight Mesh stack
-
-	SYS_TaskHandler(); // Call the system task handler once before we configure the radio
-	//NWK_SetAddr(boot_signature_byte_get(0x0100) | (((uint16_t)boot_signature_byte_get(0x0101)) << 8)); // Set network address based upon the MAC address
-	NWK_SetAddr(4);
-	NWK_SetPanId(0); // Default PAN ID will be 0, can be changed using the set PAN command
-	PHY_SetChannel(APP_CHANNEL);
-	//NWK_SetSecurityKey(APP_SECURITY_KEY);
-	PHY_SetRxState(true);
-	NWK_OpenEndpoint(APP_ENDPOINT, rfReceivePacket);
-	PHY_SetTxPower(0);
+//	SYS_Init(); // Init Atmel Lightweight Mesh stack
+//
+//	SYS_TaskHandler(); // Call the system task handler once before we configure the radio
+//	//NWK_SetAddr(boot_signature_byte_get(0x0100) | (((uint16_t)boot_signature_byte_get(0x0101)) << 8)); // Set network address based upon the MAC address
+//	NWK_SetAddr(4);
+//	NWK_SetPanId(0); // Default PAN ID will be 0, can be changed using the set PAN command
+//	PHY_SetChannel(APP_CHANNEL);
+//	//NWK_SetSecurityKey(APP_SECURITY_KEY);
+//	PHY_SetRxState(true);
+//	NWK_OpenEndpoint(APP_ENDPOINT, rfReceivePacket);
+//	PHY_SetTxPower(0);
 
 	// Configure the ADC
-	SPCR = (1<<SPE) | (1<<MSTR) | (1<<CPHA);
-	PORTB |= 1;
-	DDRB |= 0b111;
+	initADC();
+	sei();
+	sendCommand(CMD_STOP);
+	sendCommand(CMD_SDATAC);
 
-	PORTB &= ~(1);
-	_delay_us(10);
-	SPDR = 0x0A; // Send stop
-	_delay_us(10);
-	PORTB |= 1;
-	
-	_delay_us(4);
-	
-	PORTB &= ~(1);
-	_delay_us(10);
-	SPDR = 0x11; // Stop continous read mode
-	_delay_us(10);
-	PORTB |= 1;
-	
-	_delay_us(4);
-	
-	PORTB &= ~(1);
-	_delay_us(10);
-	SPDR = 0b01000000 | 0x05; // Read reg 5
-	_delay_us(10);
-	SPDR = 7;
-	_delay_us(10);
-	SPDR = 0x10;
-	_delay_us(4);
-	SPDR = 0x90;
-	_delay_us(4);
-	SPDR = 0x90;
-	_delay_us(4);
-	SPDR = 0x90;
-	_delay_us(4);
-	SPDR = 0x90;
-	_delay_us(4);
-	SPDR = 0x90;
-	_delay_us(4);
-	SPDR = 0x90;
-	_delay_us(4);
-	SPDR = 0x90;
-	_delay_us(4);
-	PORTB |= 1;
+	uint8_t registers[] = {0x10, 0x10, 0x10, 0x10, 0x10, 0x90, 0x90, 0x90};
+	writeRegisters(0x05, registers, 8);
+	startReadRegisters(0x05, 8);
 
-	// Configure onboard LED as output
-	//DDRB |= 1<<4;
-	//PORTB |= 1<<4;
+	sendCommand(CMD_START);
+	while(PINB & (1<<4));
+	readData();
+	while(1) {
+	while(PINB & (1<<4));
+	readData();
+	}
 
 	// Configure analog switch for antenna
 	//DDRG |= 1<<1;
@@ -177,62 +147,7 @@ int main(void) {
 	uint16_t cnt = 0;
 	while (1) {
 		SYS_TaskHandler();
-		if (cnt == 100) {
-
-		PORTB &= ~(1);
-		_delay_us(10);
-		SPDR = 0x08; // Send start
-		_delay_us(10);
-		PORTB |= 1;
-
-		while (PINB & (1<<4)); // Wait for data to be ready
-		
-		PORTB &= ~(1);
-		_delay_us(10);
-		SPDR = 0x12; // Send RDATA command
-		_delay_us(10);
-		SPDR = 0;
-		_delay_us(4);
-		SPDR = 0;
-		_delay_us(4);
-		SPDR = 0;
-		_delay_us(4);
-		SPDR = 0;
-		_delay_us(4);
-		value = ((int16_t)SPDR)<<8;
-		SPDR = 0;
-		_delay_us(4);
-		value |= (int16_t)SPDR;
-		SPDR = 0;
-		_delay_us(4);
-		SPDR = 0;
-		_delay_us(4);
-		SPDR = 0;
-		_delay_us(4);
-		SPDR = 0;
-		_delay_us(4);
-		SPDR = 0;
-		_delay_us(4);
-		SPDR = 0;
-		_delay_us(4);
-		SPDR = 0;
-		_delay_us(4);
-		SPDR = 0;
-		_delay_us(4);
-		SPDR = 0;
-		_delay_us(4);
-		SPDR = 0;
-		_delay_us(4);
-		SPDR = 0;
-		_delay_us(4);
-		SPDR = 0;
-		_delay_us(4);
-		SPDR = 0;
-		_delay_us(4);
-		SPDR = 0;
-		_delay_us(4);
-		PORTB |= 1;
-
+/*
 			nwkPacket.dstAddr = 1;
 			nwkPacket.dstEndpoint = APP_ENDPOINT;
 			nwkPacket.srcEndpoint = APP_ENDPOINT;
@@ -243,7 +158,7 @@ int main(void) {
 			cnt = 0;
 		}
 		cnt = cnt+1;
-
+*/
 	/*	if (uart_received_bytes() != 0) {
 			uint8_t data_byte = uart_rx_byte() - '0';
 			if (data_byte < BASESTATION_LIST_SIZE) {
