@@ -1,0 +1,9 @@
+{
+	"beacon_p":"=BH16s",
+	"conn_req_p":"=BHHHHH",
+	"conn_ack_p": "=B",
+	"data_req_p": "=BB",
+	"data_p": "=BBBHq",
+	"data_e_p": "=BBBHqHQQ",
+	"data_ack_p": "=BB"
+}
