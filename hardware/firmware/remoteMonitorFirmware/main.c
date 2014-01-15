@@ -127,15 +127,16 @@ int main(void) {
 	sendCommand(CMD_SDATAC);
 
 	uint8_t registers[] = {0x10, 0x10, 0x10, 0x10, 0x10, 0x90, 0x90, 0x90};
+	writeRegister(0x05,0x10);
 	writeRegisters(0x05, registers, 8);
-	startReadRegisters(0x05, 8);
+	readRegisters(0x05, registers, 8);
 
 	sendCommand(CMD_START);
 	while(PINB & (1<<4));
-	readData();
+	//readData();
 	while(1) {
 	while(PINB & (1<<4));
-	readData();
+	//readData();
 	}
 
 	// Configure analog switch for antenna

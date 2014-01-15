@@ -16,28 +16,12 @@
 #define CMD_RDATAC  (0x10)
 #define CMD_SDATAC  (0x11)
 
-struct adc_data_packet {
-	uint32_t status;
-	int16_t channel1;
-	int16_t channel2;
-	int16_t channel3;
-	int16_t channel4;
-	int16_t channel5;
-	int16_t channel6;
-	int16_t channel7;
-	int16_t channel8;
-};
-
-extern struct adc_data_packet adc_data_sample;
-
 void initADC(); // Initializes IO and SPI peripherals for ADC communication
 void writeRegister(uint8_t address, uint8_t value);
 void writeRegisters(uint8_t address, uint8_t *data, uint8_t count);
-void startReadRegister(uint8_t address);
-uint8_t getReadRegister();
-void startReadRegisters(uint8_t address, uint8_t count);
-void getReadRegisters(uint8_t count, uint8_t *data); // Retrieves read register data from input buffer
+uint8_t readRegister(uint8_t address);
+void readRegisters(uint8_t address, uint8_t *data, uint8_t count);
 void sendCommand(uint8_t command);
-void readData();
+void readData(int16_t *data, uint8_t channelCount);
 
 #endif //ADC_H
