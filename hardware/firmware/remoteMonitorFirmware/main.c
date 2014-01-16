@@ -14,6 +14,8 @@
 #include "basestation.h"
 #include "adc.h"
 
+uint8_t uart_tx_buf[100];
+uint8_t uart_rx_buf[100];
 static NWK_DataReq_t nwkPacket;
 
 static dataPacket_t dataPacket = {.type = data};
@@ -119,24 +121,33 @@ int main(void) {
 //	PHY_SetRxState(true);
 //	NWK_OpenEndpoint(APP_ENDPOINT, rfReceivePacket);
 //	PHY_SetTxPower(0);
+	uart_init_port(uart_baud_115200, uart_tx_buf, 100, uart_rx_buf, 100); // Init uart
 
 	// Configure the ADC
+	int16_t sample_data[8];
 	initADC();
 	sei();
 	sendCommand(CMD_STOP);
 	sendCommand(CMD_SDATAC);
-
 	uint8_t registers[] = {0x10, 0x10, 0x10, 0x10, 0x10, 0x90, 0x90, 0x90};
-	writeRegister(0x05,0x10);
 	writeRegisters(0x05, registers, 8);
+	_delay_us(10);
 	readRegisters(0x05, registers, 8);
 
 	sendCommand(CMD_START);
-	while(PINB & (1<<4));
-	//readData();
+//	sendCommand(CMD_RDATAC);
+//	while(PINB & (1<<4));
+//	readData(sample_data,4);
+	uint16_t cnt = 0;
 	while(1) {
-	while(PINB & (1<<4));
-	//readData();
+		while(PINB & (1<<4));
+		readData(sample_data,4);
+		if (cnt == 1000) {
+			printf("%d, %d, %d, %d\n", sample_data[0], sample_data[1], sample_data[2], sample_data[3]);
+			cnt = 0;
+		}
+		cnt++;
+		
 	}
 
 	// Configure analog switch for antenna
@@ -145,7 +156,6 @@ int main(void) {
 	//PORTG |= 1<<1;
 	//PORTF &= ~(1<<2);
 	int16_t value;
-	uint16_t cnt = 0;
 	while (1) {
 		SYS_TaskHandler();
 /*
