@@ -18,6 +18,6 @@ extern uint16_t linePeriod[2];
 
 void initDataAck();
 void stopDataAck();
-void StartDataAck();
+void startDataAck();
 
 #endif //DATA_ACK_H

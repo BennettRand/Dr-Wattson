@@ -33,6 +33,8 @@ ISR(PCINT0_vect) { // Data ready triggered
 	newCurrentSum[0] += (int64_t)(((int32_t)(adcSampleData[2] - deviceCalibration.channel1VoltageOffset) * (int32_t)(adcSampleData[2] - deviceCalibration.channel1VoltageOffset)));
 	newCurrentSum[1] += (int64_t)(((int32_t)(adcSampleData[3] - deviceCalibration.channel2VoltageOffset) * (int32_t)(adcSampleData[3] - deviceCalibration.channel2VoltageOffset)));
 	#endif
+	
+	PCIFR = (1<<PCIF0); // Need to clear the pin change interrupt flag as we leave to clear out the rising edge interrupt on drdy.
 }
 
 ISR(INT0_vect) {
@@ -67,21 +69,22 @@ void initDataAck() {
 	PCMSK0 = 1<<4;
 
 	// Configure zero cross interrupt
-	EICRA |= (1<<ISC01) | (1<<ISC00);
+//	EICRA |= (1<<ISC01) | (1<<ISC00);
+	DDRE |= 1<<2;
 }
 
 void stopDataAck() {
-	EIMSK &= ~1;
+//	EIMSK &= ~1;
 	PCICR &= ~1;
 	sendCommand(CMD_STOP);
 	sendCommand(CMD_SDATAC);
 }
 
 
-void StartDataAck() {
+void startDataAck() {
 	sendCommand(CMD_START);
 	sendCommand(CMD_RDATAC);
-	EIMSK |= 1;
+//	EIMSK |= 1;
 	PCICR |= 1;
 }
 
