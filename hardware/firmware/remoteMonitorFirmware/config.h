@@ -12,11 +12,17 @@
 
 struct calibData {
 	uint16_t channel1VoltageScaling;
+	int16_t channel1VoltageOffset;
 	uint16_t channel1CurrentScaling;
+	int16_t channel1CurrentOffset;
 	uint16_t channel2VoltageScaling;
+	int16_t channel2VoltageOffset;
 	uint16_t channel2CurrentScaling;
+	int16_t channel2CurrentOffset;
 	uint16_t linePeriodScalingFactor;
 };
+
+extern struct calibData deviceCalibration;
 
 #define BASESTATION_LIST_SIZE               8
 
