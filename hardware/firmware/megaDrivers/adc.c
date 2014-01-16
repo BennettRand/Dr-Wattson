@@ -101,7 +101,6 @@ void readData(int16_t *data, uint8_t channelCount) {
 	uint8_t *end_pntr = sample_data_buffer + 3 + (channelCount<<1);
 	
 	PORTB &= ~1;
-	cli();
 	if (!contRead) { // If we are not in continuous read mode, then we need to send read command
 		SPDR = CMD_RDATA;
 		while (!(SPSR & (1<<SPIF)));
@@ -114,9 +113,20 @@ void readData(int16_t *data, uint8_t channelCount) {
 		_delay_loop_1(1);
 	} while (cur_pntr < end_pntr);
 	_delay_loop_2(8); // Need to wait 2us after last falling edge before bringing CS high
-	sei();
 	PORTB |= 1;
-	for (uint8_t cnt = 0; cnt < channelCount; cnt++)
-		data[cnt] = (((int16_t)sample_data_buffer[3+(cnt<<1)])<<8) | (int16_t)(sample_data_buffer[4+(cnt<<1)]);
+	
+	switch (channelCount) {
+	case 8: data[7] = (((int16_t)sample_data_buffer[17])<<8) | (int16_t)(sample_data_buffer[18]);
+	case 7: data[6] = (((int16_t)sample_data_buffer[15])<<8) | (int16_t)(sample_data_buffer[16]);
+	case 6: data[5] = (((int16_t)sample_data_buffer[13])<<8) | (int16_t)(sample_data_buffer[14]);
+	case 5: data[4] = (((int16_t)sample_data_buffer[11])<<8) | (int16_t)(sample_data_buffer[12]);
+	case 4: data[3] = (((int16_t)sample_data_buffer[9])<<8) | (int16_t)(sample_data_buffer[10]);
+	case 3: data[2] = (((int16_t)sample_data_buffer[7])<<8) | (int16_t)(sample_data_buffer[8]);
+	case 2: data[1] = (((int16_t)sample_data_buffer[5])<<8) | (int16_t)(sample_data_buffer[6]);
+	case 1: data[0] = (((int16_t)sample_data_buffer[3])<<8) | (int16_t)(sample_data_buffer[4]);
+	}
+
+	//for (uint8_t cnt = 0; cnt < channelCount; cnt++)
+	//	data[cnt] = (((int16_t)sample_data_buffer[3+(cnt<<1)])<<8) | (int16_t)(sample_data_buffer[4+(cnt<<1)]);
 }
 
