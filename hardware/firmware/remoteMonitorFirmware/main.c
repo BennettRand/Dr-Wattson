@@ -100,39 +100,43 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 	return true;
 }
 
-int main(void) {
-	SYS_Init(); // Init Atmel Lightweight Mesh stack
-
-	SYS_TaskHandler(); // Call the system task handler once before we configure the radio
-	//NWK_SetAddr(boot_signature_byte_get(0x0100) | (((uint16_t)boot_signature_byte_get(0x0101)) << 8)); // Set network address based upon the MAC address
-	NWK_SetAddr(4);
-	NWK_SetPanId(0); // Default PAN ID will be 0, can be changed using the set PAN command
-	PHY_SetChannel(APP_CHANNEL);
-	//NWK_SetSecurityKey(APP_SECURITY_KEY);
-	PHY_SetRxState(true);
-	NWK_OpenEndpoint(APP_ENDPOINT, rfReceivePacket);
-	PHY_SetTxPower(0);
-	uart_init_port(uart_baud_115200, uart_tx_buf, 100, uart_rx_buf, 100); // Init uart
-
 	uint16_t counter = 0;
+int main(void) {
+//	SYS_Init(); // Init Atmel Lightweight Mesh stack
+
+//	SYS_TaskHandler(); // Call the system task handler once before we configure the radio
+//	//NWK_SetAddr(boot_signature_byte_get(0x0100) | (((uint16_t)boot_signature_byte_get(0x0101)) << 8)); // Set network address based upon the MAC address
+//	NWK_SetAddr(4);
+//	NWK_SetPanId(0); // Default PAN ID will be 0, can be changed using the set PAN command
+//	PHY_SetChannel(APP_CHANNEL);
+//	//NWK_SetSecurityKey(APP_SECURITY_KEY);
+//	PHY_SetRxState(true);
+//	NWK_OpenEndpoint(APP_ENDPOINT, rfReceivePacket);
+//	PHY_SetTxPower(0);
+	uart_init_port(uart_baud_115200, uart_tx_buf, 100, uart_rx_buf, 100); // Init uart
+	initDataAck();
+	sei();
+	startDataAck();
+
 
 	while (1) {
-		SYS_TaskHandler();
-
+//		SYS_TaskHandler();
+/*
 		if (counter == 1000) {
 			printf("Power 1: %lld, Power2: %lld\n", powerSum[0], powerSum[1]);
 			counter = 0;
 		}
 		counter = counter+1;
-
-		if (uart_received_bytes() != 0) {
+*/
+/*		if (uart_received_bytes() != 0) {
 			uint8_t data_byte = uart_rx_byte() - '0';
 			if (data_byte < BASESTATION_LIST_SIZE) {
 				sendConnectionRequest(data_byte, &deviceCalibration);
 				printf("Connecting to network %u\n", data_byte);
 			}
 		}
-
+*/
+//	EIMSK |= 1;
 		_delay_ms(1);
 	}
 }

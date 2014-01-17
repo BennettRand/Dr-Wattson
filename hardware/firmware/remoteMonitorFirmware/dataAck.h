@@ -7,7 +7,7 @@
 #include "adc.h"
 #include "config.h"
 
-extern uint16_t sampleCount;
+extern uint32_t sampleCount;
 extern int64_t powerSum[2];
 
 #ifdef EXTENDED_DATA_PACKET
