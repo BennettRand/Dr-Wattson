@@ -10,6 +10,8 @@
 #include <stdio.h>
 #endif
 
+#include "config.h"
+
 /* These values are only correct for a 16Mhz oscillator*/
 typedef enum {
 	uart_baud_2400 = 832,

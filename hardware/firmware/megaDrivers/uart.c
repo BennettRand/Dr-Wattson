@@ -23,37 +23,37 @@ static uint16_t rx_buffer_start;    /**< Beginning position of data in the recei
 static uint16_t rx_buffer_end;	    /**< Ending position of data in the receive buffer */
 static bool currently_transmitting; /**< True if the port is currently transmitting, set false when the buffer is emptied */
 
-ISR(USART1_TX_vect) {
+ISR(USART_TX_vect) {
 	if (tx_buffer_start != tx_buffer_end) {
 		/* There is actually data to send, so increment the start position and send that byte. Make sure to handle wrap arounds*/ 
 		currently_transmitting = true; 
-		UDR1 = tx_buffer[tx_buffer_start];      /* write the data into the output buffer */ 
+		USART_UDR = tx_buffer[tx_buffer_start];      /* write the data into the output buffer */ 
 		tx_buffer_start = (tx_buffer_start+1)%tx_buffer_size; 
         }
 	else 
 		currently_transmitting = false; 
 } 
 
-ISR(USART1_RX_vect) { 
+ISR(USART_RX_vect) { 
 	/* Check if the buffer is full, if it is, then throw out the oldest data by incrementing rx_buffer_start */ 
 	if (((rx_buffer_start != 0) && (rx_buffer_end == rx_buffer_start-1)) || ((rx_buffer_start == 0) && (rx_buffer_end == rx_buffer_size-1))) { 
 		/* There is not enough room, so make so space */ 
 		rx_buffer_start = ((rx_buffer_start+1) % rx_buffer_size); 
 	} 
 	/* Now that we have space, copy the byte into the buffer and increment the end */ 
-	rx_buffer[rx_buffer_end] = UDR1; 
+	rx_buffer[rx_buffer_end] = USART_UDR; 
 	rx_buffer_end = ((rx_buffer_end+1) % rx_buffer_size); 
 } 
 
 void uart_init_port(uart_baud_t baud_rate, void *tx_buf, uint16_t tx_buf_len, void *rx_buf, uint16_t rx_buf_len) {
-	DDRD |= (1<<3);
-	DDRD &= ~(1<<2);
-	PORTD &= ~(1<<2);
+	DDRE |= (1<<1);
+	DDRE &= ~(1<<0);
+	PORTE &= ~(1<<0);
 
-	UBRR1 = baud_rate;
-	UCSR1A |= (1<<U2X1);
-	UCSR1B |= (1<<RXCIE1) | (1<<TXCIE1) | (1<<RXEN1) | (1<<TXEN1);
-	UCSR1C |= (1<<UCSZ10) | (1<<UCSZ11);
+	USART_UBRR = baud_rate;
+	USART_UCSRA |= (1<<U2X1);
+	USART_UCSRB |= (1<<RXCIE1) | (1<<TXCIE1) | (1<<RXEN1) | (1<<TXEN1);
+	USART_UCSRC |= (1<<UCSZ10) | (1<<UCSZ11);
 
 	tx_buffer = tx_buf;
 	tx_buffer_size = tx_buf_len;
@@ -103,7 +103,7 @@ int uart_tx_data(void *data, uint16_t data_length) {
 
 	// If we were not in the middle of transmittind data, then we should start of the transmit by putting the first byte into the output buffer
 	if (currently_transmitting == false) {
-		UDR1 = tx_buffer[tx_buffer_start];
+		USART_UDR = tx_buffer[tx_buffer_start];
 		tx_buffer_start = ((tx_buffer_start + 1) % tx_buffer_size);
 		currently_transmitting = true;
 	}

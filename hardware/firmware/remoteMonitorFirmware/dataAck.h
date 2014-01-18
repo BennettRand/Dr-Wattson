@@ -13,7 +13,7 @@ extern int64_t powerSum[2];
 #ifdef EXTENDED_DATA_PACKET
 extern int64_t voltageSum[2];
 extern int64_t currentSum[2];
-extern uint16_t linePeriod[2];
+extern uint16_t linePeriod;
 #endif
 
 void initDataAck();

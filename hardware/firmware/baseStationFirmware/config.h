@@ -8,6 +8,14 @@
  * the application program as well.
  */
 
+#define USART_TX_vect USART1_TX_vect
+#define USART_RX_vect USART1_RX_vect
+#define USART_UDR     UDR1
+#define USART_UBRR    UBRR1
+#define USART_UCSRA   UCSR1A
+#define USART_UCSRB   UCSR1B
+#define USART_UCSRC   UCSR1C
+
 #define APP_ENDPOINT              1
 #define APP_FLUSH_TIMER_INTERVAL  20
 

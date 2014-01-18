@@ -2,6 +2,7 @@
 #define PROTOCOL_H
 
 #include <stdint.h>
+#include "config.h"
 
 typedef enum __attribute__((packed)) {
 	bacon = 0,
