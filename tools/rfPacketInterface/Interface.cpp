@@ -92,7 +92,6 @@ void Widget::dataReceived()
             on_tableView_clicked(tableModel.index(tableModel.rowCount(QModelIndex())-1,4));
         }
 
-
         if (ui->autoRespCheckBox->isChecked())
         {
             txHeader_t txPacketHeader;
@@ -102,6 +101,12 @@ void Widget::dataReceived()
             port->write((char*)(&txPacketHeader), sizeof(txPacketHeader));
             port->write("Got message: ", 13);
             port->write(data);
+        }
+
+        if ((ui->autoAckDataCheckbox->isChecked()) && (data[0] == 4) && (data.length() == sizeof(dataPacket_t))) {
+            dataPacket_t *pkt = (dataPacket_t*)data.data();
+            ui->dataAckSeqNumber->setValue(pkt->dataSequence);
+            ui->sendDataAck->clicked();
         }
     }
 }

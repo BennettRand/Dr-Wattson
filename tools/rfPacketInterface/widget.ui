@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>938</width>
-    <height>659</height>
+    <height>646</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -504,7 +504,7 @@
         </property>
        </spacer>
       </item>
-      <item row="10" column="1">
+      <item row="11" column="1">
        <spacer name="verticalSpacer_2">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -541,10 +541,24 @@
         </property>
        </widget>
       </item>
+      <item row="3" column="2">
+       <widget class="QPushButton" name="sendConnectionAck">
+        <property name="text">
+         <string>Send</string>
+        </property>
+       </widget>
+      </item>
       <item row="4" column="0" colspan="3">
        <widget class="Line" name="line_5">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0" colspan="2">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Data Ack:</string>
         </property>
        </widget>
       </item>
@@ -555,19 +569,8 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="2">
-       <widget class="QPushButton" name="sendConnectionAck">
-        <property name="text">
-         <string>Send</string>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="0" colspan="2">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Data Ack:</string>
-        </property>
-       </widget>
+      <item row="9" column="1">
+       <widget class="QSpinBox" name="dataAckSeqNumber"/>
       </item>
       <item row="6" column="1">
        <widget class="QSpinBox" name="dataReqSeqNumber">
@@ -583,13 +586,17 @@
         </property>
        </widget>
       </item>
-      <item row="9" column="1">
-       <widget class="QSpinBox" name="dataAckSeqNumber"/>
-      </item>
       <item row="9" column="2">
        <widget class="QPushButton" name="sendDataAck">
         <property name="text">
          <string>Send</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="1" colspan="2">
+       <widget class="QCheckBox" name="autoAckDataCheckbox">
+        <property name="text">
+         <string>Auto Ack Data</string>
         </property>
        </widget>
       </item>
