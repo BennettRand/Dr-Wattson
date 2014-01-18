@@ -25,6 +25,7 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const;
     void addData(rxHeader_t header, QByteArray data, QDateTime time);
     void encodingChanged(enum dataEncoding encoding);
+    QByteArray getRawData(int row);
 
 signals:
 

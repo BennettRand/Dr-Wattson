@@ -10,8 +10,11 @@
 
 #include <string.h>
 
+#define EXTENDED_DATA_PACKET
+
 #include "protocol.h"
 #include "packettablemodel.h"
+#include "../../hardware/firmware/remoteMonitorFirmware/protocol.h"
 
 namespace Ui {
 class Widget;
@@ -33,6 +36,8 @@ private slots:
     void on_transmitButton_clicked();
 
     void on_rxASCIIButton_toggled(bool checked);
+    void on_tableView_clicked(const QModelIndex &index);
+
 private:
     Ui::Widget *ui;
     QSerialPort *port;

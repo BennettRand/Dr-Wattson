@@ -15,6 +15,11 @@ void PacketTableModel::addData(rxHeader_t header, QByteArray data, QDateTime tim
     endInsertRows();
 }
 
+QByteArray PacketTableModel::getRawData(int row)
+{
+    return data_list.at(row);
+}
+
 void PacketTableModel::encodingChanged(enum dataEncoding encoding)
 {
     currentEncoding = encoding;

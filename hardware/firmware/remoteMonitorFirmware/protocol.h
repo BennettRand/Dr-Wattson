@@ -1,8 +1,11 @@
-#ifndef PROTOCOL_H
-#define PROTOCOL_H
+#ifndef PROTOCOL_COMM_H
+#define PROTOCOL_COMM_H
 
 #include <stdint.h>
+
+#ifdef __AVR__
 #include "config.h"
+#endif
 
 typedef enum __attribute__((packed)) {
 	bacon = 0,
@@ -52,8 +55,8 @@ typedef struct __attribute__((packed)) {
 
 typedef struct __attribute__((packed)) {
 	packetType_t type;
-	uint8_t dataSequence;;
+    uint8_t dataSequence;
 } dataAckPacket_t;
 
 
-#endif //PROTOCOL_H
+#endif //PROTOCOL_COMM_H

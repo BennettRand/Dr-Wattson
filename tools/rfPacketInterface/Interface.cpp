@@ -18,6 +18,50 @@ Widget::Widget(QWidget *parent) :
     ui->tableView->setModel(&tableModel);
     ui->tableView->setColumnWidth(0, 140);
     ui->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+    rxHeader_t h;
+    h.sourceAddr = 4;
+    h.rssi = -30;
+    QByteArray d;
+    QDateTime t = QDateTime::currentDateTime();
+
+    ui->voltagescalingSpinbox->setValue(0.000152588);
+    ui->currentScalingSpinbox->setValue(0.000915527);
+
+    d.clear();
+    d.append((char)0x01).append((char)0x01).append((char)0x00).append((char)0x03).append((char)0x00).append((char)0x07).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x09).append((char)0x00);
+    h.size = d.size();
+    tableModel.addData(h, d, t);
+
+    d.clear();
+    d.append((char)0x04).append((char)0x01).append((char)0x01).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00);
+    h.size = d.size();
+    tableModel.addData(h, d, t);
+
+    d.clear();
+    d.append((char)0x04).append((char)0x01).append((char)0x05).append((char)0x70).append((char)0x28).append((char)0xC5).append((char)0x84).append((char)0x7A).append((char)0xA6).append((char)0xFF).append((char)0xFF).append((char)0xFF).append((char)0xFF).append((char)0x00).append((char)0x00).append((char)0xEA).append((char)0x47).append((char)0xFB).append((char)0x78).append((char)0x6D).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x5D).append((char)0x32).append((char)0x3C).append((char)0x01).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00);
+    h.size = d.size();
+    tableModel.addData(h, d, t);
+
+    d.clear();
+    d.append((char)0x00).append((char)0x01).append((char)0x00).append((char)0x48).append((char)0x65).append((char)0x6c).append((char)0x6c).append((char)0x6f).append((char)0x20).append((char)0x57).append((char)0x6f).append((char)0x72).append((char)0x6c).append((char)0x64).append((char)0x20).append((char)0x20).append((char)0x20).append((char)0x20).append((char)0x20);
+    h.size = d.size();
+    tableModel.addData(h, d, t);
+
+    d.clear();
+    d.append((char)0x02);
+    h.size = d.size();
+    tableModel.addData(h, d, t);
+
+    d.clear();
+    d.append((char)0x03).append((char)0x01);
+    h.size = d.size();
+    tableModel.addData(h, d, t);
+
+    d.clear();
+    d.append((char)0x05).append((char)0x05);
+    h.size = d.size();
+    tableModel.addData(h, d, t);
 }
 
 Widget::~Widget()
@@ -136,4 +180,50 @@ void Widget::on_rxASCIIButton_toggled(bool checked)
         tableModel.encodingChanged(PacketTableModel::ASCII);
     else
         tableModel.encodingChanged(PacketTableModel::HEX);
+}
+
+void Widget::on_tableView_clicked(const QModelIndex &index)
+{
+    QByteArray selData = tableModel.getRawData(index.row());
+
+    ui->packetDataEdit->clear();
+
+    if ((selData[0] == bacon) && (selData.size() == sizeof(baconPacket_t))) {
+        ui->packetDataEdit->appendPlainText("Beacon Packet (0x00)");
+        baconPacket_t *pkt = (baconPacket_t*)selData.data();
+        ui->packetDataEdit->appendPlainText(QString("PAN ID: ").append(QString().setNum(pkt->PAN_ID)));
+        ui->packetDataEdit->appendPlainText(QString("Network Name: \"").append(QString(QByteArray().setRawData(pkt->name,16))).append("\""));
+    }
+    else if ((selData[0] == connectionRequest) && (selData.size() == sizeof(connectionRequestPacket_t))) {
+        ui->packetDataEdit->appendPlainText("Connection Request Packet (0x01)");
+    }
+    else if ((selData[0] == connectionAck) && (selData.size() == sizeof(connectionAckPacket_t))) {
+        ui->packetDataEdit->appendPlainText("Connection Ack Packet (0x02)");
+    }
+    else if ((selData[0] == dataRequest) && (selData.size() == sizeof(dataRequestPacket_t))) {
+        ui->packetDataEdit->appendPlainText("Data Request Packet (0x03)");
+        ui->packetDataEdit->appendPlainText(QString("Request Sequence Number: ").append(QString().setNum(selData[1])));
+    }
+    else if ((selData[0] == 4) && (selData.size() == sizeof(dataPacket_t))) {
+        ui->packetDataEdit->appendPlainText("Data Packet (0x04)");
+        dataPacket_t *pkt = (dataPacket_t*)selData.data();
+
+        ui->packetDataEdit->appendPlainText(QString("Request Sequence Number: ").append(QString().setNum(pkt->requestSequence)));
+        ui->packetDataEdit->appendPlainText(QString("Data Sequence Number: ").append(QString().setNum(pkt->dataSequence)));
+        ui->packetDataEdit->appendPlainText(QString("Sample Count: ").append(QString().setNum(pkt->sampleCount)));
+        ui->packetDataEdit->appendPlainText(QString("Raw Power Value: ").append(QString().setNum(pkt->powerData)));
+        ui->packetDataEdit->appendPlainText(QString("Raw Line Period: ").append(QString().setNum(pkt->linePeriod)));
+        ui->packetDataEdit->appendPlainText(QString("Raw Voltage Value: ").append(QString().setNum(pkt->squaredVoltage)));
+        ui->packetDataEdit->appendPlainText(QString("Raw Current Value: ").append(QString().setNum(pkt->squaredCurrent)));
+
+        ui->packetDataEdit->appendPlainText("");
+        ui->packetDataEdit->appendPlainText(QString("Power: ").append(QString().setNum((((double)pkt->powerData)/pkt->sampleCount)*ui->voltagescalingSpinbox->value()*ui->currentScalingSpinbox->value())));
+        ui->packetDataEdit->appendPlainText(QString("Voltage (RMS): ").append(QString().setNum(sqrt((((double)pkt->squaredVoltage)/pkt->sampleCount))*ui->voltagescalingSpinbox->value())));
+        ui->packetDataEdit->appendPlainText(QString("Current (RMS): ").append(QString().setNum(sqrt((((double)pkt->squaredCurrent)/pkt->sampleCount))*ui->currentScalingSpinbox->value())));
+
+    }
+    else if ((selData[0] == dataAck) && (selData.size() == sizeof(dataAckPacket_t))) {
+        ui->packetDataEdit->appendPlainText("Data Ack Packet (0x05)");
+        ui->packetDataEdit->appendPlainText(QString("Data Sequence Number: ").append(QString().setNum(selData[1])));
+    }
 }
