@@ -38,12 +38,21 @@ private slots:
     void on_rxASCIIButton_toggled(bool checked);
     void on_tableView_clicked(const QModelIndex &index);
 
+    void on_sendBaconPacket_clicked();
+
+    void on_sendConnectionAck_clicked();
+
+    void on_sendDataRrequest_clicked();
+
+    void on_sendDataAck_clicked();
+
 private:
     Ui::Widget *ui;
     QSerialPort *port;
     QByteArray inbuffer;
     QList<QSerialPortInfo> portList;
     PacketTableModel tableModel;
+    void transmitRawData(void* data, uint8_t size, int32_t address, bool panBroadcast);
 
 };
 

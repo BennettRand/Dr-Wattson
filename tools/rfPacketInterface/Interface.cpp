@@ -256,3 +256,58 @@ void Widget::on_tableView_clicked(const QModelIndex &index)
         ui->packetDataEdit->appendPlainText(QString("Data Sequence Number: ").append(QString().setNum(selData[1])));
     }
 }
+
+void Widget::on_sendBaconPacket_clicked()
+{
+    baconPacket_t pkt;
+    pkt.type = bacon;
+    pkt.PAN_ID = ui->panLineEdit->text().toInt();
+    QByteArray name = ui->networkNameEdit->text().toUtf8();
+    while (name.length() < 16)
+    {
+        name.append(' ');
+    }
+    memcpy(pkt.name, name.data(), 16);
+    transmitRawData(&pkt, sizeof(pkt), 0xFFFF, true);
+}
+
+void Widget::transmitRawData(void* data, uint8_t size, int32_t address, bool panBroadcast)
+{
+    QString outData;
+    for (int i = 0; i < size; i++)
+        outData.append(QString("%1 ").arg(((uint8_t*)data)[i],2,16,QChar('0')));
+
+    if ((address >= 0) && (address <= 0xFFFF))
+        ui->addressEdit->setText(QString().setNum(address,16).toUpper());
+    ui->panBroadcastCheckbox->setChecked(panBroadcast);
+    ui->dataEdit->setPlainText(outData);
+    ui->hexRadioButton->setChecked(true);
+    ui->transmitButton->clicked();
+}
+
+void Widget::on_sendConnectionAck_clicked()
+{
+    connectionAckPacket_t pkt;
+    pkt.type = connectionAck;
+    transmitRawData(&pkt, sizeof(pkt), -1, false);
+}
+
+void Widget::on_sendDataRrequest_clicked()
+{
+    dataRequestPacket_t pkt;
+    pkt.type = dataRequest;
+    pkt.requestSequence = ui->dataReqSeqNumber->value();
+    if (pkt.requestSequence != 255)
+        ui->dataReqSeqNumber->setValue(pkt.requestSequence+1);
+    else
+        ui->dataReqSeqNumber->setValue(0);
+    transmitRawData(&pkt, sizeof(pkt), -1, false);
+}
+
+void Widget::on_sendDataAck_clicked()
+{
+    dataAckPacket_t pkt;
+    pkt.type = dataAck;
+    pkt.dataSequence = ui->dataAckSeqNumber->value();
+    transmitRawData(&pkt, sizeof(pkt), -1, false);
+}
