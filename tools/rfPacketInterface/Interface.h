@@ -12,7 +12,7 @@
 
 #define EXTENDED_DATA_PACKET
 
-#include "protocol.h"
+#include "../../hardware/firmware/baseStationFirmware/protocol.h"
 #include "packettablemodel.h"
 #include "../../hardware/firmware/remoteMonitorFirmware/protocol.h"
 

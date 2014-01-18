@@ -17,8 +17,8 @@ SOURCES += main.cpp\
     packettablemodel.cpp
 
 HEADERS  += Interface.h \
-    protocol.h \
     packettablemodel.h \
-    ../../hardware/firmware/remoteMonitorFirmware/protocol.h
+    ../../hardware/firmware/remoteMonitorFirmware/protocol.h \
+    ../../hardware/firmware/baseStationFirmware/protocol.h
 
 FORMS    += widget.ui

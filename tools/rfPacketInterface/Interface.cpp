@@ -25,8 +25,8 @@ Widget::Widget(QWidget *parent) :
     QByteArray d;
     QDateTime t = QDateTime::currentDateTime();
 
-    ui->voltagescalingSpinbox->setValue(0.000152588);
-    ui->currentScalingSpinbox->setValue(0.000915527);
+    ui->voltage1ScalingSpinbox->setValue(0.000152588);
+    ui->current1ScalingSpinbox->setValue(0.000915527);
 
     d.clear();
     d.append((char)0x01).append((char)0x01).append((char)0x00).append((char)0x03).append((char)0x00).append((char)0x07).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x09).append((char)0x00);
@@ -85,6 +85,13 @@ void Widget::dataReceived()
 
         tableModel.addData(packetHeader, data, QDateTime::currentDateTime());
         ui->tableView->scrollToBottom();
+
+        if (ui->followDataCheckbox->isChecked())
+        {
+            ui->tableView->selectRow(tableModel.rowCount(QModelIndex())-1);
+            on_tableView_clicked(tableModel.index(tableModel.rowCount(QModelIndex())-1,4));
+        }
+
 
         if (ui->autoRespCheckBox->isChecked())
         {
@@ -196,6 +203,26 @@ void Widget::on_tableView_clicked(const QModelIndex &index)
     }
     else if ((selData[0] == connectionRequest) && (selData.size() == sizeof(connectionRequestPacket_t))) {
         ui->packetDataEdit->appendPlainText("Connection Request Packet (0x01)");
+        connectionRequestPacket_t *pkt = (connectionRequestPacket_t*)selData.data();
+        ui->packetDataEdit->appendPlainText(QString("Raw Voltage Scaling 1: ").append(QString().setNum(pkt->channel1VoltageScaling)));
+        ui->packetDataEdit->appendPlainText(QString("Raw Current Scaling 1: ").append(QString().setNum(pkt->channel1CurrentScaling)));
+        ui->packetDataEdit->appendPlainText(QString("Raw Voltage Scaling 2: ").append(QString().setNum(pkt->channel2VoltageScaling)));
+        ui->packetDataEdit->appendPlainText(QString("Raw Current Scaling 2: ").append(QString().setNum(pkt->channel2CurrentScaling)));
+        ui->packetDataEdit->appendPlainText(QString("Raw Line Period Scaling: ").append(QString().setNum(pkt->linePeriodScalingFactor)));
+        ui->packetDataEdit->appendPlainText("");
+
+        ui->packetDataEdit->appendPlainText(QString("Voltage Scaling 1: ").append(QString().setNum(pkt->channel1VoltageScaling * 0.0000001).append(" Volts/Count")));
+        ui->packetDataEdit->appendPlainText(QString("Current Scaling 1: ").append(QString().setNum(pkt->channel1CurrentScaling * 0.0000001).append(" Amps/Count")));
+        ui->packetDataEdit->appendPlainText(QString("Voltage Scaling 2: ").append(QString().setNum(pkt->channel2VoltageScaling * 0.0000001).append(" Volts/Count")));
+        ui->packetDataEdit->appendPlainText(QString("Current Scaling 2: ").append(QString().setNum(pkt->channel2CurrentScaling * 0.0000001).append(" Amps/Count")));
+        ui->packetDataEdit->appendPlainText(QString("Line Period Scaling: ").append(QString().setNum(pkt->linePeriodScalingFactor * 0.000001).append(" Seconds/Count")));
+
+        ui->voltage1ScalingSpinbox->setValue(pkt->channel1VoltageScaling * 0.0000001);
+        ui->current1ScalingSpinbox->setValue(pkt->channel1CurrentScaling * 0.0000001);
+        ui->voltage2ScalingSpinbox->setValue(pkt->channel2VoltageScaling * 0.0000001);
+        ui->current2ScalingSpinbox->setValue(pkt->channel2CurrentScaling * 0.0000001);
+        ui->linePeriodScalingSpinbox->setValue(pkt->linePeriodScalingFactor * 0.000001);
+
     }
     else if ((selData[0] == connectionAck) && (selData.size() == sizeof(connectionAckPacket_t))) {
         ui->packetDataEdit->appendPlainText("Connection Ack Packet (0x02)");
@@ -217,9 +244,11 @@ void Widget::on_tableView_clicked(const QModelIndex &index)
         ui->packetDataEdit->appendPlainText(QString("Raw Current Value: ").append(QString().setNum(pkt->squaredCurrent)));
 
         ui->packetDataEdit->appendPlainText("");
-        ui->packetDataEdit->appendPlainText(QString("Power: ").append(QString().setNum((((double)pkt->powerData)/pkt->sampleCount)*ui->voltagescalingSpinbox->value()*ui->currentScalingSpinbox->value())));
-        ui->packetDataEdit->appendPlainText(QString("Voltage (RMS): ").append(QString().setNum(sqrt((((double)pkt->squaredVoltage)/pkt->sampleCount))*ui->voltagescalingSpinbox->value())));
-        ui->packetDataEdit->appendPlainText(QString("Current (RMS): ").append(QString().setNum(sqrt((((double)pkt->squaredCurrent)/pkt->sampleCount))*ui->currentScalingSpinbox->value())));
+        ui->packetDataEdit->appendPlainText(QString("Power: ").append(QString().setNum((((double)pkt->powerData)/pkt->sampleCount)*ui->voltage1ScalingSpinbox->value()*ui->current1ScalingSpinbox->value())));
+        ui->packetDataEdit->appendPlainText(QString("Voltage (RMS): ").append(QString().setNum(sqrt((((double)pkt->squaredVoltage)/pkt->sampleCount))*ui->voltage1ScalingSpinbox->value())));
+        ui->packetDataEdit->appendPlainText(QString("Current (RMS): ").append(QString().setNum(sqrt((((double)pkt->squaredCurrent)/pkt->sampleCount))*ui->current1ScalingSpinbox->value())));
+
+        ui->dataAckSeqNumber->setValue(pkt->dataSequence);
 
     }
     else if ((selData[0] == dataAck) && (selData.size() == sizeof(dataAckPacket_t))) {

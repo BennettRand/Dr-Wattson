@@ -8,7 +8,7 @@
 #include <QDebug>
 #include <QDateTime>
 
-#include "protocol.h"
+#include "../../hardware/firmware/baseStationFirmware/protocol.h"
 
 class PacketTableModel : public QAbstractTableModel
 {
