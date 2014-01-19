@@ -81,6 +81,10 @@ if len(macAddr) != 16:
 	quit()
 macAddr = int(macAddr,16);
 
+while len(Name) < 16:
+	Name += " "
+Name = Name[:16]
+
 if not outputFileSpecified:
 	output_fd = open(".tempOutputFile.bin", 'w')
 
@@ -102,6 +106,8 @@ if (networkValid):
 	dataArray += [Address & 0xFF, (Address>>8) & 0xFF]
 	databytearray.extend(bytearray(dataArray))
 	databytearray.extend(Name)
+else:
+	databytearray.extend([0])
 
 output_fd.write(databytearray)
 output_fd.close();
