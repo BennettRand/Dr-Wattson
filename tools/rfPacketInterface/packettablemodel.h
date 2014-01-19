@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <QDebug>
 #include <QDateTime>
+#include <QFile>
 
 #include "../../hardware/firmware/baseStationFirmware/protocol.h"
 
@@ -26,6 +27,7 @@ public:
     void addData(rxHeader_t header, QByteArray data, QDateTime time);
     void encodingChanged(enum dataEncoding encoding);
     QByteArray getRawData(int row);
+    void writeDataFile(QString filename);
 
 signals:
 

@@ -19,49 +19,6 @@ Widget::Widget(QWidget *parent) :
     ui->tableView->setColumnWidth(0, 140);
     ui->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-    rxHeader_t h;
-    h.sourceAddr = 4;
-    h.rssi = -30;
-    QByteArray d;
-    QDateTime t = QDateTime::currentDateTime();
-
-    ui->voltage1ScalingSpinbox->setValue(0.000152588);
-    ui->current1ScalingSpinbox->setValue(0.000915527);
-
-    d.clear();
-    d.append((char)0x01).append((char)0x01).append((char)0x00).append((char)0x03).append((char)0x00).append((char)0x07).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x09).append((char)0x00);
-    h.size = d.size();
-    tableModel.addData(h, d, t);
-
-    d.clear();
-    d.append((char)0x04).append((char)0x01).append((char)0x01).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00);
-    h.size = d.size();
-    tableModel.addData(h, d, t);
-
-    d.clear();
-    d.append((char)0x04).append((char)0x01).append((char)0x05).append((char)0x70).append((char)0x28).append((char)0xC5).append((char)0x84).append((char)0x7A).append((char)0xA6).append((char)0xFF).append((char)0xFF).append((char)0xFF).append((char)0xFF).append((char)0x00).append((char)0x00).append((char)0xEA).append((char)0x47).append((char)0xFB).append((char)0x78).append((char)0x6D).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x5D).append((char)0x32).append((char)0x3C).append((char)0x01).append((char)0x00).append((char)0x00).append((char)0x00).append((char)0x00);
-    h.size = d.size();
-    tableModel.addData(h, d, t);
-
-    d.clear();
-    d.append((char)0x00).append((char)0x01).append((char)0x00).append((char)0x48).append((char)0x65).append((char)0x6c).append((char)0x6c).append((char)0x6f).append((char)0x20).append((char)0x57).append((char)0x6f).append((char)0x72).append((char)0x6c).append((char)0x64).append((char)0x20).append((char)0x20).append((char)0x20).append((char)0x20).append((char)0x20);
-    h.size = d.size();
-    tableModel.addData(h, d, t);
-
-    d.clear();
-    d.append((char)0x02);
-    h.size = d.size();
-    tableModel.addData(h, d, t);
-
-    d.clear();
-    d.append((char)0x03).append((char)0x01);
-    h.size = d.size();
-    tableModel.addData(h, d, t);
-
-    d.clear();
-    d.append((char)0x05).append((char)0x05);
-    h.size = d.size();
-    tableModel.addData(h, d, t);
 }
 
 Widget::~Widget()
@@ -315,4 +272,10 @@ void Widget::on_sendDataAck_clicked()
     pkt.type = dataAck;
     pkt.dataSequence = ui->dataAckSeqNumber->value();
     transmitRawData(&pkt, sizeof(pkt), -1, false);
+}
+
+void Widget::on_saveDataButton_clicked()
+{
+    QString filename = QFileDialog::getSaveFileName(this,"Save Data",QDir::homePath());
+    tableModel.writeDataFile(filename);
 }

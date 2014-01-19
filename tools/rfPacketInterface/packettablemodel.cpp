@@ -96,3 +96,38 @@ QVariant PacketTableModel::headerData(int section, Qt::Orientation orientation, 
     else
         return QVariant();
 }
+
+void PacketTableModel::writeDataFile(QString filename)
+{
+    QFile dataFile(filename);
+    dataFile.open(QIODevice::WriteOnly);
+    QDataStream outStream(&dataFile);
+
+    QByteArray dataString("Time,Source Address,RSSI,Length,Data\n");
+    outStream.writeRawData(dataString.data(), dataString.length());
+
+    for (int val = 0; val < header_list.length(); val++)
+    {
+        dataString = time_list[val].toString(QString("yyyy-M-d h:mm AP")).toUtf8();
+        outStream.writeRawData(dataString.data(), dataString.length());
+        outStream.writeRawData(",",1);
+
+        dataString = QString().setNum(header_list[val].sourceAddr).toUtf8();
+        outStream.writeRawData(dataString.data(), dataString.length());
+        outStream.writeRawData(",",1);
+
+        dataString = QString().setNum(header_list[val].rssi).toUtf8();
+        outStream.writeRawData(dataString.data(), dataString.length());
+        outStream.writeRawData(",",1);
+
+        dataString = QString().setNum(header_list[val].size).toUtf8();
+        outStream.writeRawData(dataString.data(), dataString.length());
+        outStream.writeRawData(",",1);
+
+        dataString = QString(data_list[val].toHex()).toUpper().toUtf8();
+        outStream.writeRawData(dataString.data(), dataString.length());
+        outStream.writeRawData("\n",1);
+    }
+
+    dataFile.close();
+}

@@ -7,6 +7,8 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QScrollBar>
+#include <QFileDialog>
+#include <QDir>
 
 #include <string.h>
 
@@ -45,6 +47,8 @@ private slots:
     void on_sendDataRrequest_clicked();
 
     void on_sendDataAck_clicked();
+
+    void on_saveDataButton_clicked();
 
 private:
     Ui::Widget *ui;
