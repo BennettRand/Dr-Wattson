@@ -91,7 +91,7 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 			printf("Connected to network\n");
 			eeprom_update_block(&(baseStationList[connectedBaseStation]), (void*)27, sizeof(struct baseStation));
 			eeprom_update_byte((uint8_t*)29, 1); // Force the RSSI of the connected base station to 1 without modifying value in ram.
-			eeprom_update_byte((uint8_t*)26, 0);
+			eeprom_update_byte((uint8_t*)26, 0xFF);
 		}
 		break;
 	case dataRequest:
@@ -119,16 +119,19 @@ int main(void) {
 	PHY_SetRxState(true);
 	NWK_OpenEndpoint(APP_ENDPOINT, rfReceivePacket);
 	PHY_SetTxPower(0);
+	uart_init_port(uart_baud_115200, uart_tx_buf, 100, uart_rx_buf, 100); // Init uart
 
 	// Read eeprom data
 	eeprom_read_block(&deviceCalibration, (void*)8, sizeof(deviceCalibration));
-	if (eeprom_read_byte((uint8_t*)26) == true) { // There is valid data in the network information struct
+	if (eeprom_read_byte((uint8_t*)26)) { // There is valid data in the network information struct
 		eeprom_read_block(baseStationList, (void*)27, sizeof(struct baseStation));
 		baseStationListLength += 1;
+
+		printf("Last connected network (%d): %u %u %16s\n", baseStationListLength, baseStationList[0].PAN_ID, baseStationList[0].addr, baseStationList[0].name);
+
 		sendConnectionRequest(0, &deviceCalibration);
 	}	
 
-	uart_init_port(uart_baud_115200, uart_tx_buf, 100, uart_rx_buf, 100); // Init uart
 	initDataAck();
 //	sei();
 	startDataAck();
