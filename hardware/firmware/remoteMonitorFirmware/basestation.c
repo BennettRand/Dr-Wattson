@@ -99,7 +99,7 @@ void sendConnectionRequest(int8_t num, struct calibData *cal) {
 	connReqPacket.channel1VoltageScaling = cal->channel1VoltageScaling;
 	connReqPacket.channel1CurrentScaling = cal->channel1CurrentScaling;
 	connReqPacket.channel2VoltageScaling = cal->channel2VoltageScaling;
-	connReqPacket.channel2VoltageScaling = cal->channel2CurrentScaling;
+	connReqPacket.channel2CurrentScaling = cal->channel2CurrentScaling;
 	connReqPacket.linePeriodScalingFactor = cal->linePeriodScalingFactor;
 
 	nwkPacket.dstAddr = baseStationList[num].addr;
