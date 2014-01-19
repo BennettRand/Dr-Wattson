@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include <avr/boot.h>
+#include <avr/eeprom.h>
 #include <util/delay.h>
 #include <stdint.h>
 
@@ -107,14 +108,22 @@ int main(void) {
 	SYS_Init(); // Init Atmel Lightweight Mesh stack
 
 	SYS_TaskHandler(); // Call the system task handler once before we configure the radio
-	//NWK_SetAddr(boot_signature_byte_get(0x0100) | (((uint16_t)boot_signature_byte_get(0x0101)) << 8)); // Set network address based upon the MAC address
-	NWK_SetAddr(4);
+	NWK_SetAddr(eeprom_read_word((uint16_t*)0));
 	NWK_SetPanId(0); // Default PAN ID will be 0, can be changed using the set PAN command
 	PHY_SetChannel(APP_CHANNEL);
 	//NWK_SetSecurityKey(APP_SECURITY_KEY);
 	PHY_SetRxState(true);
 	NWK_OpenEndpoint(APP_ENDPOINT, rfReceivePacket);
 	PHY_SetTxPower(0);
+
+	// Read eeprom data
+	eeprom_read_block(&deviceCalibration, (void*)8, sizeof(deviceCalibration));
+	if (eeprom_read_byte((uint8_t*)26) == true) { // There is valid data in the network information struct
+		eeprom_read_block(baseStationList, (void*)27, sizeof(struct baseStation));
+		baseStationListLength += 1;
+		sendConnectionRequest(0, &deviceCalibration);
+	}	
+
 	uart_init_port(uart_baud_115200, uart_tx_buf, 100, uart_rx_buf, 100); // Init uart
 	initDataAck();
 //	sei();
