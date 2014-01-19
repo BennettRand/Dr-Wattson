@@ -44,7 +44,7 @@ typedef struct __attribute__((packed)) {
 	packetType_t type;
 	uint8_t requestSequence;
 	uint8_t dataSequence;
-	uint16_t sampleCount;
+	uint32_t sampleCount;
 	int64_t powerData;
 	#ifdef EXTENDED_DATA_PACKET
 	int16_t linePeriod;

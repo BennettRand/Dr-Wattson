@@ -24,6 +24,7 @@ int64_t newCurrentSum[2];
 int16_t adcSampleData[4];
 
 ISR(PCINT0_vect) { // Data ready triggered
+	PORTE |= 1<<2;
 	readData(adcSampleData,4);
 	
 	newSampleCount++;
@@ -38,9 +39,11 @@ ISR(PCINT0_vect) { // Data ready triggered
 	#endif
 	
 	PCIFR = (1<<PCIF0); // Need to clear the pin change interrupt flag as we leave to clear out the rising edge interrupt on drdy.
+	PORTE &= ~(1<<2);
 }
 
 ISR(INT0_vect) {
+	PORTE |= 1<<3;
 	if ((newSampleCount > 115) && (newSampleCount < 200)) {
 		sampleCount += newSampleCount;
 		powerSum[0] += newPowerSum[0];
@@ -60,6 +63,7 @@ ISR(INT0_vect) {
 		newCurrentSum[1] = 0;
 		#endif
 	}
+	PORTE  &= ~(1<<3);
 }
 
 void initDataAck() {
@@ -76,7 +80,8 @@ void initDataAck() {
 
 	// Configure zero cross interrupt
 	EICRA |= (1<<ISC01) | (1<<ISC00);
-	DDRE |= 1<<2;
+	DDRE |= 1<<2 | 1<<3;
+	
 }
 
 void stopDataAck() {
