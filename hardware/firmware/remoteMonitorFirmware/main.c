@@ -87,8 +87,11 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 		printf("Got Bacon packet %d\n",baseStationListLength); 
 		break;
 	case connectionAck:
-		if(processConnectionAck(ind))
+		if(processConnectionAck(ind)) {
 			printf("Connected to network\n");
+			eeprom_update_block(&(baseStationList[connectedBaseStation]), (void*)27, sizeof(struct baseStation));
+			eeprom_update_byte((uint8_t*)26, 0);
+		}
 		break;
 	case dataRequest:
 		handleDataRequest(ind);
