@@ -44,7 +44,7 @@ ISR(PCINT0_vect) { // Data ready triggered
 
 ISR(INT0_vect) {
 	PORTE |= 1<<3;
-	if ((newSampleCount > 115) && (newSampleCount < 200)) {
+	if ((newSampleCount > 100)) {
 		if (TIFR1 & (1<<TOV1)) // Coutner rolled over, throw out the data
 			linePeriod = 0;
 		else {
