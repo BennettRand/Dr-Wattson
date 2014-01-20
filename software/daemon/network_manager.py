@@ -9,10 +9,13 @@ import data_readers
 
 pan = sum([ord(x) for x in platform.node()]) % 65536
 
-ser = serial.Serial('/dev/ttyACM0', 38400, timeout = .01)
-ser.open()
+ser = None
 
 def main(argc = len(sys.argv), args = sys.argv):
+	
+	global ser
+	
+	ser = serial.Serial(args[1], 38400, timeout = .01)
 	
 	req_seq = 0
 	
@@ -23,12 +26,11 @@ def main(argc = len(sys.argv), args = sys.argv):
 	
 	data_request_h = data_readers.tx_h.pack(data_readers.data_req_p.size, 0, 0xFFFF)
 	
+	print pan
 	ser.write(setPAN)
 	print '@',
 	ser.write(beacon)
 	print '!',
-	ser.write(data_request_h + data_readers.data_req_p.pack(3, req_seq))
-	print'.',
 	req_seq += 1
 	last_sent_b = time.time()
 	last_sent_r = time.time()
