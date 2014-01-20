@@ -32,6 +32,6 @@
 #define NWK_ACK_WAIT_TIME                   1000 // ms
 
 #define NWK_ENABLE_ROUTING
-#define NWK_ENABLE_SECURITY
+//#define NWK_ENABLE_SECURITY
 
 #endif // _CONFIG_H_

@@ -84,12 +84,11 @@ void Widget::on_connectButton_clicked(bool checked)
             ui->connectButton->setText("Close Port");
             uint16_t pan_id = ui->panLineEdit->text().toInt(0,16);
             txHeader_t packetHeader;
-            packetHeader.destAddr = 0;
+            packetHeader.destAddr = pan_id;
             packetHeader.command = setPAN;
-            packetHeader.size = 2;
+            packetHeader.size = 0;
 
             port->write((char*)(&packetHeader), sizeof(txHeader_t));
-            port->write((char*)(&pan_id),2);
         }
         else
         {
