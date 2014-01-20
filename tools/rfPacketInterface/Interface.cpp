@@ -190,7 +190,7 @@ void Widget::on_tableView_clicked(const QModelIndex &index)
     }
     else if ((selData[0] == dataRequest) && (selData.size() == sizeof(dataRequestPacket_t))) {
         ui->packetDataEdit->appendPlainText("Data Request Packet (0x03)");
-        ui->packetDataEdit->appendPlainText(QString("Request Sequence Number: ").append(QString().setNum(selData[1])));
+        ui->packetDataEdit->appendPlainText(QString("Request Sequence Number: ").append(QString().setNum((uint8_t)selData[1])));
     }
     else if ((selData[0] == 4) && (selData.size() == sizeof(dataPacket_t))) {
         ui->packetDataEdit->appendPlainText("Data Packet (0x04)");
