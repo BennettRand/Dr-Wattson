@@ -4,7 +4,8 @@ struct baseStation baseStationList[BASESTATION_LIST_SIZE];
 int8_t baseStationListLength = 0;
 int8_t connectedBaseStation = -1;
 	
-static NWK_DataReq_t nwkPacket;
+extern NWK_DataReq_t nwkPacket[DATA_REQ_BUFFER_CNT];
+extern bool dataReqBusy[DATA_REQ_BUFFER_CNT];
 static connectionRequestPacket_t connReqPacket;
 static uint16_t current_PAN;
 
@@ -102,13 +103,20 @@ void sendConnectionRequest(int8_t num, struct calibData *cal) {
 	connReqPacket.channel2CurrentScaling = cal->channel2CurrentScaling;
 	connReqPacket.linePeriodScalingFactor = cal->linePeriodScalingFactor;
 
-	nwkPacket.dstAddr = baseStationList[num].addr;
-	nwkPacket.dstEndpoint = APP_ENDPOINT;
-	nwkPacket.srcEndpoint = APP_ENDPOINT;
-	nwkPacket.data = (uint8_t *)(&connReqPacket);
-	nwkPacket.size = sizeof(connectionRequestPacket_t);
-	nwkPacket.confirm = packetTxConf;
+	uint8_t ind = 0;
+	while (dataReqBusy[ind]) {
+		SYS_TaskHandler();
+		ind++;
+	}
+	nwkPacket[ind].dstAddr = baseStationList[num].addr;
+	nwkPacket[ind].dstEndpoint = APP_ENDPOINT;
+	nwkPacket[ind].srcEndpoint = APP_ENDPOINT;
+	nwkPacket[ind].options = 0;
+	nwkPacket[ind].data = (uint8_t *)(&connReqPacket);
+	nwkPacket[ind].size = sizeof(connectionRequestPacket_t);
+	nwkPacket[ind].confirm = packetTxConf;
 	NWK_SetPanId(baseStationList[num].PAN_ID);
-	NWK_DataReq(&nwkPacket);
+	NWK_DataReq(&(nwkPacket[ind]));
+	dataReqBusy[ind] = true;
 }
 

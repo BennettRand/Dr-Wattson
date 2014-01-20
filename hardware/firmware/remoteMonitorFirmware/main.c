@@ -15,23 +15,20 @@
 #include "basestation.h"
 #include "dataAck.h"
 
+NWK_DataReq_t nwkPacket[DATA_REQ_BUFFER_CNT];
+bool dataReqBusy[DATA_REQ_BUFFER_CNT];
+
 uint8_t uart_tx_buf[100];
 uint8_t uart_rx_buf[100];
-static NWK_DataReq_t nwkPacket;
 
 static dataPacket_t dataPacket = {.type = data};
 static uint8_t dataSequence = 0;
 
 struct calibData deviceCalibration = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter" // Ignore the unused parameter warning here, the function has to have this prototype.
 void packetTxConf(NWK_DataReq_t *req) {
-	// We don't really care about if a packet was received or not
-	// But we have to have a function here, because the library does not
-	// handle null function pointers for the confirm callback.
+	dataReqBusy[req - nwkPacket] = false;
 }
-#pragma GCC diagnostic pop
 
 void handleDataRequest(NWK_DataInd_t *packet) {
 	if (packet->size != sizeof(dataRequestPacket_t))
@@ -51,13 +48,20 @@ void handleDataRequest(NWK_DataInd_t *packet) {
 	dataPacket.squaredCurrent = currentSum[0];
 	#endif
 
-	nwkPacket.dstAddr = baseStationList[connectedBaseStation].addr;
-	nwkPacket.dstEndpoint = APP_ENDPOINT;
-	nwkPacket.srcEndpoint = APP_ENDPOINT;
-	nwkPacket.data = (uint8_t *)(&dataPacket);
-	nwkPacket.size = sizeof(dataPacket_t);
-	nwkPacket.confirm = packetTxConf;
-	NWK_DataReq(&nwkPacket);
+	uint8_t ind = 0;
+	while (dataReqBusy[ind]) {
+		SYS_TaskHandler();
+		ind++;
+	}
+	nwkPacket[ind].dstAddr = baseStationList[connectedBaseStation].addr;
+	nwkPacket[ind].dstEndpoint = APP_ENDPOINT;
+	nwkPacket[ind].srcEndpoint = APP_ENDPOINT;
+	nwkPacket[ind].options = 0;
+	nwkPacket[ind].data = (uint8_t *)(&dataPacket);
+	nwkPacket[ind].size = sizeof(dataPacket_t);
+	nwkPacket[ind].confirm = packetTxConf;
+	NWK_DataReq(&(nwkPacket[ind]));
+	dataReqBusy[ind] = true;
 }
 
 void handleDataAck(NWK_DataInd_t *packet) {

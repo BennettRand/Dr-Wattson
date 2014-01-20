@@ -25,6 +25,7 @@ struct calibData {
 extern struct calibData deviceCalibration;
 
 #define EXTENDED_DATA_PACKET
+#define DATA_REQ_BUFFER_CNT 32
 
 #define USART_TX_vect USART0_TX_vect
 #define USART_RX_vect USART0_RX_vect

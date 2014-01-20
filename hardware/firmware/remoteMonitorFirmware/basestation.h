@@ -1,6 +1,7 @@
 #ifndef BASESTATION_H
 #define BASESTATION_H
 
+#include "sys.h"
 #include "nwk.h"
 #include "config.h"
 #include "protocol.h"
