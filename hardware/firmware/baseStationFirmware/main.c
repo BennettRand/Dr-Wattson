@@ -14,24 +14,18 @@
 
 #include "protocol.h"
 
-#define SET_BIT(p, n) p |= (1<<n)
-#define CLR_BIT(p, n) p &= !(1<<n)
+#define DATA_REQ_BUFFER_CNT 32
 
-static NWK_DataReq_t txPacket;
+static NWK_DataReq_t txPacket[DATA_REQ_BUFFER_CNT];
+static bool dataReqBusy[DATA_REQ_BUFFER_CNT];
 
 uint8_t uart_tx_buf[100];
 uint8_t uart_rx_buf[100];
 uint8_t packet_buf[100];
 
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter" // Ignore the unused parameter warning here, the function has to have this prototype.
 static void packetTxConf(NWK_DataReq_t *req) {
-	// We don't really care about if a packet was received or not
-	// But we have to have a function here, because the library does not
-	// handle null function pointers for the confirm callback.
+	dataReqBusy[req - txPacket] = false;
 }
-#pragma GCC diagnostic pop
 		
 static bool rfReceivePacket(NWK_DataInd_t *ind) {
 	rxHeader_t packetHeader;
@@ -69,16 +63,7 @@ int main(void) {
 	PORTG |= 1<<1;
 	PORTF &= ~(1<<2);
 	
-	//Debug Pins
-	SET_BIT(DDRE,5); //EXT4 9
-	SET_BIT(DDRG,0); //EXT4 10
-	SET_BIT(DDRD,5); //EXT4 15
-	
 	while (1) {
-		CLR_BIT(PORTE, 5);
-		CLR_BIT(PORTG, 0);
-		CLR_BIT(PORTD, 5);
-		
 		SYS_TaskHandler();
 		
 		// Flash the LED so we can tell if something has frozen up
@@ -94,37 +79,34 @@ int main(void) {
 		if (uart_received_bytes() == 0) /* no bytes, just continue */
 			continue;
 		
-		SET_BIT(PORTE, 5);
-		
 		if ((uart_received_bytes() > 0) && ((uart_rx_peek(0) + sizeof(txHeader_t)) <= uart_received_bytes())) {
 			txHeader_t packetHeader;
 			uart_rx_data(&packetHeader, sizeof(txHeader_t));
 			uart_rx_data(packet_buf, packetHeader.size);
 			
-			CLR_BIT(PORTE, 5);
-			SET_BIT(PORTG, 0);
-			
 			if (packetHeader.command == 2) {
-				SET_BIT(PORTE, 5);
 				NWK_SetPanId(packetHeader.destAddr);
 			}
 			else {
-				if (packetHeader.command == sendPacket)
-					txPacket.options = 0;
-				else
-					txPacket.options = NWK_OPT_BROADCAST_PAN_ID;
+				uint8_t ind = 0;
+				while (dataReqBusy[ind]) {
+					SYS_TaskHandler();
+					ind++;
+				}
 
-				txPacket.dstAddr = packetHeader.destAddr;
-				txPacket.dstEndpoint = APP_ENDPOINT;
-				txPacket.srcEndpoint = APP_ENDPOINT;
-				txPacket.data = packet_buf;
-				txPacket.size = packetHeader.size;
-				txPacket.confirm = packetTxConf;
-				CLR_BIT(PORTE, 5);
-				CLR_BIT(PORTG, 0);
-				SET_BIT(PORTD, 5);
-				NWK_DataReq(&txPacket);
-				SET_BIT(PORTE, 5);
+				if (packetHeader.command == sendPacket)
+					txPacket[ind].options = 0;
+				else
+					txPacket[ind].options = NWK_OPT_BROADCAST_PAN_ID;
+
+				txPacket[ind].dstAddr = packetHeader.destAddr;
+				txPacket[ind].dstEndpoint = APP_ENDPOINT;
+				txPacket[ind].srcEndpoint = APP_ENDPOINT;
+				txPacket[ind].data = packet_buf;
+				txPacket[ind].size = packetHeader.size;
+				txPacket[ind].confirm = packetTxConf;
+				NWK_DataReq(&(txPacket[ind]));
+				dataReqBusy[ind] = true;
 			}
 		}
 	}
