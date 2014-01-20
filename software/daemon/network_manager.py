@@ -40,14 +40,11 @@ def main(argc = len(sys.argv), args = sys.argv):
 			print '!',
 			ser.write(beacon)
 			last_sent_b = time.time()
-			last_sent_r += .01
-			
 		if time.time()-last_sent_r >= 1:
 			ser.write(data_request_h + data_readers.data_req_p.pack(3, req_seq%256))
 			print '.',
 			req_seq += 1
 			last_sent_r = time.time()
-			last_sent_b += 0.01
 		
 		read_in = ser.read(4)
 		
