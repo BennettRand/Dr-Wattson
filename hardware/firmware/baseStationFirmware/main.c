@@ -14,6 +14,9 @@
 
 #include "protocol.h"
 
+#define SET_BIT(p, n) p |= (1<<n)
+#define CLR_BIT(p, n) p &= !(1<<n)
+
 static NWK_DataReq_t txPacket;
 
 uint8_t uart_tx_buf[100];
@@ -65,8 +68,17 @@ int main(void) {
 	DDRF |= 1<<2;
 	PORTG |= 1<<1;
 	PORTF &= ~(1<<2);
-
+	
+	//Debug Pins
+	SET_BIT(DDRE,5); //EXT4 9
+	SET_BIT(DDRG,0); //EXT4 10
+	SET_BIT(DDRD,5); //EXT4 15
+	
 	while (1) {
+		CLR_BIT(PORTE, 5);
+		CLR_BIT(PORTG, 0);
+		CLR_BIT(PORTD, 5);
+		
 		SYS_TaskHandler();
 		
 		// Flash the LED so we can tell if something has frozen up
@@ -81,13 +93,19 @@ int main(void) {
 		// Parse received uart packets, if we get one, then transmit it to the RF network
 		if (uart_received_bytes() == 0) /* no bytes, just continue */
 			continue;
-
+		
+		SET_BIT(PORTE, 5);
+		
 		if ((uart_received_bytes() > 0) && ((uart_rx_peek(0) + sizeof(txHeader_t)) <= uart_received_bytes())) {
 			txHeader_t packetHeader;
 			uart_rx_data(&packetHeader, sizeof(txHeader_t));
 			uart_rx_data(packet_buf, packetHeader.size);
-		
+			
+			CLR_BIT(PORTE, 5);
+			SET_BIT(PORTG, 0);
+			
 			if (packetHeader.command == 2) {
+				SET_BIT(PORTE, 5);
 				NWK_SetPanId(packetHeader.destAddr);
 			}
 			else {
@@ -102,7 +120,11 @@ int main(void) {
 				txPacket.data = packet_buf;
 				txPacket.size = packetHeader.size;
 				txPacket.confirm = packetTxConf;
+				CLR_BIT(PORTE, 5);
+				CLR_BIT(PORTG, 0);
+				SET_BIT(PORTD, 5);
 				NWK_DataReq(&txPacket);
+				SET_BIT(PORTE, 5);
 			}
 		}
 	}
