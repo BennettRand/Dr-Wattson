@@ -99,7 +99,6 @@ int uart_tx_data(void *data, uint16_t data_length) {
 	}
 
 	tx_buffer_end = (tx_buffer_end + data_length) % tx_buffer_size;
-	sei();
 
 	// If we were not in the middle of transmittind data, then we should start of the transmit by putting the first byte into the output buffer
 	if (currently_transmitting == false) {
@@ -107,6 +106,7 @@ int uart_tx_data(void *data, uint16_t data_length) {
 		tx_buffer_start = ((tx_buffer_start + 1) % tx_buffer_size);
 		currently_transmitting = true;
 	}
+	sei();
 
 	// Return the number of bytes that were actually put into the buffer
 	return data_length;
