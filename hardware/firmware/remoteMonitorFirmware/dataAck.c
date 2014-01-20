@@ -45,6 +45,13 @@ ISR(PCINT0_vect) { // Data ready triggered
 ISR(INT0_vect) {
 	PORTE |= 1<<3;
 	if ((newSampleCount > 115) && (newSampleCount < 200)) {
+		if (TIFR1 & (1<<TOV1)) // Coutner rolled over, throw out the data
+			linePeriod = 0;
+		else {
+			linePeriod = TCNT1;
+			TCNT1 = 0;
+		}
+
 		sampleCount += newSampleCount;
 		powerSum[0] += newPowerSum[0];
 		powerSum[1] += newPowerSum[1];
@@ -81,7 +88,10 @@ void initDataAck() {
 	// Configure zero cross interrupt
 	EICRA |= (1<<ISC01) | (1<<ISC00);
 	DDRE |= 1<<2 | 1<<3;
-	
+
+	// Configure period counter
+	TCCR1B = (1<<CS11);
+		
 }
 
 void stopDataAck() {

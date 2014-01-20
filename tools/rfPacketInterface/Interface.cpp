@@ -182,7 +182,7 @@ void Widget::on_tableView_clicked(const QModelIndex &index)
         ui->current1ScalingSpinbox->setValue(pkt->channel1CurrentScaling * 0.0000001);
         ui->voltage2ScalingSpinbox->setValue(pkt->channel2VoltageScaling * 0.0000001);
         ui->current2ScalingSpinbox->setValue(pkt->channel2CurrentScaling * 0.0000001);
-        ui->linePeriodScalingSpinbox->setValue(pkt->linePeriodScalingFactor * 0.000001);
+        ui->linePeriodScalingSpinbox->setValue(pkt->linePeriodScalingFactor * 0.000000001);
 
     }
     else if ((selData[0] == connectionAck) && (selData.size() == sizeof(connectionAckPacket_t))) {
@@ -206,8 +206,9 @@ void Widget::on_tableView_clicked(const QModelIndex &index)
 
         ui->packetDataEdit->appendPlainText("");
         ui->packetDataEdit->appendPlainText(QString("Power: ").append(QString().setNum((((double)pkt->powerData)/pkt->sampleCount)*ui->voltage1ScalingSpinbox->value()*ui->current1ScalingSpinbox->value())));
-        ui->packetDataEdit->appendPlainText(QString("Voltage (RMS): ").append(QString().setNum(sqrt((((double)pkt->squaredVoltage)/pkt->sampleCount))*ui->voltage1ScalingSpinbox->value())));
-        ui->packetDataEdit->appendPlainText(QString("Current (RMS): ").append(QString().setNum(sqrt((((double)pkt->squaredCurrent)/pkt->sampleCount))*ui->current1ScalingSpinbox->value())));
+        ui->packetDataEdit->appendPlainText(QString("Voltage (Vrms): ").append(QString().setNum(sqrt((((double)pkt->squaredVoltage)/pkt->sampleCount))*ui->voltage1ScalingSpinbox->value())));
+        ui->packetDataEdit->appendPlainText(QString("Current (Arms): ").append(QString().setNum(sqrt((((double)pkt->squaredCurrent)/pkt->sampleCount))*ui->current1ScalingSpinbox->value())));
+        ui->packetDataEdit->appendPlainText(QString("Line Frequency (Hz): ").append(QString().setNum(1.0/(((double)pkt->linePeriod) * ui->linePeriodScalingSpinbox->value()))));
 
         ui->dataAckSeqNumber->setValue(pkt->dataSequence);
 

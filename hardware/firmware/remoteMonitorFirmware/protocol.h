@@ -47,7 +47,7 @@ typedef struct __attribute__((packed)) {
 	uint32_t sampleCount;
 	int64_t powerData;
 	#ifdef EXTENDED_DATA_PACKET
-	int16_t linePeriod;
+    uint16_t linePeriod;
 	int64_t squaredVoltage;
 	int64_t squaredCurrent;
 	#endif
