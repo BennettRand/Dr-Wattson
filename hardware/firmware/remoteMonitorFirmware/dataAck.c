@@ -52,11 +52,11 @@ ISR(INT0_vect) {
 		newPowerSum[0] = 0;
 		newPowerSum[1] = 0;
 	
+		#ifdef EXTENDED_DATA_PACKET
 		voltageSum[0] += newVoltageSum[0];
 		voltageSum[1] += newVoltageSum[1];
 		newVoltageSum[0] = 0;
 		newVoltageSum[1] = 0;
-		#ifdef EXTENDED_DATA_PACKET
 		currentSum[0] += newCurrentSum[0];
 		currentSum[1] += newCurrentSum[1];
 		newCurrentSum[0] = 0;
@@ -97,6 +97,5 @@ void startDataAck() {
 	sendCommand(CMD_RDATAC);
 	EIMSK |= 1;
 	PCICR |= 1;
-	printf("Enabling Interrupts");
 }
 
