@@ -24,7 +24,7 @@
 #define APP_SECURITY_KEY          ((uint8_t*) "Dr.Wattson Key 0")
 #define SYS_SECURITY_MODE                   0
 
-#define NWK_BUFFERS_AMOUNT                  3
+#define NWK_BUFFERS_AMOUNT                  32
 #define NWK_DUPLICATE_REJECTION_TABLE_SIZE  10
 #define NWK_DUPLICATE_REJECTION_TTL         3000 // ms
 #define NWK_ROUTE_TABLE_SIZE                100

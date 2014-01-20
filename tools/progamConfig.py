@@ -29,6 +29,7 @@ PAN_ID = 0
 Address = 0
 Name = ''
 networkValid = False
+calValid = False
 
 for opt, val in options:
 	if opt in ("-c", "--config"):
@@ -54,6 +55,11 @@ if (configFileName == "") :
 
 try:
 	macAddr = config.get('Mac Address', 'address')
+except:
+	print("Missing MAC address field")
+	quit()
+
+try:
 	voltageScaling1 = int(config.get('Calibration Data', 'voltageScaling1'))
 	voltageOffset1 = int(config.get('Calibration Data', 'voltageOffset1'))
 	currentScaling1 = int(config.get('Calibration Data', 'currentScaling1'))
@@ -63,17 +69,20 @@ try:
 	currentScaling2 = int(config.get('Calibration Data', 'currentScaling2'))
 	currentOffset2 = int(config.get('Calibration Data', 'currentOffset2'))
 	linePeriodScaling = int(config.get('Calibration Data', 'linePeriodScaling'))
+	calValid = True;
+	print("Calibration values found")
 except:
-	print("Missing values in config file")
-	quit()
+	calValid = False;
+	print("No calibration values found")
 
 try:
 	PAN_ID = int(config.get('Network Information', 'PAN_ID'))
 	Address = int(config.get('Network Information', 'Address'))
 	Name = config.get('Network Information', 'Name')
 	networkValid = True
+	print("Network information found")
 except:
-	print("No Network Information")
+	print("No network information found")
 
 macAddr = re.sub(r"[^ABCDEF0123456789]", "", string.upper(macAddr))[:16]
 if len(macAddr) != 16:
@@ -89,15 +98,16 @@ if not outputFileSpecified:
 	output_fd = open(".tempOutputFile.bin", 'w')
 
 dataArray = [macAddr & 0xFF, (macAddr>>8) & 0xFF, (macAddr>>16) & 0xFF, (macAddr>>24) & 0xFF, (macAddr>>32) & 0xFF, (macAddr>>40) & 0xFF, (macAddr>>48) & 0xFF, (macAddr>>56) & 0xFF]
-dataArray += [voltageScaling1 & 0xFF, (voltageScaling1>>8) & 0xFF]
-dataArray += [voltageOffset1 & 0xFF, (voltageOffset1>>8) & 0xFF]
-dataArray += [currentScaling1 & 0xFF, (currentScaling1>>8) & 0xFF]
-dataArray += [currentOffset1 & 0xFF, (currentOffset1>>8) & 0xFF]
-dataArray += [voltageScaling1 & 0xFF, (voltageScaling1>>8) & 0xFF]
-dataArray += [voltageOffset1 & 0xFF, (voltageOffset1>>8) & 0xFF]
-dataArray += [currentScaling1 & 0xFF, (currentScaling1>>8) & 0xFF]
-dataArray += [currentOffset1 & 0xFF, (currentOffset1>>8) & 0xFF]
-dataArray += [linePeriodScaling & 0xFF, (linePeriodScaling >> 8) & 0xFF]
+if (calValid):
+	dataArray += [voltageScaling1 & 0xFF, (voltageScaling1>>8) & 0xFF]
+	dataArray += [voltageOffset1 & 0xFF, (voltageOffset1>>8) & 0xFF]
+	dataArray += [currentScaling1 & 0xFF, (currentScaling1>>8) & 0xFF]
+	dataArray += [currentOffset1 & 0xFF, (currentOffset1>>8) & 0xFF]
+	dataArray += [voltageScaling1 & 0xFF, (voltageScaling1>>8) & 0xFF]
+	dataArray += [voltageOffset1 & 0xFF, (voltageOffset1>>8) & 0xFF]
+	dataArray += [currentScaling1 & 0xFF, (currentScaling1>>8) & 0xFF]
+	dataArray += [currentOffset1 & 0xFF, (currentOffset1>>8) & 0xFF]
+	dataArray += [linePeriodScaling & 0xFF, (linePeriodScaling >> 8) & 0xFF]
 databytearray = bytearray(dataArray)
 if (networkValid):
 	dataArray = [0xFF]
