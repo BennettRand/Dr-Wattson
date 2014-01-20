@@ -10,7 +10,7 @@ def dummy_data(size):
 		
 	return s
 
-formats = json.load(open("struct_formats.json"))
+formats = json.load(open("../lib/struct_formats.json"))
 
 # structs = {f:struct.Struct(str(formats[f])) for f in formats}
 
