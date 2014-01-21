@@ -13,7 +13,8 @@ typedef enum __attribute__((packed)) {
 	connectionAck = 2,
 	dataRequest = 3,
 	data = 4,
-	dataAck = 5
+	dataAck = 5,
+	coldStart = 6
 } packetType_t;
 
 typedef struct __attribute__((packed)) {
@@ -61,5 +62,8 @@ typedef struct __attribute__((packed)) {
     uint8_t dataSequence;
 } dataAckPacket_t;
 
+typedef struct __attribute__((packed)) {
+	packetType_t type;
+} coldStartPacket_t;
 
 #endif //PROTOCOL_COMM_H

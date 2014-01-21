@@ -218,15 +218,15 @@ void Widget::on_tableView_clicked(const QModelIndex &index)
         ui->packetDataEdit->appendPlainText(QString("Voltage (Vrms): ").append(QString().setNum(sqrt((((double)pkt->squaredVoltage2)/pkt->sampleCount))*ui->voltage2ScalingSpinbox->value())));
         ui->packetDataEdit->appendPlainText(QString("Current (Arms): ").append(QString().setNum(sqrt((((double)pkt->squaredCurrent2)/pkt->sampleCount))*ui->current2ScalingSpinbox->value())));
 
-
-
-
         ui->dataAckSeqNumber->setValue(pkt->dataSequence);
 
     }
     else if ((selData[0] == dataAck) && (selData.size() == sizeof(dataAckPacket_t))) {
         ui->packetDataEdit->appendPlainText("Data Ack Packet (0x05)");
         ui->packetDataEdit->appendPlainText(QString("Data Sequence Number: ").append(QString().setNum(selData[1])));
+    }
+    else if ((selData[0] == coldStart) && (selData.size() == sizeof(coldStartPacket_t))) {
+        ui->packetDataEdit->appendPlainText("Cold Start Packet (0x06)");
     }
 }
 

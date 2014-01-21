@@ -114,6 +114,9 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 	case dataAck:
 		handleDataAck(ind);
 		break;
+	case coldStart:
+		sendConnectionRequest(connectedBaseStation, &deviceCalibration);
+		break;
 	default:
 		break;
 	}
