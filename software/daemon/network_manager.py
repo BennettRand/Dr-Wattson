@@ -15,6 +15,18 @@ ser = None
 
 devices = {}
 
+def addr_to_mac(a):
+	s = ''
+	
+	for x in xrange(4):
+		s = str(hex(a&0xF)[2:]) + s
+		a = a>>4
+	
+	return '00-00-00-00-'+s[:2]+'-'+s[2:]
+
+def addr_to_inet(a):
+	return '0.0.'+str(a/256)+'.'+str(a%256)
+
 def calib_dict(t):
 	ret = {}
 	
@@ -31,10 +43,15 @@ def calib_dict(t):
 def power_dict(d,t):
 	ret = {}
 	
-	ret['power'] = (t[4]*devices[str(d)]['calib']['v_scale_1']*devices[str(d)]['calib']['c_scale_1'])/t[3]
-	ret['frequency'] = 1.0/(t[5]*devices[str(d)]['calib']['p_scale'])
-	ret['voltage'] = (math.sqrt(t[6]/t[3])*devices[str(d)]['calib']['v_scale_1'])
-	ret['current'] = (math.sqrt(t[7]/t[3])*devices[str(d)]['calib']['c_scale_1'])
+	ret['frequency'] = 1.0/(t[6]*devices[str(d)]['calib']['p_scale'])
+	
+	ret['power_1'] = (t[4]*devices[str(d)]['calib']['v_scale_1']*devices[str(d)]['calib']['c_scale_1'])/t[3]
+	ret['voltage_1'] = (math.sqrt(t[7]/t[3])*devices[str(d)]['calib']['v_scale_1'])
+	ret['current_1'] = (math.sqrt(t[9]/t[3])*devices[str(d)]['calib']['c_scale_1'])
+	
+	ret['power_2'] = (t[5]*devices[str(d)]['calib']['v_scale_2']*devices[str(d)]['calib']['c_scale_2'])/t[3]
+	ret['voltage_2'] = (math.sqrt(t[8]/t[3])*devices[str(d)]['calib']['v_scale_2'])
+	ret['current_2'] = (math.sqrt(t[10]/t[3])*devices[str(d)]['calib']['c_scale_2'])
 	
 	return ret
 
@@ -53,8 +70,14 @@ def main(argc = len(sys.argv), args = sys.argv):
 	
 	data_request_h = data_readers.tx_h.pack(data_readers.data_req_p.size, 0, 0xFFFF)
 	
+	cold_start = data_readers.tx_h.pack(data_readers.cold_start_p.size, 0, 0xFFFF)
+	cold_start += data_readers.cold_start_p.pack(6)
+	
 	print pan
 	ser.write(setPAN)
+	
+	ser.write(cold_start)
+	
 	req_seq += 1
 	last_sent_b = 0
 	last_sent_r = 0
@@ -82,9 +105,9 @@ def main(argc = len(sys.argv), args = sys.argv):
 				conn_r = data_readers.conn_req_p.unpack(payload)
 				print "Connection request:", conn_r
 				
-				devices[str(rx_h_data[1])] = {}
-				devices[str(rx_h_data[1])]['calib'] = calib_dict(conn_r)
-				devices[str(rx_h_data[1])]['power'] = []
+				devices[addr_to_mac(rx_h_data[1])] = {}
+				devices[addr_to_mac(rx_h_data[1])]['calib'] = calib_dict(conn_r)
+				devices[addr_to_mac(rx_h_data[1])]['power'] = []
 				
 				header = data_readers.tx_h.pack(data_readers.conn_ack_p.size,0,rx_h_data[1])
 				
@@ -96,7 +119,7 @@ def main(argc = len(sys.argv), args = sys.argv):
 				data_e_p = data_readers.data_e_p.unpack(payload)
 				print "Data received:", data_e_p
 				
-				devices[str(rx_h_data[1])]['power'].append(power_dict(rx_h_data[1], data_e_p))
+				devices[addr_to_mac(rx_h_data[1])]['power'].append(power_dict(addr_to_mac(rx_h_data[1]), data_e_p))
 				
 				header = data_readers.tx_h.pack(data_readers.data_ack_p.size,0,rx_h_data[1])
 				
