@@ -199,16 +199,27 @@ void Widget::on_tableView_clicked(const QModelIndex &index)
         ui->packetDataEdit->appendPlainText(QString("Request Sequence Number: ").append(QString().setNum(pkt->requestSequence)));
         ui->packetDataEdit->appendPlainText(QString("Data Sequence Number: ").append(QString().setNum(pkt->dataSequence)));
         ui->packetDataEdit->appendPlainText(QString("Sample Count: ").append(QString().setNum(pkt->sampleCount)));
-        ui->packetDataEdit->appendPlainText(QString("Raw Power Value: ").append(QString().setNum(pkt->powerData)));
         ui->packetDataEdit->appendPlainText(QString("Raw Line Period: ").append(QString().setNum(pkt->linePeriod)));
-        ui->packetDataEdit->appendPlainText(QString("Raw Voltage Value: ").append(QString().setNum(pkt->squaredVoltage)));
-        ui->packetDataEdit->appendPlainText(QString("Raw Current Value: ").append(QString().setNum(pkt->squaredCurrent)));
-
-        ui->packetDataEdit->appendPlainText("");
-        ui->packetDataEdit->appendPlainText(QString("Power: ").append(QString().setNum((((double)pkt->powerData)/pkt->sampleCount)*ui->voltage1ScalingSpinbox->value()*ui->current1ScalingSpinbox->value())));
-        ui->packetDataEdit->appendPlainText(QString("Voltage (Vrms): ").append(QString().setNum(sqrt((((double)pkt->squaredVoltage)/pkt->sampleCount))*ui->voltage1ScalingSpinbox->value())));
-        ui->packetDataEdit->appendPlainText(QString("Current (Arms): ").append(QString().setNum(sqrt((((double)pkt->squaredCurrent)/pkt->sampleCount))*ui->current1ScalingSpinbox->value())));
         ui->packetDataEdit->appendPlainText(QString("Line Frequency (Hz): ").append(QString().setNum(1.0/(((double)pkt->linePeriod) * ui->linePeriodScalingSpinbox->value()))));
+        ui->packetDataEdit->appendPlainText("\nChannel 1:");
+        ui->packetDataEdit->appendPlainText(QString("Raw Power Value: ").append(QString().setNum(pkt->powerData1)));
+        ui->packetDataEdit->appendPlainText(QString("Raw Voltage Value: ").append(QString().setNum(pkt->squaredVoltage1)));
+        ui->packetDataEdit->appendPlainText(QString("Raw Current Value: ").append(QString().setNum(pkt->squaredCurrent1)));
+        ui->packetDataEdit->appendPlainText("");
+        ui->packetDataEdit->appendPlainText(QString("Power: ").append(QString().setNum((((double)pkt->powerData1)/pkt->sampleCount)*ui->voltage1ScalingSpinbox->value()*ui->current1ScalingSpinbox->value())));
+        ui->packetDataEdit->appendPlainText(QString("Voltage (Vrms): ").append(QString().setNum(sqrt((((double)pkt->squaredVoltage1)/pkt->sampleCount))*ui->voltage1ScalingSpinbox->value())));
+        ui->packetDataEdit->appendPlainText(QString("Current (Arms): ").append(QString().setNum(sqrt((((double)pkt->squaredCurrent1)/pkt->sampleCount))*ui->current1ScalingSpinbox->value())));
+        ui->packetDataEdit->appendPlainText("\n\nChannel 2:");
+        ui->packetDataEdit->appendPlainText(QString("Raw Power Value: ").append(QString().setNum(pkt->powerData2)));
+        ui->packetDataEdit->appendPlainText(QString("Raw Voltage Value: ").append(QString().setNum(pkt->squaredVoltage2)));
+        ui->packetDataEdit->appendPlainText(QString("Raw Current Value: ").append(QString().setNum(pkt->squaredCurrent2)));
+        ui->packetDataEdit->appendPlainText("");
+        ui->packetDataEdit->appendPlainText(QString("Power: ").append(QString().setNum((((double)pkt->powerData2)/pkt->sampleCount)*ui->voltage2ScalingSpinbox->value()*ui->current2ScalingSpinbox->value())));
+        ui->packetDataEdit->appendPlainText(QString("Voltage (Vrms): ").append(QString().setNum(sqrt((((double)pkt->squaredVoltage2)/pkt->sampleCount))*ui->voltage2ScalingSpinbox->value())));
+        ui->packetDataEdit->appendPlainText(QString("Current (Arms): ").append(QString().setNum(sqrt((((double)pkt->squaredCurrent2)/pkt->sampleCount))*ui->current2ScalingSpinbox->value())));
+
+
+
 
         ui->dataAckSeqNumber->setValue(pkt->dataSequence);
 

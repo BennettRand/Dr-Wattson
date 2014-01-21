@@ -41,11 +41,14 @@ void handleDataRequest(NWK_DataInd_t *packet) {
 	dataPacket.requestSequence = reqPacket->requestSequence;
 	dataPacket.dataSequence = dataSequence;
 	dataPacket.sampleCount = sampleCount;
-	dataPacket.powerData = powerSum[0];
+	dataPacket.powerData1 = powerSum[0];
+	dataPacket.powerData2 = powerSum[1];
 	#ifdef EXTENDED_DATA_PACKET
 	dataPacket.linePeriod = linePeriod;
-	dataPacket.squaredVoltage = voltageSum[0];
-	dataPacket.squaredCurrent = currentSum[0];
+	dataPacket.squaredVoltage1 = voltageSum[0];
+	dataPacket.squaredVoltage2 = voltageSum[1];
+	dataPacket.squaredCurrent1 = currentSum[0];
+	dataPacket.squaredCurrent2 = currentSum[1];
 	#endif
 
 	uint8_t ind = 0;
@@ -73,11 +76,14 @@ void handleDataAck(NWK_DataInd_t *packet) {
 	if (ackPacket->dataSequence == dataSequence) { // This is the ack for the most recent data
 		cli(); // Don't interrupt while we are doing this. Is it really safe to do this?
 		sampleCount -= dataPacket.sampleCount;
-		powerSum[0] -= dataPacket.powerData;
+		powerSum[0] -= dataPacket.powerData1;
+		powerSum[1] -= dataPacket.powerData2;
 		#ifdef EXTENDED_DATA_PACKET
 		linePeriod -= dataPacket.linePeriod;
-		voltageSum[0] -= dataPacket.squaredVoltage;		
-		currentSum[0] -= dataPacket.squaredCurrent;
+		voltageSum[0] -= dataPacket.squaredVoltage1;		
+		voltageSum[1] -= dataPacket.squaredVoltage2;		
+		currentSum[0] -= dataPacket.squaredCurrent1;
+		currentSum[1] -= dataPacket.squaredCurrent2;
 		#endif
 		sei();
 	}

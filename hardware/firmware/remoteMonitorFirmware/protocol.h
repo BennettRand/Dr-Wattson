@@ -45,11 +45,14 @@ typedef struct __attribute__((packed)) {
 	uint8_t requestSequence;
 	uint8_t dataSequence;
 	uint32_t sampleCount;
-	int64_t powerData;
+	int64_t powerData1;
+	int64_t powerData2;
 	#ifdef EXTENDED_DATA_PACKET
     uint16_t linePeriod;
-	int64_t squaredVoltage;
-	int64_t squaredCurrent;
+	int64_t squaredVoltage1;
+	int64_t squaredVoltage2;
+	int64_t squaredCurrent1;
+	int64_t squaredCurrent2;
 	#endif
 } dataPacket_t;
 
