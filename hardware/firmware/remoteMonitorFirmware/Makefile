@@ -42,6 +42,7 @@ INCLUDES += \
   -I$(STACK_PATH)/nwk/inc \
   -I$(STACK_PATH)/sys/inc \
   -I../megaDrivers \
+  -I../utils \
   -I.
 
 SRCS += \
@@ -50,6 +51,7 @@ SRCS += \
   dataAck.c \
   ../megaDrivers/uart.c \
   ../megaDrivers/adc.c \
+  ../utils/int_sqrt.c \
   $(STACK_PATH)/hal/atmega256rfr2/src/hal.c \
   $(STACK_PATH)/hal/atmega256rfr2/src/halTimer.c \
   $(STACK_PATH)/phy/atmega256rfr2/src/phy.c \

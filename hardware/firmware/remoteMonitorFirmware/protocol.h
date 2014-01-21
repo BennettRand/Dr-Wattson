@@ -49,10 +49,10 @@ typedef struct __attribute__((packed)) {
 	int64_t powerData2;
 	#ifdef EXTENDED_DATA_PACKET
     uint16_t linePeriod;
-	int64_t squaredVoltage1;
-	int64_t squaredVoltage2;
-	int64_t squaredCurrent1;
-	int64_t squaredCurrent2;
+	uint64_t squaredVoltage1;
+	uint64_t squaredVoltage2;
+	uint64_t squaredCurrent1;
+	uint64_t squaredCurrent2;
 	#endif
 } dataPacket_t;
 
