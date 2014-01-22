@@ -95,7 +95,7 @@ def main(argc = len(sys.argv), args = sys.argv):
 			
 			read_in = ser.read(4)
 			rx_h_data = data_readers.rx_h.unpack(read_in)
-			print rx_h_data
+			# print rx_h_data
 			
 			while ser.inWaiting() < rx_h_data[0]: pass
 			payload = ser.read(rx_h_data[0])
@@ -103,7 +103,7 @@ def main(argc = len(sys.argv), args = sys.argv):
 			
 			if type == 1:
 				conn_r = data_readers.conn_req_p.unpack(payload)
-				print "Connection request:", conn_r
+				print "Connection request from", addr_to_mac(rx_h_data[1])
 				
 				devices[addr_to_mac(rx_h_data[1])] = {}
 				devices[addr_to_mac(rx_h_data[1])]['calib'] = calib_dict(conn_r)
@@ -114,10 +114,10 @@ def main(argc = len(sys.argv), args = sys.argv):
 				packet = data_readers.conn_ack_p.pack(2)
 				
 				ser.write(header+packet)
-				print "Sent Conn Ack"
+				print "Accepted", addr_to_mac(rx_h_data[1])
 			elif type == 4:
 				data_e_p = data_readers.data_e_p.unpack(payload)
-				print "Data received:", data_e_p
+				print "Data received from", addr_to_mac(rx_h_data[1])
 				
 				devices[addr_to_mac(rx_h_data[1])]['power'].append(power_dict(addr_to_mac(rx_h_data[1]), data_e_p))
 				
@@ -126,7 +126,7 @@ def main(argc = len(sys.argv), args = sys.argv):
 				packet = data_readers.data_ack_p.pack(5,data_e_p[2])
 				
 				ser.write(header+packet)
-				print "Sent Data Ack"
+				# print "Sent Data Ack"
 			else:
 				print payload
 	
