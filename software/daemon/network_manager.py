@@ -87,7 +87,6 @@ def main(argc = len(sys.argv), args = sys.argv):
 	cold_start = data_readers.tx_h.pack(data_readers.cold_start_p.size, 0, 0xFFFF)
 	cold_start += data_readers.cold_start_p.pack(6)
 	
-	# print pan
 	ser.write(setPAN)
 	
 	ser.write(cold_start)
@@ -97,6 +96,7 @@ def main(argc = len(sys.argv), args = sys.argv):
 	last_sent_r = 0
 	last_db_commit = 0
 	
+	print "Initialized on:", pan
 	while True:
 		if time.time()-last_sent_b >= 10:
 			ser.write(beacon)
@@ -122,6 +122,8 @@ def main(argc = len(sys.argv), args = sys.argv):
 			if type == 1:
 				conn_r = data_readers.conn_req_p.unpack(payload)
 				print "Connection request from", addr_to_mac(rx_h_data[1])
+				
+				add_device(rx_h_data[1])
 				
 				devices[addr_to_mac(rx_h_data[1])] = {}
 				devices[addr_to_mac(rx_h_data[1])]['calib'] = calib_dict(conn_r)
