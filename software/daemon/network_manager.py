@@ -155,7 +155,7 @@ def main(argc = len(sys.argv), args = sys.argv):
 if __name__ == "__main__":
 	try:
 		main()
-	except:
+	except KeyboardInterrupt as e:
 		f = open("collected.json","w")
 		json.dump(devices, f, indent = 4, sort_keys=True)
 		f.close()
