@@ -32,7 +32,7 @@ def addr_to_mac(a):
 def addr_to_inet(a):
 	return '0.0.'+str(a/256)+'.'+str(a%256)
 
-def add_device(dev):
+def add_device(a):
 	query = "INSERT INTO device (addr, mac) VALUES (%s, %s) SELECT %s, %s WHERE NOT EXISTS (SELECT mac FROM device WHERE mac = %s)"
 	
 	g_cur.execute(query, (addr_to_inet(a),addr_to_mac(a),addr_to_inet(a),addr_to_mac(a),addr_to_mac(a)))
@@ -155,7 +155,7 @@ def main(argc = len(sys.argv), args = sys.argv):
 if __name__ == "__main__":
 	try:
 		main()
-	except KeyboardInterrupt as e:
+	except:
 		f = open("collected.json","w")
 		json.dump(devices, f, indent = 4, sort_keys=True)
 		f.close()
