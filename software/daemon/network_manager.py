@@ -4,8 +4,12 @@ import time
 import serial
 import json
 import math
+import psycopg2
 
 sys.path.append('../lib')
+
+conn = psycopg2.connect(database = "wattson", host = "localhost", user = "root", password = "means swim of stream")
+g_cur = conn.cursor()
 
 import data_readers
 
@@ -14,6 +18,7 @@ pan = sum([ord(x) for x in platform.node()]) % 65536
 ser = None
 
 devices = {}
+threads = {}
 
 def addr_to_mac(a):
 	s = ''
@@ -26,6 +31,13 @@ def addr_to_mac(a):
 
 def addr_to_inet(a):
 	return '0.0.'+str(a/256)+'.'+str(a%256)
+
+def add_device(dev):
+	query = "INSERT INTO device (addr, mac) VALUES (%s, %s) SELECT %s, %s WHERE NOT EXISTS (SELECT mac FROM device WHERE mac = %s)"
+	
+	g_cur.execute(query, (addr_to_inet(a),addr_to_mac(a),addr_to_inet(a),addr_to_mac(a),addr_to_mac(a)))
+	
+	return
 
 def calib_dict(t):
 	ret = {}
@@ -83,6 +95,7 @@ def main(argc = len(sys.argv), args = sys.argv):
 	req_seq += 1
 	last_sent_b = 0
 	last_sent_r = 0
+	last_db_commit = 0
 	
 	while True:
 		if time.time()-last_sent_b >= 10:
@@ -92,6 +105,9 @@ def main(argc = len(sys.argv), args = sys.argv):
 			ser.write(data_request_h + data_readers.data_req_p.pack(3, req_seq%256))
 			req_seq += 1
 			last_sent_r = time.time()
+		if time.time()-last_db_commit >= 1:
+			conn.commit()
+			last_db_commit = time.time()
 		
 		if ser.inWaiting() >= 4:
 			
@@ -142,4 +158,7 @@ if __name__ == "__main__":
 		json.dump(devices, f, indent = 4, sort_keys=True)
 		f.close()
 		ser.close()
+		conn.commit()
+		g_cur.close()
+		conn.close()
 		print "Exiting..."
