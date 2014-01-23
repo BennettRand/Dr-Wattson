@@ -33,9 +33,11 @@ def addr_to_inet(a):
 	return '0.0.'+str(a/256)+'.'+str(a%256)
 
 def add_device(a):
-	query = "INSERT INTO device (addr, mac) VALUES (%s, %s) SELECT %s, %s WHERE NOT EXISTS (SELECT mac FROM device WHERE mac = %s)"
+	query = '''INSERT INTO device (addr, mac)
+	SELECT %s, %s
+	WHERE NOT EXISTS (SELECT mac FROM device WHERE mac = %s)'''
 	
-	g_cur.execute(query, (addr_to_inet(a),addr_to_mac(a),addr_to_inet(a),addr_to_mac(a),addr_to_mac(a)))
+	g_cur.execute(query, (addr_to_inet(a),addr_to_mac(a),addr_to_mac(a)))
 	
 	return
 
