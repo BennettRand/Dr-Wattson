@@ -43,6 +43,8 @@ def calib_dict(t):
 def power_dict(d,t):
 	ret = {}
 	
+	# print t
+	
 	ret['frequency'] = 1.0/(t[6]*devices[str(d)]['calib']['p_scale'])
 	
 	ret['power_1'] = (t[4]*devices[str(d)]['calib']['v_scale_1']*devices[str(d)]['calib']['c_scale_1'])/t[3]
@@ -73,7 +75,7 @@ def main(argc = len(sys.argv), args = sys.argv):
 	cold_start = data_readers.tx_h.pack(data_readers.cold_start_p.size, 0, 0xFFFF)
 	cold_start += data_readers.cold_start_p.pack(6)
 	
-	print pan
+	# print pan
 	ser.write(setPAN)
 	
 	ser.write(cold_start)
@@ -137,7 +139,7 @@ if __name__ == "__main__":
 		main()
 	except KeyboardInterrupt as e:
 		f = open("collected.json","w")
-		json.dump(devices, f, indent = 4)
+		json.dump(devices, f, indent = 4, sort_keys=True)
 		f.close()
 		ser.close()
 		print "Exiting..."
