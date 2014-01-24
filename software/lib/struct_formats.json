@@ -3,10 +3,11 @@
 	"conn_req_p":"=BHHHHH",
 	"conn_ack_p": "=B",
 	"data_req_p": "=BB",
-	"data_p": "=BBBIq",
-	"data_e_p": "=BBBIqHQQ",
+	"data_p": "=BBBIqq",
+	"data_e_p": "=BBBIqqHQQQQ",
 	"data_ack_p": "=BB",
 	"rx_h": "=BHb",
 	"tx_h": "=BBH",
-	"type": "=B"
+	"type": "=B",
+	"cold_start_p": "=B"
 }
