@@ -12,6 +12,7 @@ uint8_t uart_rx_buf[100];
 int16_t inputBuffer[425][4];
 uint16_t sampleCount = 0;
 bool transmitting = false;
+bool waiting = true;
 
 
 ISR(PCINT0_vect) { // Data ready triggered
@@ -20,14 +21,14 @@ ISR(PCINT0_vect) { // Data ready triggered
 }
 
 ISR(INT0_vect) {
-	if (sampleCount > 300) {
+	if ((sampleCount > 300) && (transmitting == false) && (waiting == false)) {
 		// We should probably stop sampling now
 		PCICR &= ~1;
 		PCIFR = (1<<PCIF0);
 		transmitting = true;
 	}
-	if (transmitting == false)
-		PCICR &= ~1;
+	if ((transmitting == false) && (waiting == false))
+		PCICR |= 1;
 }
 
 int main(void) {
@@ -51,16 +52,24 @@ int main(void) {
 
 	sendCommand(CMD_START);
 	sendCommand(CMD_RDATAC);
-	EIMSK &= ~1;
+	EIMSK |= 1;
 
 
 	while (1) {
 		if (transmitting){
 			for (uint16_t cnt = 0; cnt < sampleCount; cnt++) {
-				printf("%d, %d, %d, %d\n", inputBuffer[cnt][0], inputBuffer[cnt][1], inputBuffer[cnt][2], inputBuffer[cnt][3]);
+				printf("%u, %d, %d, %d, %d\n", cnt, inputBuffer[cnt][0], inputBuffer[cnt][1], inputBuffer[cnt][2], inputBuffer[cnt][3]);
 				_delay_ms(1);
 			}
 			transmitting = false;
+			waiting = true;
+		}
+		else if (waiting) {
+			if (uart_rx_byte() == 's') {
+				waiting = false;
+				sampleCount = 0;
+			}
+			
 		}
 	}
 }
