@@ -33,23 +33,30 @@ def call_b(data):
 		print "None",
 	print "Done",time.asctime()
 
-def commit_power(data, conn, g_cur):
+def commit_power(data):
+	conn = psycopg2.connect(database = "wattson", host = "localhost", user = "root", password = "means swim of stream")
+	cur = conn.cursor()
 	sample_insert = "INSERT INTO sample VALUES (DEFAULT, to_timestamp(%s), to_timestamp(%s), %s, %s, %s, %s, %s, %s, %s, %s);"
 	f = open('err.out','a')
 	f.write(time.asctime()+'\n')
+	f.write(str(conn)+'\n')
 	f.flush()
 	try:
 		if data != None:
 			for d in data:
 				for t in data[d]['power']:
-					g_cur.execute(sample_insert,(t['t'],t['t'],d,t['v_1'],t['v_2'],t['i_1'],t['i_2'],t['p_1'],t['p_2'],t['f']))
+					cur.execute(sample_insert,(t['t'],t['t'],d,t['v_1'],t['v_2'],t['i_1'],t['i_2'],t['p_1'],t['p_2'],t['f']))
 			conn.commit()
 	except Exception as e:
 		f.write(str(e)+'\n')
 		f.flush()
 		f.close()
+		cur.close()
+		conn.close()
 		return None
 	else:
+		cur.close()
+		conn.close()
 		f.close()
 		return data
 
@@ -152,7 +159,7 @@ def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):
 		if time.time()-last_db_commit >= 2:
 			data = copy.deepcopy(devices)
 			print "Spawn DB sync"
-			commit_p.apply_async(commit_power, args=(data,conn, g_cur),callback=call_b)
+			commit_p.apply_async(commit_power, args=(data,),callback=call_b)
 			empty_power()
 			last_db_commit = time.time()
 		
@@ -206,13 +213,13 @@ if __name__ == "__main__":
 	g_cur = conn.cursor()
 	if platform.system() == "Windows":
 		freeze_support()
-	commit_p = Pool(1,init_worker)
+	commit_p = Pool(4,init_worker)
 	try:
 		main(commit_p, conn, g_cur)
 	except KeyboardInterrupt as e:
 		# if commit_p.is_alive(): commit_p.join()
 		data = copy.deepcopy(devices)
-		commit_p.apply_async(commit_power, args=(data,conn, g_cur),callback=call_b)
+		commit_p.apply_async(commit_power, args=(data,),callback=call_b)
 		empty_power()
 		commit_p.close()
 		commit_p.join()
