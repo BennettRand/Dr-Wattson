@@ -9,7 +9,10 @@
 #include <QDateTime>
 #include <QFile>
 
+#define EXTENDED_DATA_PACKET
+
 #include "../../hardware/firmware/baseStationFirmware/protocol.h"
+#include "../../hardware/firmware/remoteMonitorFirmware/protocol.h"
 
 class PacketTableModel : public QAbstractTableModel
 {
