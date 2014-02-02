@@ -37,6 +37,7 @@ def call_b(data):
 def commit_power(data, conn, g_cur):
 	f = open('err.out','a')
 	f.write(time.asctime()+'\n')
+	f.flush()
 	try:
 		if data != None:
 			for d in data:
@@ -45,6 +46,7 @@ def commit_power(data, conn, g_cur):
 			conn.commit()
 	except psycopg2.Error as e:
 		f.write(str(e.diag))
+		f.flush()
 		f.close()
 		return None
 	else:
@@ -208,7 +210,7 @@ if __name__ == "__main__":
 	g_cur = conn.cursor()
 	if platform.system() == "Windows":
 		freeze_support()
-	commit_p = Pool(4,init_worker)
+	commit_p = Pool(1,init_worker)
 	try:
 		main(commit_p, conn, g_cur)
 	except KeyboardInterrupt as e:
