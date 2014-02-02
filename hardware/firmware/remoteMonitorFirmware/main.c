@@ -93,6 +93,7 @@ void handleDataAck(NWK_DataInd_t *packet) {
 	}
 }
 
+extern int16_t adcSampleData[4];
 static bool rfReceivePacket(NWK_DataInd_t *ind) {
 	// First figure out what kind of packet this is, and then call the appropreate function.
 	switch ((packetType_t) (ind->data[0])) {
@@ -116,6 +117,7 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 		break;
 	case coldStart:
 		sendConnectionRequest(connectedBaseStation, &deviceCalibration);
+		printf("Got Cold Start\n");
 		break;
 	default:
 		break;
@@ -150,19 +152,12 @@ int main(void) {
 	}	
 
 	initDataAck();
-//	sei();
+	sei();
 	startDataAck();
 
 
 	while (1) {
 		SYS_TaskHandler();
-/*
-		if (counter == 1000) {
-			printf("Power 1: %lld, Power2: %lld\n", powerSum[0], powerSum[1]);
-			counter = 0;
-		}
-		counter = counter+1;
-*/
 		if (uart_received_bytes() != 0) {
 			uint8_t data_byte = uart_rx_byte() - '0';
 			if (data_byte < BASESTATION_LIST_SIZE) {
