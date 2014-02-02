@@ -35,12 +35,16 @@ def call_b(data):
 	print "Done",time.asctime()
 
 def commit_power(data):
-	if data != None:
-		for d in data:
-			for t in data[d]['power']:
-				g_cur.execute(sample_insert,(t['t'],t['t'],d,t['v_1'],t['v_2'],t['i_1'],t['i_2'],t['p_1'],t['p_2'],t['f']))
-		conn.commit()
-	return data
+	try:
+		if data != None:
+			for d in data:
+				for t in data[d]['power']:
+					g_cur.execute(sample_insert,(t['t'],t['t'],d,t['v_1'],t['v_2'],t['i_1'],t['i_2'],t['p_1'],t['p_2'],t['f']))
+			conn.commit()
+	except:
+		return None
+	else:
+		return data
 
 # commit_p = None#Pool()#(target = commit_power, args=(devices,))
 
