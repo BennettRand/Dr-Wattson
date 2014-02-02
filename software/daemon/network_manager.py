@@ -5,6 +5,9 @@ import serial
 import json
 import math
 import psycopg2
+from multiprocessing import Pool, freeze_support
+import signal
+import copy
 
 sys.path.append('../lib')
 
@@ -17,8 +20,35 @@ pan = sum([ord(x) for x in platform.node()]) % 65536
 
 ser = None
 
-devices = {}
-threads = {}
+# id from til device_mac v1 v2 i1 i2 p1 p2 f
+sample_insert = "INSERT INTO sample VALUES (DEFAULT, to_timestamp(%s), to_timestamp(%s), %s, %s, %s, %s, %s, %s, %s, %s);"
+
+def init_worker():
+	signal.signal(signal.SIGINT, signal.SIG_IGN)
+
+def call_b(data):
+	if data != None:
+		for d in data:
+			print len(data[d]['power']),
+	else:
+		print "None",
+	print "Done",time.asctime()
+
+def commit_power(data):
+	if data != None:
+		for d in data:
+			for t in data[d]['power']:
+				g_cur.execute(sample_insert,(t['t'],t['t'],d,t['v_1'],t['v_2'],t['i_1'],t['i_2'],t['p_1'],t['p_2'],t['f']))
+		conn.commit()
+	return data
+
+# commit_p = None#Pool()#(target = commit_power, args=(devices,))
+
+def empty_power():
+	global devices
+	for d in devices:
+		del devices[d]['power']
+		devices[d]['power'] = []
 
 def addr_to_mac(a):
 	s = ''
@@ -57,7 +87,7 @@ def calib_dict(t):
 def power_dict(d,t):
 	ret = {}
 	
-	print t
+	# print t
 	
 	ret['t'] = time.time()
 	
@@ -65,17 +95,18 @@ def power_dict(d,t):
 	
 	ret['p_1'] = (t[4]*devices[str(d)]['calib']['v_scale_1']*devices[str(d)]['calib']['c_scale_1'])/t[3]
 	ret['v_1'] = (math.sqrt(t[7]/t[3])*devices[str(d)]['calib']['v_scale_1'])
-	ret['c_1'] = (math.sqrt(t[9]/t[3])*devices[str(d)]['calib']['c_scale_1'])
+	ret['i_1'] = (math.sqrt(t[9]/t[3])*devices[str(d)]['calib']['c_scale_1'])
 	
 	ret['p_2'] = (t[5]*devices[str(d)]['calib']['v_scale_2']*devices[str(d)]['calib']['c_scale_2'])/t[3]
 	ret['v_2'] = (math.sqrt(t[8]/t[3])*devices[str(d)]['calib']['v_scale_2'])
-	ret['c_2'] = (math.sqrt(t[10]/t[3])*devices[str(d)]['calib']['c_scale_2'])
+	ret['i_2'] = (math.sqrt(t[10]/t[3])*devices[str(d)]['calib']['c_scale_2'])
 	
 	return ret
 
-def main(argc = len(sys.argv), args = sys.argv):
+def main(commit_p, argc = len(sys.argv), args = sys.argv):
 	
 	global ser
+	global devices
 	
 	ser = serial.Serial(args[1], 38400, timeout = .01)
 	
@@ -110,7 +141,10 @@ def main(argc = len(sys.argv), args = sys.argv):
 			req_seq += 1
 			last_sent_r = time.time()
 		if time.time()-last_db_commit >= 1:
-			conn.commit()
+			# if commit_p.is_alive(): commit_p.join()
+			data = copy.deepcopy(devices)
+			commit_p.apply_async(commit_power, args=(data,),callback=call_b)
+			empty_power()
 			last_db_commit = time.time()
 		
 		if ser.inWaiting() >= 4:
@@ -157,9 +191,19 @@ def main(argc = len(sys.argv), args = sys.argv):
 	
 
 if __name__ == "__main__":
+	global devices
+	devices = {}
+	freeze_support()
+	commit_p = Pool(1,init_worker)
 	try:
-		main()
+		main(commit_p)
 	except KeyboardInterrupt as e:
+		# if commit_p.is_alive(): commit_p.join()
+		data = copy.deepcopy(devices)
+		commit_p.apply_async(commit_power, args=(data,),callback=call_b)
+		empty_power()
+		commit_p.close()
+		commit_p.join()
 		f = open("collected.json","w")
 		json.dump(devices, f, indent = 4, sort_keys=True)
 		f.close()
