@@ -35,6 +35,8 @@ def call_b(data):
 	print "Done",time.asctime()
 
 def commit_power(data, conn, g_cur):
+	f = open('err.out','a')
+	f.write(time.asctime()+'\n')
 	try:
 		if data != None:
 			for d in data:
@@ -42,9 +44,11 @@ def commit_power(data, conn, g_cur):
 					g_cur.execute(sample_insert,(t['t'],t['t'],d,t['v_1'],t['v_2'],t['i_1'],t['i_2'],t['p_1'],t['p_2'],t['f']))
 			conn.commit()
 	except psycopg2.Error as e:
-		open('err.out','a').write(str(e.diag))
+		f.write(str(e.diag))
+		f.close()
 		return None
 	else:
+		f.close()
 		return data
 
 # commit_p = None#Pool()#(target = commit_power, args=(devices,))
