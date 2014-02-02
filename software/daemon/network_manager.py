@@ -19,7 +19,6 @@ pan = sum([ord(x) for x in platform.node()]) % 65536
 ser = None
 
 # id from til device_mac v1 v2 i1 i2 p1 p2 f
-sample_insert = "INSERT INTO sample VALUES (DEFAULT, to_timestamp(%s), to_timestamp(%s), %s, %s, %s, %s, %s, %s, %s, %s);"
 
 def init_worker():
 	signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -35,6 +34,7 @@ def call_b(data):
 	print "Done",time.asctime()
 
 def commit_power(data, conn, g_cur):
+	sample_insert = "INSERT INTO sample VALUES (DEFAULT, to_timestamp(%s), to_timestamp(%s), %s, %s, %s, %s, %s, %s, %s, %s);"
 	f = open('err.out','a')
 	f.write(time.asctime()+'\n')
 	f.flush()
@@ -52,8 +52,6 @@ def commit_power(data, conn, g_cur):
 	else:
 		f.close()
 		return data
-
-# commit_p = None#Pool()#(target = commit_power, args=(devices,))
 
 def empty_power():
 	global devices
@@ -152,10 +150,9 @@ def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):
 			req_seq += 1
 			last_sent_r = time.time()
 		if time.time()-last_db_commit >= 2:
-			# if commit_p.is_alive(): commit_p.join()
 			data = copy.deepcopy(devices)
 			print "Spawn DB sync"
-			commit_p.apply_async(commit_power, args=(data,),callback=call_b)
+			commit_p.apply_async(commit_power, args=(data,conn, g_cur),callback=call_b)
 			empty_power()
 			last_db_commit = time.time()
 		
@@ -163,7 +160,6 @@ def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):
 			
 			read_in = ser.read(4)
 			rx_h_data = data_readers.rx_h.unpack(read_in)
-			# print rx_h_data
 			
 			while ser.inWaiting() < rx_h_data[0]: pass
 			payload = ser.read(rx_h_data[0])
@@ -189,14 +185,14 @@ def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):
 				data_e_p = data_readers.data_e_p.unpack(payload)
 				print "Data received from", addr_to_mac(rx_h_data[1])
 				
-				devices[addr_to_mac(rx_h_data[1])]['power'].append(power_dict(addr_to_mac(rx_h_data[1]), data_e_p))
-				
-				header = data_readers.tx_h.pack(data_readers.data_ack_p.size,0,rx_h_data[1])
-				
-				packet = data_readers.data_ack_p.pack(5,data_e_p[2])
-				
-				ser.write(header+packet)
-				# print "Sent Data Ack"
+				if addr_to_mac(rx_h_data[1]) in devices:
+					devices[addr_to_mac(rx_h_data[1])]['power'].append(power_dict(addr_to_mac(rx_h_data[1]), data_e_p))
+					
+					header = data_readers.tx_h.pack(data_readers.data_ack_p.size,0,rx_h_data[1])
+					
+					packet = data_readers.data_ack_p.pack(5,data_e_p[2])
+					
+					ser.write(header+packet)
 			else:
 				print payload
 	
