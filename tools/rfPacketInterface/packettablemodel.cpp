@@ -33,7 +33,7 @@ int PacketTableModel::rowCount(const QModelIndex &parent) const
 
 int PacketTableModel::columnCount(const QModelIndex &parent) const
 {
-    return 5;
+    return 6;
 }
 
 Qt::ItemFlags PacketTableModel::flags(const QModelIndex &index) const
@@ -55,11 +55,28 @@ QVariant PacketTableModel::data(const QModelIndex &index, int role) const
             return QString().setNum(header_list.at(index.row()).rssi);
         case 3:
             return QString().setNum(header_list.at(index.row()).size);
-        case 4:
+        case 5:
             if (currentEncoding == ASCII)
                 return QString(data_list.at(index.row()));
             else if (currentEncoding == HEX)
                 return QString(data_list.at(index.row()).toHex()).toUpper();
+        case 4:
+            if ((data_list[index.row()].at(0) == bacon) && (data_list[index.row()].size() == sizeof(baconPacket_t)))
+                return "Beacon";
+            else if ((data_list[index.row()].at(0) == connectionRequest) && (data_list[index.row()].size() == sizeof(connectionRequestPacket_t)))
+                return "Connection Request";
+            else if ((data_list[index.row()].at(0) == connectionAck) && (data_list[index.row()].size() == sizeof(connectionAckPacket_t)))
+                return "Connection Ack";
+            else if ((data_list[index.row()].at(0) == dataRequest) && (data_list[index.row()].size() == sizeof(dataRequestPacket_t)))
+                return "Data Request";
+            else if ((data_list[index.row()].at(0) == 4) && (data_list[index.row()].size() == sizeof(dataPacket_t)))
+                return "Data";
+            else if ((data_list[index.row()].at(0) == dataAck) && (data_list[index.row()].size() == sizeof(dataAckPacket_t)))
+                return "Data Ack";
+            else if ((data_list[index.row()].at(0) == coldStart) && (data_list[index.row()].size() == sizeof(coldStartPacket_t)))
+                return "Cold Start";
+            else
+                return "Unknown";
         default:
             return QVariant();
         }
@@ -83,8 +100,10 @@ QVariant PacketTableModel::headerData(int section, Qt::Orientation orientation, 
                 return "RSSI";
             case 3:
                 return "Length";
-            case 4:
+            case 5:
                 return "Data";
+            case 4:
+                return "Packet Type";
             default: return "ERROR";
             }
         }
