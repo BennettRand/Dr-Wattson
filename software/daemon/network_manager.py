@@ -23,8 +23,8 @@ sample_insert = "INSERT INTO sample VALUES (DEFAULT, to_timestamp(%s), to_timest
 
 def init_worker():
 	signal.signal(signal.SIGINT, signal.SIG_IGN)
-	sys.stderr = open('err.out','w')
-	sys.stdout = open('std.out','w')
+	# sys.stderr = open('err.out','a')
+	# sys.stdout = open('std.out','a')
 
 def call_b(data):
 	if data != None:
@@ -35,12 +35,17 @@ def call_b(data):
 	print "Done",time.asctime()
 
 def commit_power(data, conn, g_cur):
-	if data != None:
-		for d in data:
-			for t in data[d]['power']:
-				g_cur.execute(sample_insert,(t['t'],t['t'],d,t['v_1'],t['v_2'],t['i_1'],t['i_2'],t['p_1'],t['p_2'],t['f']))
-		conn.commit()
-	return data
+	try:
+		if data != None:
+			for d in data:
+				for t in data[d]['power']:
+					g_cur.execute(sample_insert,(t['t'],t['t'],d,t['v_1'],t['v_2'],t['i_1'],t['i_2'],t['p_1'],t['p_2'],t['f']))
+			conn.commit()
+	except psycopg2.Error as e:
+		open('err.out','a').write(str(e.diag))
+		return None
+	else:
+		return data
 
 # commit_p = None#Pool()#(target = commit_power, args=(devices,))
 
