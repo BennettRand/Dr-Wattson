@@ -140,9 +140,10 @@ def main(commit_p, argc = len(sys.argv), args = sys.argv):
 			ser.write(data_request_h + data_readers.data_req_p.pack(3, req_seq%256))
 			req_seq += 1
 			last_sent_r = time.time()
-		if time.time()-last_db_commit >= 1:
+		if time.time()-last_db_commit >= 2:
 			# if commit_p.is_alive(): commit_p.join()
 			data = copy.deepcopy(devices)
+			print "Spawn DB sync"
 			commit_p.apply_async(commit_power, args=(data,),callback=call_b)
 			empty_power()
 			last_db_commit = time.time()
@@ -193,8 +194,9 @@ def main(commit_p, argc = len(sys.argv), args = sys.argv):
 if __name__ == "__main__":
 	global devices
 	devices = {}
-	freeze_support()
-	commit_p = Pool(1,init_worker)
+	if platform.system() == "Windows":
+		freeze_support()
+	commit_p = Pool(4,init_worker)
 	try:
 		main(commit_p)
 	except KeyboardInterrupt as e:
