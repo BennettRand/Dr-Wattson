@@ -11,8 +11,6 @@ import copy
 
 sys.path.append('../lib')
 
-conn = psycopg2.connect(database = "wattson", host = "localhost", user = "root", password = "means swim of stream")
-g_cur = conn.cursor()
 
 import data_readers
 
@@ -36,7 +34,7 @@ def call_b(data):
 		print "None",
 	print "Done",time.asctime()
 
-def commit_power(data):
+def commit_power(data, conn, g_cur):
 	if data != None:
 		for d in data:
 			for t in data[d]['power']:
@@ -64,7 +62,7 @@ def addr_to_mac(a):
 def addr_to_inet(a):
 	return '0.0.'+str(a/256)+'.'+str(a%256)
 
-def add_device(a):
+def add_device(a, g_cur):
 	query = '''INSERT INTO device (addr, mac)
 	SELECT %s, %s
 	WHERE NOT EXISTS (SELECT mac FROM device WHERE mac = %s)'''
@@ -105,7 +103,7 @@ def power_dict(d,t):
 	
 	return ret
 
-def main(commit_p, argc = len(sys.argv), args = sys.argv):
+def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):
 	
 	global ser
 	global devices
@@ -164,7 +162,7 @@ def main(commit_p, argc = len(sys.argv), args = sys.argv):
 				conn_r = data_readers.conn_req_p.unpack(payload)
 				print "Connection request from", addr_to_mac(rx_h_data[1])
 				
-				add_device(rx_h_data[1])
+				add_device(rx_h_data[1], g_cur)
 				
 				devices[addr_to_mac(rx_h_data[1])] = {}
 				devices[addr_to_mac(rx_h_data[1])]['calib'] = calib_dict(conn_r)
@@ -196,15 +194,18 @@ def main(commit_p, argc = len(sys.argv), args = sys.argv):
 if __name__ == "__main__":
 	global devices
 	devices = {}
+	conn = psycopg2.connect(database = "wattson", host = "localhost", user = "root", password = "means swim of stream")]
+	print "Connected to",conn
+	g_cur = conn.cursor()
 	if platform.system() == "Windows":
 		freeze_support()
 	commit_p = Pool(4,init_worker)
 	try:
-		main(commit_p)
+		main(commit_p, conn, g_cur)
 	except KeyboardInterrupt as e:
 		# if commit_p.is_alive(): commit_p.join()
 		data = copy.deepcopy(devices)
-		commit_p.apply_async(commit_power, args=(data,),callback=call_b)
+		commit_p.apply_async(commit_power, args=(data,conn, g_cur),callback=call_b)
 		empty_power()
 		commit_p.close()
 		commit_p.join()
