@@ -44,10 +44,10 @@ def add_device(a):
 def calib_dict(t):
 	ret = {}
 	
-	ret['v_scale_1'] = t[1]/10000000.0
+	ret['v_scale_1'] = t[1]/1000000.0
 	ret['c_scale_1'] = t[2]/10000000.0
 	
-	ret['v_scale_2'] = t[3]/10000000.0
+	ret['v_scale_2'] = t[3]/1000000.0
 	ret['c_scale_2'] = t[4]/10000000.0
 	
 	ret['p_scale'] = t[5]/1000000000.0
@@ -57,17 +57,19 @@ def calib_dict(t):
 def power_dict(d,t):
 	ret = {}
 	
-	# print t
+	print t
 	
-	ret['frequency'] = 1.0/(t[6]*devices[str(d)]['calib']['p_scale'])
+	ret['t'] = time.time()
 	
-	ret['power_1'] = (t[4]*devices[str(d)]['calib']['v_scale_1']*devices[str(d)]['calib']['c_scale_1'])/t[3]
-	ret['voltage_1'] = (math.sqrt(t[7]/t[3])*devices[str(d)]['calib']['v_scale_1'])
-	ret['current_1'] = (math.sqrt(t[9]/t[3])*devices[str(d)]['calib']['c_scale_1'])
+	ret['f'] = 1.0/(t[6]*devices[str(d)]['calib']['p_scale'])
 	
-	ret['power_2'] = (t[5]*devices[str(d)]['calib']['v_scale_2']*devices[str(d)]['calib']['c_scale_2'])/t[3]
-	ret['voltage_2'] = (math.sqrt(t[8]/t[3])*devices[str(d)]['calib']['v_scale_2'])
-	ret['current_2'] = (math.sqrt(t[10]/t[3])*devices[str(d)]['calib']['c_scale_2'])
+	ret['p_1'] = (t[4]*devices[str(d)]['calib']['v_scale_1']*devices[str(d)]['calib']['c_scale_1'])/t[3]
+	ret['v_1'] = (math.sqrt(t[7]/t[3])*devices[str(d)]['calib']['v_scale_1'])
+	ret['c_1'] = (math.sqrt(t[9]/t[3])*devices[str(d)]['calib']['c_scale_1'])
+	
+	ret['p_2'] = (t[5]*devices[str(d)]['calib']['v_scale_2']*devices[str(d)]['calib']['c_scale_2'])/t[3]
+	ret['v_2'] = (math.sqrt(t[8]/t[3])*devices[str(d)]['calib']['v_scale_2'])
+	ret['c_2'] = (math.sqrt(t[10]/t[3])*devices[str(d)]['calib']['c_scale_2'])
 	
 	return ret
 
