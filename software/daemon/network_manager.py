@@ -44,8 +44,8 @@ def commit_power(data, conn, g_cur):
 				for t in data[d]['power']:
 					g_cur.execute(sample_insert,(t['t'],t['t'],d,t['v_1'],t['v_2'],t['i_1'],t['i_2'],t['p_1'],t['p_2'],t['f']))
 			conn.commit()
-	except psycopg2.Error as e:
-		f.write(str(e.diag))
+	except Exception as e:
+		f.write(str(e)+'\n')
 		f.flush()
 		f.close()
 		return None
