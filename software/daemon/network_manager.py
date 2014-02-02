@@ -194,7 +194,7 @@ def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):
 if __name__ == "__main__":
 	global devices
 	devices = {}
-	conn = psycopg2.connect(database = "wattson", host = "localhost", user = "root", password = "means swim of stream")]
+	conn = psycopg2.connect(database = "wattson", host = "localhost", user = "root", password = "means swim of stream")
 	print "Connected to",conn
 	g_cur = conn.cursor()
 	if platform.system() == "Windows":
