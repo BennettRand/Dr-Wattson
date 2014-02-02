@@ -34,39 +34,29 @@ void packetTxConf(NWK_DataReq_t *req) {
 void handleDataRequest(NWK_DataInd_t *packet) {
 	if (packet->size != sizeof(dataRequestPacket_t))
 		return; // Packet wrong size, just throw it out
+
+	if (dataReady()) {
+		dataRequestPacket_t *reqPacket = (dataRequestPacket_t*)packet->data;
 	
-	dataRequestPacket_t *reqPacket = (dataRequestPacket_t*)packet->data;
-
-	dataSequence += 1;
-
-	dataPacket.requestSequence = reqPacket->requestSequence;
-	dataPacket.dataSequence = dataSequence;
-	dataPacket.sampleCount = sampleCount;
-	dataPacket.powerData1 = powerSum[0];
-	dataPacket.powerData2 = powerSum[1];
-	#ifdef EXTENDED_DATA_PACKET
-	dataPacket.linePeriod = linePeriod;
-	dataPacket.squaredVoltage1 = voltageSum[0];
-	dataPacket.squaredVoltage2 = voltageSum[1];
-	dataPacket.squaredCurrent1 = currentSum[0];
-	dataPacket.squaredCurrent2 = currentSum[1];
-	#endif
-
-	uint8_t ind = 0;
-	while (dataReqBusy[ind]) {
-		SYS_TaskHandler();
-		ind++;
+		dataSequence += 1;
+		dataPacket.requestSequence = reqPacket->requestSequence;
+		getData(&dataPacket);
+	
+		uint8_t ind = 0;
+		while (dataReqBusy[ind]) {
+			SYS_TaskHandler();
+			ind++;
+		}
+		nwkPacket[ind].dstAddr = baseStationList[connectedBaseStation].addr;
+		nwkPacket[ind].dstEndpoint = APP_ENDPOINT;
+		nwkPacket[ind].srcEndpoint = APP_ENDPOINT;
+		nwkPacket[ind].options = 0;
+		nwkPacket[ind].data = (uint8_t *)(&dataPacket);
+		nwkPacket[ind].size = sizeof(dataPacket_t);
+		nwkPacket[ind].confirm = packetTxConf;
+		NWK_DataReq(&(nwkPacket[ind]));
+		dataReqBusy[ind] = true;
 	}
-	nwkPacket[ind].dstAddr = baseStationList[connectedBaseStation].addr;
-	nwkPacket[ind].dstEndpoint = APP_ENDPOINT;
-	nwkPacket[ind].srcEndpoint = APP_ENDPOINT;
-	nwkPacket[ind].options = 0;
-	nwkPacket[ind].data = (uint8_t *)(&dataPacket);
-	nwkPacket[ind].size = sizeof(dataPacket_t);
-	nwkPacket[ind].confirm = packetTxConf;
-	NWK_DataReq(&(nwkPacket[ind]));
-	dataReqBusy[ind] = true;
-
 //	printf("Voltage: %umV\n", (int_sqrt((uint32_t)(voltageSum[0]/((uint32_t)sampleCount)))*deviceCalibration.channel1VoltageScaling)/10000000);
 //	printf("Power: %umw\n", (((int64_t)(powerSum[0]/10000000ll)*(int32_t)deviceCalibration.channel1VoltageScaling*(int32_t)deviceCalibration.channel1CurrentScaling)/sampleCount)/1000);
 }
@@ -74,23 +64,7 @@ void handleDataRequest(NWK_DataInd_t *packet) {
 void handleDataAck(NWK_DataInd_t *packet) {
 	if (packet->size != sizeof(dataAckPacket_t))
 		return; // Not the right size for this kind of packet
-
-	dataAckPacket_t *ackPacket = (dataAckPacket_t*)packet->data;
-
-	if (ackPacket->dataSequence == dataSequence) { // This is the ack for the most recent data
-		cli(); // Don't interrupt while we are doing this. Is it really safe to do this?
-		sampleCount -= dataPacket.sampleCount;
-		powerSum[0] -= dataPacket.powerData1;
-		powerSum[1] -= dataPacket.powerData2;
-		#ifdef EXTENDED_DATA_PACKET
-		linePeriod -= dataPacket.linePeriod;
-		voltageSum[0] -= dataPacket.squaredVoltage1;		
-		voltageSum[1] -= dataPacket.squaredVoltage2;		
-		currentSum[0] -= dataPacket.squaredCurrent1;
-		currentSum[1] -= dataPacket.squaredCurrent2;
-		#endif
-		sei();
-	}
+	removeSamples(&dataPacket);
 }
 
 extern int16_t adcSampleData[4];
@@ -166,6 +140,12 @@ int main(void) {
 			}
 		}
 
-//	EIMSK |= 1;
+		if (sampleCount > 160000) {
+			removeSamples(&dataPacket);
+			getData(&dataPacket);
+			removeSamples(&dataPacket);
+		}
+			
+
 	}
 }

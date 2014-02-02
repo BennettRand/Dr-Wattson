@@ -6,18 +6,15 @@
 
 #include "adc.h"
 #include "config.h"
+#include "protocol.h"
 
 extern uint32_t sampleCount;
-extern int64_t powerSum[2];
-
-#ifdef EXTENDED_DATA_PACKET
-extern int64_t voltageSum[2];
-extern int64_t currentSum[2];
-extern uint16_t linePeriod;
-#endif
 
 void initDataAck();
 void stopDataAck();
 void startDataAck();
+bool dataReady();
+void getData(dataPacket_t *pkt);
+void removeSamples(dataPacket_t *pkt);
 
 #endif //DATA_ACK_H
