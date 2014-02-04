@@ -51,6 +51,7 @@ SRCS += \
   dataAck.c \
   ../megaDrivers/uart.c \
   ../megaDrivers/adc.c \
+  ../megaDrivers/lcd.c \
   ../utils/int_sqrt.c \
   $(STACK_PATH)/hal/atmega256rfr2/src/hal.c \
   $(STACK_PATH)/hal/atmega256rfr2/src/halTimer.c \
