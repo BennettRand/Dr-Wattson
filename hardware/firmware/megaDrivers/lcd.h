@@ -12,12 +12,12 @@
 #define LCD_CMD_DSP_ON 0x0C
 #define LCD_MOVE_TO_CHAR(row,col) (sendLCDCmd(0x80 | (col +(row<<6))));
 
-typedef struct {
+struct lcd_cmd {
 	uint8_t data;
 	bool command;
-} lcd_cmd_t;
+};
 
-void initLCD(lcd_cmd_t buffer[], uint8_t buf_len);
+void initLCD(struct lcd_cmd buffer[], uint8_t buf_len);
 void serviceLCD(void);
 void sendLCDCmd(uint8_t byte);
 void writeChar(char c);

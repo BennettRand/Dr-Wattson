@@ -49,6 +49,7 @@ SRCS += \
   main.c \
   basestation.c \
   dataAck.c \
+  ui.c \
   ../megaDrivers/uart.c \
   ../megaDrivers/adc.c \
   ../megaDrivers/lcd.c \

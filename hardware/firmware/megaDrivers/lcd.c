@@ -1,11 +1,11 @@
 #include "lcd.h"
 
-static lcd_cmd_t *lcd_buf;
+static struct lcd_cmd *lcd_buf;
 static uint8_t lcd_buf_start = 0;
 static uint8_t lcd_buf_end = 0;
 static uint8_t lcd_buf_size;
 
-void initLCD(lcd_cmd_t buffer[], uint8_t buf_len) {
+void initLCD(struct lcd_cmd buffer[], uint8_t buf_len) {
 	// Init IO pins
 	DDRG |= (1<<2) | (1<<3);
 	PORTG |= (1<<2); // Clock should idle high because it is falling edge triggered.

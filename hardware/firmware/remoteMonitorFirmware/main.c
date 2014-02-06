@@ -14,7 +14,7 @@
 #include "protocol.h"
 #include "basestation.h"
 #include "dataAck.h"
-#include "int_sqrt.h"
+#include "lcd.h"
 
 NWK_DataReq_t nwkPacket[DATA_REQ_BUFFER_CNT];
 bool dataReqBusy[DATA_REQ_BUFFER_CNT];
@@ -26,6 +26,8 @@ static dataPacket_t dataPacket = {.type = data};
 static uint8_t dataSequence = 0;
 
 struct calibData deviceCalibration = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+struct lcd_cmd display_cmd_buffer[32];
 
 void packetTxConf(NWK_DataReq_t *req) {
 	dataReqBusy[req - nwkPacket] = false;
@@ -126,12 +128,17 @@ int main(void) {
 	}	
 
 	initDataAck();
+	initLCD(display_cmd_buffer, 32);
+
+	TCCR3B |= CS30;
+
 	sei();
 	startDataAck();
 
 
 	while (1) {
 		SYS_TaskHandler();
+		updateUI();
 		if (uart_received_bytes() != 0) {
 			uint8_t data_byte = uart_rx_byte() - '0';
 			if (data_byte < BASESTATION_LIST_SIZE) {
@@ -145,7 +152,11 @@ int main(void) {
 			getData(&dataPacket);
 			removeSamples(&dataPacket);
 		}
-			
-
+		
+		if (TCNT3 > 640) {
+			serviceLCD();
+			TCNT3 = 0;
+		}
 	}
 }
+
