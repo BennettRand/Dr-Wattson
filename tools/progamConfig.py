@@ -91,7 +91,7 @@ if len(macAddr) != 16:
 macAddr = int(macAddr,16);
 
 while len(Name) < 16:
-	Name += " "
+	Name += "\0"
 Name = Name[:16]
 
 if not outputFileSpecified:
