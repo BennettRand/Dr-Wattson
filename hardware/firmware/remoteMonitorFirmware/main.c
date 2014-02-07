@@ -14,6 +14,7 @@
 #include "protocol.h"
 #include "basestation.h"
 #include "dataAck.h"
+#include "ui.h"
 #include "lcd.h"
 
 NWK_DataReq_t nwkPacket[DATA_REQ_BUFFER_CNT];
@@ -114,7 +115,7 @@ int main(void) {
 	PHY_SetRxState(true);
 	NWK_OpenEndpoint(APP_ENDPOINT, rfReceivePacket);
 	PHY_SetTxPower(0);
-	uart_init_port(uart_baud_115200, uart_tx_buf, 100, uart_rx_buf, 100); // Init uart
+	//uart_init_port(uart_baud_115200, uart_tx_buf, 100, uart_rx_buf, 100); // Init uart
 
 	// Read eeprom data
 	eeprom_read_block(&deviceCalibration, (void*)8, sizeof(deviceCalibration));
@@ -129,6 +130,11 @@ int main(void) {
 
 	initDataAck();
 	initLCD(display_cmd_buffer, 32);
+	initUI();
+	while (1) {
+		serviceLCD();
+		_delay_us(60);
+	}
 
 	TCCR3B |= CS30;
 
@@ -138,7 +144,7 @@ int main(void) {
 
 	while (1) {
 		SYS_TaskHandler();
-		updateUI();
+		//updateUI();
 		if (uart_received_bytes() != 0) {
 			uint8_t data_byte = uart_rx_byte() - '0';
 			if (data_byte < BASESTATION_LIST_SIZE) {

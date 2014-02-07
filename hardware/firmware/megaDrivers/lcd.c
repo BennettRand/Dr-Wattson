@@ -13,23 +13,26 @@ void initLCD(struct lcd_cmd buffer[], uint8_t buf_len) {
 	PORTB &= (1<<5); // Generally we want to be in write mode.
 	DDRE = 0xFF; // Set data port to outputs
 
+	_delay_ms(1);
+
 	lcd_buf = buffer;
 	lcd_buf_size = buf_len;
 
-	sendLCDCmd(0x38); // Configure LCD for 8 bit mode with two lines of text
+	sendLCDCmd(0x30); // Configure LCD for 8 bit mode with two lines of text
+	serviceLCD();
 	
 }
 
 void sendLCDCmd(uint8_t cmd) {
-	lcd_buf_end = (lcd_buf_end < (lcd_buf_size-1)) ? lcd_buf_end+1 : 0;
 	lcd_buf[lcd_buf_end].data = cmd;
 	lcd_buf[lcd_buf_end].command = true;
+	lcd_buf_end = (lcd_buf_end < (lcd_buf_size-1)) ? lcd_buf_end+1 : 0;
 }
 
 void writeChar(char c) {
-	lcd_buf_end = (lcd_buf_end < (lcd_buf_size-1)) ? lcd_buf_end+1 : 0;
 	lcd_buf[lcd_buf_end].data = c;
 	lcd_buf[lcd_buf_end].command = false;
+	lcd_buf_end = (lcd_buf_end < (lcd_buf_size-1)) ? lcd_buf_end+1 : 0;
 }
 
 void writeString(char* c) {
@@ -37,7 +40,7 @@ void writeString(char* c) {
 	while (*c != 0) {
 		if (charCnt >= 16)
 			break; // Can't print more than 16 characters
-		if (charCnt >= 8)
+		if (charCnt == 8)
 			LCD_MOVE_TO_CHAR(1,0); // move to beginning of second line if longer than 8 chars
 
 		writeChar(*c);
