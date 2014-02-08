@@ -3,4 +3,5 @@
 
 void initUI(void);
 void updateUI(void);
+void baseStationConnected(void);
 

@@ -42,3 +42,8 @@ void updateUI(void) {
 	}
 }
 
+void baseStationConnected(void) {
+	sendLCDCond(LCD_CMD_CLEAR);
+	currentState = connected;
+}
+
