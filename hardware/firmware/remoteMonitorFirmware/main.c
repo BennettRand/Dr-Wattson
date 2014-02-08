@@ -1,5 +1,4 @@
 #include <avr/io.h>
-#include <avr/boot.h>
 #include <avr/eeprom.h>
 #include <util/delay.h>
 #include <stdint.h>
