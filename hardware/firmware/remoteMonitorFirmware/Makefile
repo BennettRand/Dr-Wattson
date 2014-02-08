@@ -47,28 +47,7 @@ INCLUDES += \
 
 SRCS += \
   main.c \
-  basestation.c \
-  dataAck.c \
-  ui.c \
-  ../megaDrivers/uart.c \
-  ../megaDrivers/adc.c \
   ../megaDrivers/lcd.c \
-  ../utils/int_sqrt.c \
-  $(STACK_PATH)/hal/atmega256rfr2/src/hal.c \
-  $(STACK_PATH)/hal/atmega256rfr2/src/halTimer.c \
-  $(STACK_PATH)/phy/atmega256rfr2/src/phy.c \
-  $(STACK_PATH)/nwk/src/nwk.c \
-  $(STACK_PATH)/nwk/src/nwkDataReq.c \
-  $(STACK_PATH)/nwk/src/nwkSecurity.c \
-  $(STACK_PATH)/nwk/src/nwkFrame.c \
-  $(STACK_PATH)/nwk/src/nwkGroup.c \
-  $(STACK_PATH)/nwk/src/nwkRoute.c \
-  $(STACK_PATH)/nwk/src/nwkRouteDiscovery.c \
-  $(STACK_PATH)/nwk/src/nwkRx.c \
-  $(STACK_PATH)/nwk/src/nwkTx.c \
-  $(STACK_PATH)/sys/src/sys.c \
-  $(STACK_PATH)/sys/src/sysTimer.c \
-  $(STACK_PATH)/sys/src/sysEncrypt.c \
 
 DEFINES += \
   -DPHY_ATMEGA256RFR2 \
