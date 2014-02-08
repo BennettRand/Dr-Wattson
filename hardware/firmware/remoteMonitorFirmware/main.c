@@ -103,7 +103,7 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 	return true;
 }
 
-	uint16_t counter = 0;
+	uint8_t counter = 0;
 int main(void) {
 	SYS_Init(); // Init Atmel Lightweight Mesh stack
 
@@ -131,16 +131,11 @@ int main(void) {
 	initDataAck();
 	initLCD(display_cmd_buffer, 32);
 	initUI();
-	while (1) {
-		serviceLCD();
-		_delay_us(60);
-	}
 
-	TCCR3B |= CS30;
+	TCCR3B |= (1<<CS30);
 
 	sei();
 	startDataAck();
-
 
 	while (1) {
 		SYS_TaskHandler();
