@@ -11,7 +11,7 @@ int main(void) {
 	serviceLCD(); // Clear the LCD just to make sure we know where we are.
 	_delay_ms(2); // This takes a long time
 	sendLCDCmd(LCD_CMD_DSP_ON);
-	writeString("Line 1..Line 2..",16);
+	writeString("Line:1..Line:2..",16);
 
 	while (1) {
 		serviceLCD();
