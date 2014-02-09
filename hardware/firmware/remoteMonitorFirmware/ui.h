@@ -1,7 +1,12 @@
 #include "lcd.h"
+#include "config.h"
+
+#include "basestation.h"
 #include "int_sqrt.h"
 
 void initUI(void);
 void updateUI(void);
-void baseStationConnected(void);
+void ui_baseStationConnected(void);
+void ui_baseStationDisconnected(void);
+void ui_baseStationListChanged(int8_t modifiedEntry);
 

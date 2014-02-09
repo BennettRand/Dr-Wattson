@@ -6,6 +6,7 @@
 #include "config.h"
 #include "protocol.h"
 #include <string.h>
+#include "ui.h"
 
 struct baseStation {
 	uint16_t PAN_ID;

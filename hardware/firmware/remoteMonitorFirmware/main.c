@@ -80,7 +80,7 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 		break;
 	case connectionAck:
 		if(processConnectionAck(ind)) {
-			printf("Connected to network\n");
+			ui_baseStationConnected();
 			eeprom_update_block(&(baseStationList[connectedBaseStation]), (void*)27, sizeof(struct baseStation));
 			eeprom_update_byte((uint8_t*)29, 1); // Force the RSSI of the connected base station to 1 without modifying value in ram.
 			eeprom_update_byte((uint8_t*)26, 0xFF);
@@ -94,7 +94,7 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 		break;
 	case coldStart:
 		sendConnectionRequest(connectedBaseStation, &deviceCalibration);
-		printf("Got Cold Start\n");
+		ui_baseStationDisconnected();
 		break;
 	default:
 		break;
@@ -139,14 +139,7 @@ int main(void) {
 
 	while (1) {
 		SYS_TaskHandler();
-		//updateUI();
-		if (uart_received_bytes() != 0) {
-			uint8_t data_byte = uart_rx_byte() - '0';
-			if (data_byte < BASESTATION_LIST_SIZE) {
-				sendConnectionRequest(data_byte, &deviceCalibration);
-				printf("Connecting to network %u\n", data_byte);
-			}
-		}
+		updateUI();
 
 		if (sampleCount > 160000) {
 			removeSamples(&dataPacket);

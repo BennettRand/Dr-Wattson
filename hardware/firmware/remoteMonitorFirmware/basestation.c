@@ -53,6 +53,7 @@ void processBaconPacket(NWK_DataInd_t *packet) {
 			// Update the entry and return.
 			baseStationList[count].rssi = packet->rssi;
 			memcpy(&(baseStationList[count].name), &(bacon->name), 16);
+			ui_baseStationListChanged(count);
 			return;
 		}
 
@@ -71,7 +72,7 @@ void processBaconPacket(NWK_DataInd_t *packet) {
 	}
 
 	// Add the new base station;
-	addBaseStation(bacon->PAN_ID, packet->srcAddr, packet->rssi, (char*)(&(bacon->name)));
+	ui_baseStationListChanged(addBaseStation(bacon->PAN_ID, packet->srcAddr, packet->rssi, (char*)(&(bacon->name))));
 }
 
 bool processConnectionAck(NWK_DataInd_t *packet) {
