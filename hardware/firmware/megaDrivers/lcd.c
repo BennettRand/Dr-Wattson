@@ -19,6 +19,12 @@ void initLCD(struct lcd_cmd buffer[], uint8_t buf_len) {
 	sendLCDCmd(0x38); // Configure LCD for 8 bit mode with two lines of text
 	serviceLCD();
 	_delay_ms(5);
+	sendLCDCmd(0x38); // Configure LCD for 8 bit mode with two lines of text
+	serviceLCD();
+	_delay_ms(5);
+	sendLCDCmd(0x38); // Configure LCD for 8 bit mode with two lines of text
+	serviceLCD();
+	_delay_ms(5);
 	
 }
 
@@ -34,9 +40,9 @@ void writeChar(char c) {
 	lcd_buf_end = (lcd_buf_end < (lcd_buf_size-1)) ? lcd_buf_end+1 : 0;
 }
 
-void writeString(char* c) {
+void writeString(char* c, int8_t len) {
 	uint8_t charCnt = 0;
-	while (*c != 0) {
+	while ((*c != 0) && (charCnt < len)) {
 		if (charCnt >= 16)
 			break; // Can't print more than 16 characters
 		if (charCnt == 8)

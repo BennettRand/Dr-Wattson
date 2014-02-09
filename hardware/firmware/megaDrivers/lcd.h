@@ -21,6 +21,6 @@ void initLCD(struct lcd_cmd buffer[], uint8_t buf_len);
 void serviceLCD(void);
 void sendLCDCmd(uint8_t byte);
 void writeChar(char c);
-void writeString(char* c);
+void writeString(char* c, int8_t len);
 
 #endif //LCD_H
