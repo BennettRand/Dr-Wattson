@@ -62,6 +62,19 @@ void ui_baseStationConnected(void) {
 	currentState = connected;
 }
 
+void ui_updatePowerValues(int64_t ch1, int64_t ch2, uint32_t sampleCount){
+	if (currentState == connected) {
+		char pwrStr[5];
+		ltoa(((((ch1*((int64_t)deviceCalibration.channel1VoltageScaling))/1000000)*((int64_t)deviceCalibration.channel1CurrentScaling))/10000000)/sampleCount, pwrStr, 10);
+		LCD_MOVE_TO_CHAR(0, 2);
+		writeString(pwrStr, 5);
+		
+		ltoa((((int32_t)(ch2/10000000ll)*(int32_t)deviceCalibration.channel1VoltageScaling*(int32_t)deviceCalibration.channel1CurrentScaling)/sampleCount)/1000, pwrStr, 10);
+		LCD_MOVE_TO_CHAR(1, 2);
+		writeString(pwrStr, 5);
+	}
+}
+
 void ui_baseStationDisconnected(void) {
 	LCD_MOVE_TO_CHAR(0,0);
 	writeString("Network?",8);

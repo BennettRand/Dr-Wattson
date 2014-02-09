@@ -59,9 +59,8 @@ void handleDataRequest(NWK_DataInd_t *packet) {
 		nwkPacket[ind].confirm = packetTxConf;
 		NWK_DataReq(&(nwkPacket[ind]));
 		dataReqBusy[ind] = true;
+		//ui_updatePowerValues(dataPacket.powerData1, dataPacket.powerData2, dataPacket.sampleCount);
 	}
-//	printf("Voltage: %umV\n", (int_sqrt((uint32_t)(voltageSum[0]/((uint32_t)sampleCount)))*deviceCalibration.channel1VoltageScaling)/10000000);
-//	printf("Power: %umw\n", (((int64_t)(powerSum[0]/10000000ll)*(int32_t)deviceCalibration.channel1VoltageScaling*(int32_t)deviceCalibration.channel1CurrentScaling)/sampleCount)/1000);
 }
 
 void handleDataAck(NWK_DataInd_t *packet) {
@@ -145,6 +144,7 @@ int main(void) {
 			removeSamples(&dataPacket);
 			getData(&dataPacket);
 			removeSamples(&dataPacket);
+		//	ui_updatePowerValues(dataPacket.powerData1, dataPacket.powerData2, dataPacket.sampleCount);
 		}
 		
 		if (TCNT3 > 640) {
