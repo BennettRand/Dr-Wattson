@@ -60,9 +60,6 @@ void HAL_Init(void)
 
   SYS_EnableInterrupts();
 
-	HAL_GPIO_LED_out(); //Configure PB4 as a digital output pin
-	HAL_GPIO_LED_set(); //Set PB4 to '1' (LED off)
-
   HAL_TimerInit();
 }
 
