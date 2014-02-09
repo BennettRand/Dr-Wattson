@@ -59,7 +59,7 @@ void handleDataRequest(NWK_DataInd_t *packet) {
 		nwkPacket[ind].confirm = packetTxConf;
 		NWK_DataReq(&(nwkPacket[ind]));
 		dataReqBusy[ind] = true;
-		//ui_updatePowerValues(dataPacket.powerData1, dataPacket.powerData2, dataPacket.sampleCount);
+		ui_updatePowerValues(dataPacket.powerData1, dataPacket.powerData2, dataPacket.sampleCount);
 	}
 }
 
@@ -144,7 +144,7 @@ int main(void) {
 			removeSamples(&dataPacket);
 			getData(&dataPacket);
 			removeSamples(&dataPacket);
-		//	ui_updatePowerValues(dataPacket.powerData1, dataPacket.powerData2, dataPacket.sampleCount);
+			ui_updatePowerValues(dataPacket.powerData1, dataPacket.powerData2, dataPacket.sampleCount);
 		}
 		
 		if (TCNT3 > 640) {
