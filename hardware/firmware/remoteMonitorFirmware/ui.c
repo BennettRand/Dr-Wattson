@@ -64,13 +64,26 @@ void ui_baseStationConnected(void) {
 
 void ui_updatePowerValues(int64_t ch1, int64_t ch2, uint32_t sampleCount){
 	if (currentState == connected) {
-		char pwrStr[5];
-		ltoa(((((ch1*((int64_t)deviceCalibration.channel1VoltageScaling))/1000000)*((int64_t)deviceCalibration.channel1CurrentScaling))/10000000)/sampleCount, pwrStr, 10);
+		char pwrStr[6] = {0,0,0,0,0,0};
+		ldiv_t res = ldiv(((((ch1*((int64_t)deviceCalibration.channel1VoltageScaling))/1000000)*((int64_t)deviceCalibration.channel1CurrentScaling))/sampleCount),10000000);
+		if (res.rem > (10000000/2))
+			res.quot++;
+		ltoa(res.quot, pwrStr, 10);
+		uint8_t len = strlen(pwrStr);
 		LCD_MOVE_TO_CHAR(0, 2);
+		while (len++ < 5)
+			writeChar(' ');
 		writeString(pwrStr, 5);
 		
-		ltoa((((int32_t)(ch2/10000000ll)*(int32_t)deviceCalibration.channel1VoltageScaling*(int32_t)deviceCalibration.channel1CurrentScaling)/sampleCount)/1000, pwrStr, 10);
+		memset(pwrStr, 0, 6);
+		res = ldiv(((((ch2*((int64_t)deviceCalibration.channel2VoltageScaling))/1000000)*((int64_t)deviceCalibration.channel2CurrentScaling))/sampleCount),10000000);
+		if (res.rem > (10000000/2))
+			res.quot++;
+		ltoa(res.quot, pwrStr, 10);	
+		len = strlen(pwrStr);
 		LCD_MOVE_TO_CHAR(1, 2);
+		while (len++ < 5)
+			writeChar(' ');
 		writeString(pwrStr, 5);
 	}
 }
