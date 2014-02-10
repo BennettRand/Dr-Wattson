@@ -93,16 +93,21 @@ void ui_baseStationDisconnected(void) {
 	writeString("Network?",8);
 	LCD_MOVE_TO_CHAR(1,0);
 	
-	curDisplayedBasestation = 0;
-	writeChar(0b01111110);
-	writeString(baseStationList[0].name, 7);
+	if (baseStationListLength != 0) {
+		curDisplayedBasestation = 0;
+		writeChar(0b01111110);
+		writeString(baseStationList[0].name, 7);
+	}
+	else
+		writeString("        ",8);
 
 	currentState = connecting;
 }
 
 void ui_baseStationListChanged(int8_t modifiedEntry) {
 	if (curDisplayedBasestation == modifiedEntry) {
-		LCD_MOVE_TO_CHAR(1,1);
+		LCD_MOVE_TO_CHAR(1,0);
+		writeChar(0b01111110);
 		writeString("       ",7);
 		LCD_MOVE_TO_CHAR(1,1);
 		writeString(baseStationList[curDisplayedBasestation].name, 7);
@@ -110,7 +115,8 @@ void ui_baseStationListChanged(int8_t modifiedEntry) {
 	
 	if (curDisplayedBasestation >= baseStationListLength) {
 		curDisplayedBasestation = baseStationListLength-1;
-		LCD_MOVE_TO_CHAR(1,1);
+		LCD_MOVE_TO_CHAR(1,0);
+		writeChar(0b01111110);
 		writeString("       ",7);
 		LCD_MOVE_TO_CHAR(1,1);
 		writeString(baseStationList[curDisplayedBasestation].name, 7);
