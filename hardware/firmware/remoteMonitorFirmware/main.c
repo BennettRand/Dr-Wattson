@@ -28,7 +28,7 @@ static uint8_t dataSequence = 0;
 
 struct calibData deviceCalibration = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-struct lcd_cmd display_cmd_buffer[32];
+struct lcd_cmd display_cmd_buffer[64];
 
 void packetTxConf(NWK_DataReq_t *req) {
 	dataReqBusy[req - nwkPacket] = false;
@@ -122,13 +122,11 @@ int main(void) {
 		eeprom_read_block(baseStationList, (void*)27, sizeof(struct baseStation));
 		baseStationListLength += 1;
 
-		printf("Last connected network (%d): %u %u %16s\n", baseStationListLength, baseStationList[0].PAN_ID, baseStationList[0].addr, baseStationList[0].name);
-
 		sendConnectionRequest(0, &deviceCalibration);
 	}	
 
 	initDataAck();
-	initLCD(display_cmd_buffer, 32);
+	initLCD(display_cmd_buffer, 64);
 	initUI();
 
 	TCCR3B |= (1<<CS30);

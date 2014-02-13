@@ -11,6 +11,8 @@ int8_t curDisplayedBasestation = 0;
 
 uint8_t lastButtonState;
 
+uint8_t charArray[8];
+
 void initUI(void) {
 	DDRF &= ~(0b111);
 	lastButtonState = PINF & 0b111;
@@ -18,6 +20,37 @@ void initUI(void) {
 	serviceLCD(); // Clear the LCD just to make sure we know where we are.
 	_delay_ms(2); // This takes a long time
 	sendLCDCmd(LCD_CMD_DSP_ON);
+
+	// Set up characters
+	charArray[0] = 0b00100;
+	charArray[1] = 0b01110;
+	charArray[2] = 0b10101;
+	charArray[3] = 0b00100;
+	charArray[4] = 0b00100;
+	charArray[5] = 0b10101;
+	charArray[6] = 0b01110;
+	charArray[7] = 0b00100;
+	defineLCDChar(0, charArray);
+
+	charArray[0] = 0b00100;
+	charArray[1] = 0b01110;
+	charArray[2] = 0b10101;
+	charArray[3] = 0b00100;
+	charArray[4] = 0b00100;
+	charArray[5] = 0b00100;
+	charArray[6] = 0b00100;
+	charArray[7] = 0b00000;
+	defineLCDChar(1, charArray);
+
+	charArray[0] = 0b00000;
+	charArray[1] = 0b00100;
+	charArray[2] = 0b00100;
+	charArray[3] = 0b00100;
+	charArray[4] = 0b00100;
+	charArray[5] = 0b10101;
+	charArray[6] = 0b01110;
+	charArray[7] = 0b00100;
+	defineLCDChar(2, charArray);
 
 	ui_baseStationDisconnected();
 }
@@ -31,7 +64,11 @@ void updateUI(void) {
 				curDisplayedBasestation -= 1;
 				LCD_MOVE_TO_CHAR(1,1);
 				writeString("       ",7);
-				LCD_MOVE_TO_CHAR(1,1);
+				LCD_MOVE_TO_CHAR(1,0);
+				if (curDisplayedBasestation == 0)
+					writeChar(2);
+				else
+					writeChar(0);
 				writeString(baseStationList[curDisplayedBasestation].name, 7);
 			}
 		}
@@ -40,7 +77,11 @@ void updateUI(void) {
 				curDisplayedBasestation += 1;
 				LCD_MOVE_TO_CHAR(1,1);
 				writeString("       ",7);
-				LCD_MOVE_TO_CHAR(1,1);
+				LCD_MOVE_TO_CHAR(1,0);
+				if (curDisplayedBasestation == (baseStationListLength-1))
+					writeChar(1);
+				else
+					writeChar(0);
 				writeString(baseStationList[curDisplayedBasestation].name, 7);
 			}
 		}
@@ -95,7 +136,7 @@ void ui_baseStationDisconnected(void) {
 	
 	if (baseStationListLength != 0) {
 		curDisplayedBasestation = 0;
-		writeChar(0b01111110);
+		writeChar(2);
 		writeString(baseStationList[0].name, 7);
 	}
 	else

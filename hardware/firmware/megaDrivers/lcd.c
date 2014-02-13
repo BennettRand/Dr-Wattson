@@ -70,3 +70,10 @@ void serviceLCD(void) {
 	}
 }
 
+void defineLCDChar(uint8_t index, uint8_t bits[8]) {
+	sendLCDCmd(0x40 | (index << 3));
+	for (uint8_t cnt = 0; cnt < 8; cnt++)
+		writeChar(bits[cnt]);
+	sendLCDCmd(0x80);
+}
+
