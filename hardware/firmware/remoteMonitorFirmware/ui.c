@@ -136,7 +136,7 @@ void ui_baseStationDisconnected(void) {
 	
 	if (baseStationListLength != 0) {
 		curDisplayedBasestation = 0;
-		if (baseStationList != 1)
+		if (baseStationListLength != 1)
 			writeChar(2);
 		else
 			writeChar(0b01111110);
@@ -149,9 +149,16 @@ void ui_baseStationDisconnected(void) {
 }
 
 void ui_baseStationListChanged(int8_t modifiedEntry) {
-	if (curDisplayedBasestation == modifiedEntry) {
-		LCD_MOVE_TO_CHAR(1,0);
+	LCD_MOVE_TO_CHAR(1,0);
+	if (baseStationListLength == 1)
 		writeChar(0b01111110);
+	else if (curDisplayedBasestation == 0)
+		writeChar(2);
+	else if ((baseStationListLength-1) > curDisplayedBasestation)
+		writeChar(0);
+	else
+		writeChar(1);
+	if (curDisplayedBasestation == modifiedEntry) {
 		writeString("       ",7);
 		LCD_MOVE_TO_CHAR(1,1);
 		writeString(baseStationList[curDisplayedBasestation].name, 7);
@@ -160,7 +167,7 @@ void ui_baseStationListChanged(int8_t modifiedEntry) {
 	if (curDisplayedBasestation >= baseStationListLength) {
 		curDisplayedBasestation = baseStationListLength-1;
 		LCD_MOVE_TO_CHAR(1,0);
-		writeChar(0b01111110);
+		writeChar(1);
 		writeString("       ",7);
 		LCD_MOVE_TO_CHAR(1,1);
 		writeString(baseStationList[curDisplayedBasestation].name, 7);
