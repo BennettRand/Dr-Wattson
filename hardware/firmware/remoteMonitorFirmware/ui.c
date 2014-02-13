@@ -136,7 +136,10 @@ void ui_baseStationDisconnected(void) {
 	
 	if (baseStationListLength != 0) {
 		curDisplayedBasestation = 0;
-		writeChar(2);
+		if (baseStationList != 1)
+			writeChar(2);
+		else
+			writeChar(0b01111110);
 		writeString(baseStationList[0].name, 7);
 	}
 	else
