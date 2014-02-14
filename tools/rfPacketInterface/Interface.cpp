@@ -240,7 +240,7 @@ void Widget::on_sendBaconPacket_clicked()
 {
     baconPacket_t pkt;
     pkt.type = bacon;
-    pkt.PAN_ID = ui->panLineEdit->text().toInt();
+    pkt.PAN_ID = ui->panLineEdit->text().toInt(0,16);
     QByteArray name = ui->networkNameEdit->text().toUtf8();
     while (name.length() < 16)
     {
