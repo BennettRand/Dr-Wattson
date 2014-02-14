@@ -120,7 +120,18 @@ int main(void) {
 	eeprom_read_block(&deviceCalibration, (void*)8, sizeof(deviceCalibration));
 	if (eeprom_read_byte((uint8_t*)26)) { // There is valid data in the network information struct
 		eeprom_read_block(baseStationList, (void*)27, sizeof(struct baseStation));
+		uint8_t ch = 17;
+		while ((baseStationList[0].name[ch] == ' ') || (baseStationList[0].name[ch] == '\0') || (baseStationList[0].name[ch] == 0xFF)) {
+			baseStationList[0].name[ch] = ' ';
+			ch -= 1;
+		}
+		baseStationList[0].nameLen = ch+1;
 		baseStationListLength += 1;
+
+		for (int cnt = 0; cnt < BASESTATION_LIST_SIZE; cnt++) {
+			baseStationList[cnt].name[16] = ' ';
+			baseStationList[cnt].name[17] = ' ';
+		}
 
 		sendConnectionRequest(0, &deviceCalibration);
 	}	

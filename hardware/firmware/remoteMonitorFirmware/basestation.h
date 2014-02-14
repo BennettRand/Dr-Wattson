@@ -12,7 +12,8 @@ struct baseStation {
 	uint16_t PAN_ID;
 	int8_t rssi;
 	uint16_t addr;
-	char name[16];
+	char name[18];
+	uint8_t nameLen;
 };
 
 extern struct baseStation baseStationList[BASESTATION_LIST_SIZE];

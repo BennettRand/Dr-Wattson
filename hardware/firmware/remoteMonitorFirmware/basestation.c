@@ -23,6 +23,12 @@ int8_t addBaseStation(uint16_t PAN_ID, uint16_t addr, int8_t rssi, char name[]) 
 	baseStationList[baseStationListLength].addr = addr;
 	baseStationList[baseStationListLength].rssi = rssi;
 	memcpy(&(baseStationList[baseStationListLength].name), name, 16);
+	uint8_t ch = 17;
+	while ((baseStationList[baseStationListLength].name[ch] == ' ') || (baseStationList[baseStationListLength].name[ch] == '\0')) {
+		baseStationList[baseStationListLength].name[ch] = ' ';
+		ch--;
+	}
+	baseStationList[baseStationListLength].nameLen = ch+1;
 	baseStationListLength += 1;
 	
 	return baseStationListLength - 1;
@@ -53,6 +59,12 @@ void processBaconPacket(NWK_DataInd_t *packet) {
 			// Update the entry and return.
 			baseStationList[count].rssi = packet->rssi;
 			memcpy(&(baseStationList[count].name), &(bacon->name), 16);
+			uint8_t ch = 17;
+			while ((baseStationList[count].name[ch] == ' ') || (baseStationList[count].name[ch] == '\0')) {
+				baseStationList[count].name[ch] = ' ';
+				ch--;
+			}
+			baseStationList[count].nameLen = ch+1;
 			ui_baseStationListChanged(count);
 			return;
 		}

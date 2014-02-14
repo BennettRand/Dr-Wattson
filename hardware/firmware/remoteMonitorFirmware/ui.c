@@ -8,6 +8,7 @@ enum ui_state {
 static enum ui_state currentState = connecting;
 
 int8_t curDisplayedBasestation = 0;
+uint8_t curStartChar = 0;
 
 uint8_t lastButtonState;
 
@@ -53,6 +54,9 @@ void initUI(void) {
 	defineLCDChar(2, charArray);
 
 	ui_baseStationDisconnected();
+	
+	// Set up timer for scrolling network names
+	TCCR5B |= (1<<CS52) | (1<<CS50);
 }
 
 void updateUI(void) {
@@ -62,27 +66,27 @@ void updateUI(void) {
 		if (changedButtons == 0b001) {
 			if (curDisplayedBasestation > 0) {
 				curDisplayedBasestation -= 1;
-				LCD_MOVE_TO_CHAR(1,1);
-				writeString("       ",7);
 				LCD_MOVE_TO_CHAR(1,0);
 				if (curDisplayedBasestation == 0)
 					writeChar(2);
 				else
 					writeChar(0);
 				writeString(baseStationList[curDisplayedBasestation].name, 7);
+				curStartChar = 0;
+				TCNT5 = 0;
 			}
 		}
 		else if (changedButtons == 0b010) {
 			if (curDisplayedBasestation < (baseStationListLength-1)) {
 				curDisplayedBasestation += 1;
-				LCD_MOVE_TO_CHAR(1,1);
-				writeString("       ",7);
 				LCD_MOVE_TO_CHAR(1,0);
 				if (curDisplayedBasestation == (baseStationListLength-1))
 					writeChar(1);
 				else
 					writeChar(0);
 				writeString(baseStationList[curDisplayedBasestation].name, 7);
+				curStartChar = 0;
+				TCNT5 = 0;
 			}
 		}
 		else if (changedButtons == 0b100) {
@@ -90,6 +94,22 @@ void updateUI(void) {
 		}
 
 		lastButtonState = PINF & 0b111;
+
+		if (TCNT5 > 15625) { // 1 second
+			if (baseStationList[curDisplayedBasestation].nameLen > 7) {
+				if (++curStartChar >= (baseStationList[curDisplayedBasestation].nameLen +2))
+					curStartChar = 0;
+				LCD_MOVE_TO_CHAR(1,1);
+				if ((curStartChar + 7) < (baseStationList[curDisplayedBasestation].nameLen +2))
+					writeString(baseStationList[curDisplayedBasestation].name+curStartChar, 7);
+				else {
+					writeString(baseStationList[curDisplayedBasestation].name+curStartChar, (baseStationList[curDisplayedBasestation].nameLen+2)-curStartChar);
+					writeString(baseStationList[curDisplayedBasestation].name, 7-((baseStationList[curDisplayedBasestation].nameLen+2)-curStartChar));
+				}
+			}
+			
+			TCNT5 = 0;
+		}
 	}
 	else {
 		
@@ -101,6 +121,7 @@ void ui_baseStationConnected(void) {
 	writeString("1:  0.0W2:  0.0W", 16);
 
 	currentState = connected;
+	TCNT5 = 0;
 }
 
 void ui_updatePowerValues(int64_t ch1, int64_t ch2, uint32_t sampleCount){
@@ -159,7 +180,6 @@ void ui_baseStationListChanged(int8_t modifiedEntry) {
 	else
 		writeChar(1);
 	if (curDisplayedBasestation == modifiedEntry) {
-		writeString("       ",7);
 		LCD_MOVE_TO_CHAR(1,1);
 		writeString(baseStationList[curDisplayedBasestation].name, 7);
 	}
@@ -168,8 +188,7 @@ void ui_baseStationListChanged(int8_t modifiedEntry) {
 		curDisplayedBasestation = baseStationListLength-1;
 		LCD_MOVE_TO_CHAR(1,0);
 		writeChar(1);
-		writeString("       ",7);
-		LCD_MOVE_TO_CHAR(1,1);
 		writeString(baseStationList[curDisplayedBasestation].name, 7);
 	}
 }
+
