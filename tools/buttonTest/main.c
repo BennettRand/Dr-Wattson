@@ -28,21 +28,21 @@ int main(void) {
 	while (1) {
 		LCD_MOVE_TO_CHAR(0,2);
 		if (!(PINF & 0b10))
-			writeChar('F');
-		else
 			writeChar('T');
+		else
+			writeChar('F');
 
 		LCD_MOVE_TO_CHAR(0,6);
 		if (!(PINF & 0b1))
-			writeChar('F');
-		else
 			writeChar('T');
+		else
+			writeChar('F');
 
 		LCD_MOVE_TO_CHAR(1,2);
 		if (!(PINF & 0b100))
-			writeChar('F');
-		else
 			writeChar('T');
+		else
+			writeChar('F');
 
 		for (int cnt = 0; cnt < 10; cnt++) {
 			serviceLCD();
