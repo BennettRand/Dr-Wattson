@@ -103,10 +103,10 @@ if (calValid):
 	dataArray += [voltageOffset1 & 0xFF, (voltageOffset1>>8) & 0xFF]
 	dataArray += [currentScaling1 & 0xFF, (currentScaling1>>8) & 0xFF]
 	dataArray += [currentOffset1 & 0xFF, (currentOffset1>>8) & 0xFF]
-	dataArray += [voltageScaling1 & 0xFF, (voltageScaling1>>8) & 0xFF]
-	dataArray += [voltageOffset1 & 0xFF, (voltageOffset1>>8) & 0xFF]
-	dataArray += [currentScaling1 & 0xFF, (currentScaling1>>8) & 0xFF]
-	dataArray += [currentOffset1 & 0xFF, (currentOffset1>>8) & 0xFF]
+	dataArray += [voltageScaling2 & 0xFF, (voltageScaling2>>8) & 0xFF]
+	dataArray += [voltageOffset2 & 0xFF, (voltageOffset2>>8) & 0xFF]
+	dataArray += [currentScaling2 & 0xFF, (currentScaling2>>8) & 0xFF]
+	dataArray += [currentOffset2 & 0xFF, (currentOffset2>>8) & 0xFF]
 	dataArray += [linePeriodScaling & 0xFF, (linePeriodScaling >> 8) & 0xFF]
 databytearray = bytearray(dataArray)
 if (networkValid):
