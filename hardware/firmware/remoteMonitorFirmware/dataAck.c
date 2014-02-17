@@ -26,17 +26,16 @@ uint8_t cycle_cnt = 0;
 ISR(PCINT0_vect) { // Data ready triggered
 	readData(adcSampleData,4);
 	adcSampleData[0] -= deviceCalibration.channel1VoltageOffset;
-	adcSampleData[1] -= deviceCalibration.channel2VoltageOffset;
 	adcSampleData[2] -= deviceCalibration.channel1CurrentOffset;
 	adcSampleData[3] -= deviceCalibration.channel2CurrentOffset;
 	
 	newSampleCount++;
 	newPowerSum[0] += (int64_t)(((int32_t)adcSampleData[0]) * ((int32_t)adcSampleData[2]));
-	newPowerSum[1] += (int64_t)(((int32_t)adcSampleData[1]) * ((int32_t)adcSampleData[3]));
+	newPowerSum[1] += (int64_t)(((int32_t)adcSampleData[0]) * ((int32_t)adcSampleData[3]));
 
 	#ifdef EXTENDED_DATA_PACKET
 	newVoltageSum[0] += (int64_t)(((int32_t)adcSampleData[0]) * ((int32_t)adcSampleData[0]));
-	newVoltageSum[1] += (int64_t)(((int32_t)adcSampleData[1]) * ((int32_t)adcSampleData[1]));
+	newVoltageSum[1] += (int64_t)(((int32_t)adcSampleData[0]) * ((int32_t)adcSampleData[0]));
 	newCurrentSum[0] += (int64_t)(((int32_t)adcSampleData[2]) * ((int32_t)adcSampleData[2]));
 	newCurrentSum[1] += (int64_t)(((int32_t)adcSampleData[3]) * ((int32_t)adcSampleData[3]));
 	#endif
@@ -158,7 +157,7 @@ void removeSamples(dataPacket_t *pkt) {
 	voltageSum[0] -= pkt->squaredVoltage1;
 	voltageSum[1] -= pkt->squaredVoltage2;
 	currentSum[0] -= pkt->squaredCurrent1;
-	currentSum[1] -= pkt->squaredVoltage2;
+	currentSum[1] -= pkt->squaredCurrent2;
 	#endif
 }
 
