@@ -39,7 +39,7 @@ int main(void) {
 	sei();
 	sendCommand(CMD_STOP);
 	sendCommand(CMD_SDATAC);
-	uint8_t registers[] = {0x10, 0x10, 0x10, 0x10, 0x10, 0x90, 0x90, 0x90};
+	uint8_t registers[] = {0x10, 0x10, 0x10, 0x10, 0x90, 0x90, 0x90, 0x90};
 	writeRegisters(0x05, registers, 8);
 
 	// Configure data ready interrupt
@@ -61,6 +61,7 @@ int main(void) {
 				printf("%u, %d, %d, %d, %d\n", cnt, inputBuffer[cnt][0], inputBuffer[cnt][1], inputBuffer[cnt][2], inputBuffer[cnt][3]);
 				_delay_ms(1);
 			}
+			printf("d\n");
 			transmitting = false;
 			waiting = true;
 		}
