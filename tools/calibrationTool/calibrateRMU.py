@@ -8,6 +8,8 @@ import subprocess
 import StringIO
 import math
 import csv
+import time
+import serial
 
 def signExtend16(val):
 	if (val & 0x8000) :
@@ -73,39 +75,29 @@ if (networkValid) :
 	print "    Address:             " +str(Address)
 	print "    Name:                " + Name
 
-print "\nSaving current firmware..."
-# Read in the firmware from the device so we can reprogram it later.
-proc = subprocess.Popen(["avrdude", "-patmega256rfr2", "-Pusb", "-cavrisp2", "-q", "-q", "-Uflash:r:.oldFlash.hex:h"], stdin=sys.stdin, stdout=sys.stdout)
-proc.wait()
-if (proc.returncode != 0) :
-	exit()
-
 print "Loading Calibration Firmware..."
 # program calibration firmware onto DUT
-proc = subprocess.Popen(["avrdude", "-patmega256rfr2", "-Pusb", "-cavrisp2", "-q", "-q", "-Uflash:w:calibrationTool.hex:h"], stdin=sys.stdin, stdout=sys.stdout)
+proc = subprocess.Popen(["avrdude", "-patmega256rfr2", "-Pusb", "-cavrisp2", "-Uflash:w:calibrationTool.hex:i"], stdin=sys.stdin, stdout=sys.stdout)
 proc.wait()
 if (proc.returncode != 0) :
 	# If this failed, try to write the old firmware back and exit
-	proc = subprocess.Popen(["avrdude", "-patmega256rfr2", "-Pusb", "-cavrisp2", "-q", "-q", "-Uflash:w:.oldFlash.hex:h"], stdin=sys.stdin, stdout=sys.stdout)
-	proc.wait()
+	print "Failed to write calibration firmware:" + str(proc.returncode)
 	exit()
 
 print "Starting calibration procedure..."
 portname = raw_input("    Enter serial port name: ")
 try :
-	ser = serial.Serial(portname, 115200, timeout = 1)
+	ser = serial.Serial(portname.strip(),115200)
 	#ser = open(os.path.expanduser(os.path.expandvars(portname.strip())), 'r+')
 except :
-	# If this failed, try to write the old firmware back and exit
-	proc = subprocess.Popen(["avrdude", "-patmega256rfr2", "-Pusb", "-cavrisp2", "-q", "-q", "-Uflash:w:.oldFlash.hex:h"], stdin=sys.stdin, stdout=sys.stdout)
-	proc.wait()
+	print "Could not open serial port"
 	exit()
 
 # Collect calibration information
 
 yn = raw_input("    Connect AC load to port 1. Press enter when ready (enter s to skip).")
 if not (yn.startswith('s')) :
-	#ser.write("s")
+	ser.write("s")
 	s = ser.readline()
 	data = "";
 	while (s[0] != 'd') :
@@ -142,7 +134,7 @@ else:
 
 yn = raw_input("    Connect AC load to port 2. Press enter when ready (enter s to skip).")
 if not (yn.startswith('s')) :
-	#ser.write("s")
+	ser.write("s")
 	s = ser.readline()
 	data = "";
 	while (s[0] != 'd') :
@@ -151,7 +143,6 @@ if not (yn.startswith('s')) :
 	
 	Vin = raw_input("    Enter calibration voltage for port 2: ")
 	Iin = raw_input("    Enter calibration current for port 2: ")
-	
 	reader = csv.reader(StringIO.StringIO(data))
 	Vsum = 0
 	VsquareSum = 0
@@ -192,9 +183,6 @@ print "    Line Period Scaling: " + str(old_linePeriodScaling).ljust(19) + str(l
 
 yn = raw_input("Would you program these values (y/n)? ")
 if not (yn.lower().startswith("y")):
-	print "Reprogramming old firmware..."
-	proc = subprocess.Popen(["avrdude", "-patmega256rfr2", "-Pusb", "-cavrisp2", "-q", "-q", "-Uflash:w:.oldFlash.hex:h"], stdin=sys.stdin, stdout=sys.stdout)
-	proc.wait()
 	exit()
 
 if networkValid:
@@ -280,11 +268,6 @@ output_fd.close();
 proc = subprocess.Popen(["avrdude", "-patmega256rfr2", "-Pusb", "-cavrisp2", "-Ueeprom:w:.outputFile.bin:r"], stdin=sys.stdin, stdout=sys.stdout)
 proc.wait()
 
-print "Flashing original Firmware"
-proc = subprocess.Popen(["avrdude", "-patmega256rfr2", "-Pusb", "-cavrisp2", "-q", "-q", "-Uflash:w:.oldFlash.hex:h"], stdin=sys.stdin, stdout=sys.stdout)
-proc.wait()
-
 os.unlink(".outputFile.bin")
-os.unlink(".oldFlash.hex")
 os.unlink(".oldcal.bin")
 
