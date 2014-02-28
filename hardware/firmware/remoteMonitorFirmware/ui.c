@@ -60,10 +60,10 @@ void initUI(void) {
 }
 
 void updateUI(void) {
+	uint8_t changedButtons = (lastButtonState ^ (PINF & 0b111)) & lastButtonState;
 	if (currentState == connecting) {
 		// Display list of networks to connect to
-		uint8_t changedButtons = (lastButtonState ^ (PINF & 0b111)) & lastButtonState;
-		if (changedButtons == 0b001) {
+		if (changedButtons == 0b010) {
 			if (curDisplayedBasestation > 0) {
 				curDisplayedBasestation -= 1;
 				LCD_MOVE_TO_CHAR(1,0);
@@ -76,7 +76,7 @@ void updateUI(void) {
 				TCNT5 = 0;
 			}
 		}
-		else if (changedButtons == 0b010) {
+		else if (changedButtons == 0b001) {
 			if (curDisplayedBasestation < (baseStationListLength-1)) {
 				curDisplayedBasestation += 1;
 				LCD_MOVE_TO_CHAR(1,0);
@@ -93,7 +93,6 @@ void updateUI(void) {
 			sendConnectionRequest(curDisplayedBasestation, &deviceCalibration);
 		}
 
-		lastButtonState = PINF & 0b111;
 
 		if (TCNT5 > 15625) { // 1 second
 			if (baseStationList[curDisplayedBasestation].nameLen > 7) {
@@ -111,9 +110,14 @@ void updateUI(void) {
 			TCNT5 = 0;
 		}
 	}
-	else {
+	else if (changedButtons == 0b100) {
+		// Disconnect from network
+		connectedBaseStation = -1;
+		ui_baseStationDisconnected();
 		
 	}
+
+	lastButtonState = PINF & 0b111;
 }
 
 void ui_baseStationConnected(void) {
@@ -170,25 +174,27 @@ void ui_baseStationDisconnected(void) {
 }
 
 void ui_baseStationListChanged(int8_t modifiedEntry) {
-	LCD_MOVE_TO_CHAR(1,0);
-	if (baseStationListLength == 1)
-		writeChar(0b01111110);
-	else if (curDisplayedBasestation == 0)
-		writeChar(2);
-	else if ((baseStationListLength-1) > curDisplayedBasestation)
-		writeChar(0);
-	else
-		writeChar(1);
-	if (curDisplayedBasestation == modifiedEntry) {
-		LCD_MOVE_TO_CHAR(1,1);
-		writeString(baseStationList[curDisplayedBasestation].name, 7);
-	}
-	
-	if (curDisplayedBasestation >= baseStationListLength) {
-		curDisplayedBasestation = baseStationListLength-1;
+	if (connectedBaseStation == -1) {
 		LCD_MOVE_TO_CHAR(1,0);
-		writeChar(1);
-		writeString(baseStationList[curDisplayedBasestation].name, 7);
+		if (baseStationListLength == 1)
+			writeChar(0b01111110);
+		else if (curDisplayedBasestation == 0)
+			writeChar(2);
+		else if ((baseStationListLength-1) > curDisplayedBasestation)
+			writeChar(0);
+		else
+			writeChar(1);
+		if (curDisplayedBasestation == modifiedEntry) {
+			LCD_MOVE_TO_CHAR(1,1);
+			writeString(baseStationList[curDisplayedBasestation].name, 7);
+		}
+		
+		if (curDisplayedBasestation >= baseStationListLength) {
+			curDisplayedBasestation = baseStationListLength-1;
+			LCD_MOVE_TO_CHAR(1,0);
+			writeChar(1);
+			writeString(baseStationList[curDisplayedBasestation].name, 7);
+		}
 	}
 }
 
