@@ -91,7 +91,7 @@ int main(void) {
 				uint8_t ind = 0;
 				while (dataReqBusy[ind]) {
 					SYS_TaskHandler();
-					ind++;
+					ind = (ind < (DATA_REQ_BUFFER_CNT-1)) ? (ind+1) : 0;
 				}
 
 				if (packetHeader.command == sendPacket)
