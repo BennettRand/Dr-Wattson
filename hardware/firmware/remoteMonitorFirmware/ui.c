@@ -194,55 +194,75 @@ void ui_updatePowerValues(dataPacket_t *data){
 			writeString(pwrStr, 5);
 		}
 		else if (currentUnit == voltage) {
-			res = ldiv(int_sqrt((uint32_t)(data->squaredVoltage1/((uint32_t)data->sampleCount)))*deviceCalibration.channel1VoltageScaling,1000000);
-			if (res.rem > (1000000/2))
+			res = ldiv(int_sqrt((uint32_t)(data->squaredVoltage1/((uint32_t)data->sampleCount)))*deviceCalibration.channel1VoltageScaling,100000);
+			if (res.rem > (100000/2))
 				res.quot++;
 			ltoa(res.quot, pwrStr, 10);
 			uint8_t len = strlen(pwrStr);
+			uint8_t cnt = len;
 			LCD_MOVE_TO_CHAR(0, 2);
-			while (len++ < 4)
+			while (cnt++ < 4)
 				writeChar(' ');
 			writeString(pwrStr, len-1);
 			writeChar('.');
 			writeChar(pwrStr[len-1]);
 
 			memset(pwrStr, 0, 6);
-			res = ldiv(int_sqrt((uint32_t)(data->squaredVoltage2/((uint32_t)data->sampleCount)))*deviceCalibration.channel1VoltageScaling,1000000);
-			if (res.rem > (1000000/2))
+			res = ldiv(int_sqrt((uint32_t)(data->squaredVoltage2/((uint32_t)data->sampleCount)))*deviceCalibration.channel1VoltageScaling,100000);
+			if (res.rem > (100000/2))
 				res.quot++;
 			ltoa(res.quot, pwrStr, 10);
 			len = strlen(pwrStr);
+			cnt = len;
 			LCD_MOVE_TO_CHAR(1, 2);
-			while (len++ < 4)
+			while (cnt++ < 4)
 				writeChar(' ');
 			writeString(pwrStr, len-1);
 			writeChar('.');
 			writeChar(pwrStr[len-1]);
 		}
 		else if (currentUnit == current) {
-			res = ldiv(int_sqrt((uint32_t)(data->squaredCurrent1/((uint32_t)data->sampleCount)))*deviceCalibration.channel1CurrentScaling,1000000);
-			if (res.rem > (1000000/2))
+			res = ldiv(int_sqrt((uint32_t)(data->squaredCurrent1/((uint32_t)data->sampleCount)))*deviceCalibration.channel1CurrentScaling,100000);
+			if (res.quot == 1)
+				res.quot = 0;
+			if ((res.rem > (100000/2)) && (res.quot > 1))
 				res.quot++;
 			ltoa(res.quot, pwrStr, 10);
 			uint8_t len = strlen(pwrStr);
 			LCD_MOVE_TO_CHAR(0, 2);
-			while (len++ < 4)
+			if (len < 4)
 				writeChar(' ');
-			writeString(pwrStr, len-1);
+			if (len < 3)
+				writeChar('0');
+			if (len > 2)
+				writeString(pwrStr, len-2);
 			writeChar('.');
+			if (len > 1)
+				writeChar(pwrStr[len-2]);
+			else
+				writeChar('0');
 			writeChar(pwrStr[len-1]);
-			
+
 			memset(pwrStr, 0, 6);
-			res = ldiv(int_sqrt((uint32_t)(data->squaredCurrent2/((uint32_t)data->sampleCount)))*deviceCalibration.channel2CurrentScaling,1000000);
-			if (res.rem > (1000000/2))
+			res = ldiv(int_sqrt((uint32_t)(data->squaredCurrent2/((uint32_t)data->sampleCount)))*deviceCalibration.channel2CurrentScaling,100000);
+			if (res.quot == 1)
+				res.quot = 0;
+			if ((res.rem > (100000/2)) && (res.quot > 1))
 				res.quot++;
-			ltoa(res.quot, pwrStr, 10);	
+			ltoa(res.quot, pwrStr, 10);
 			len = strlen(pwrStr);
 			LCD_MOVE_TO_CHAR(1, 2);
-			while (len++ < 54)
+			if (len < 4)
 				writeChar(' ');
-			writeString(pwrStr, 5);
+			if (len < 3)
+				writeChar('0');
+			if (len > 2)
+				writeString(pwrStr, len-2);
 			writeChar('.');
+			if (len > 1)
+				writeChar(pwrStr[len-2]);
+			else
+				writeChar('0');
 			writeChar(pwrStr[len-1]);
 		}
 	}

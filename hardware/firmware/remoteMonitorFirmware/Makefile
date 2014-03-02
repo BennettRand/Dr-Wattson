@@ -50,7 +50,6 @@ SRCS += \
   basestation.c \
   dataAck.c \
   ui.c \
-  ../megaDrivers/uart.c \
   ../megaDrivers/adc.c \
   ../megaDrivers/lcd.c \
   ../utils/int_sqrt.c \
