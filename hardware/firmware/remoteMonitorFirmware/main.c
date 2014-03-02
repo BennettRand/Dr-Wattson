@@ -10,7 +10,6 @@
 #include "sys.h"
 #include "nwk.h"
 
-#include "uart.h"
 #include "protocol.h"
 #include "basestation.h"
 #include "dataAck.h"
@@ -19,9 +18,6 @@
 
 NWK_DataReq_t nwkPacket[DATA_REQ_BUFFER_CNT];
 bool dataReqBusy[DATA_REQ_BUFFER_CNT];
-
-uint8_t uart_tx_buf[100];
-uint8_t uart_rx_buf[100];
 
 static dataPacket_t dataPacket = {.type = data};
 static uint8_t dataSequence = 0;
@@ -59,7 +55,7 @@ void handleDataRequest(NWK_DataInd_t *packet) {
 		nwkPacket[ind].confirm = packetTxConf;
 		NWK_DataReq(&(nwkPacket[ind]));
 		dataReqBusy[ind] = true;
-		ui_updatePowerValues(dataPacket.powerData1, dataPacket.powerData2, dataPacket.sampleCount);
+		ui_updatePowerValues(&dataPacket);
 	}
 }
 
@@ -75,7 +71,6 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 	switch ((packetType_t) (ind->data[0])) {
 	case bacon:
 		processBaconPacket(ind);
-		printf("Got Bacon packet %d\n",baseStationListLength); 
 		break;
 	case connectionAck:
 		if(processConnectionAck(ind)) {
@@ -152,7 +147,7 @@ int main(void) {
 			if (dataPacket.sampleCount != 0)
 				removeSamples(&dataPacket); // If the last transmitted data has not been acked then first remove the old data.
 			getData(&dataPacket); // Sample new data
-			ui_updatePowerValues(dataPacket.powerData1, dataPacket.powerData2, dataPacket.sampleCount); // Update display
+			ui_updatePowerValues(&dataPacket); // Update display
 			removeSamples(&dataPacket); // Get rid of these samples now
 		}
 		
