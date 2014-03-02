@@ -119,7 +119,7 @@ void sendConnectionRequest(int8_t num, struct calibData *cal) {
 	uint8_t ind = 0;
 	while (dataReqBusy[ind]) {
 		SYS_TaskHandler();
-		ind = (ind < (DATA_REQ_BUFFER_CNT - 1) ? (ind+1) : 0;
+		ind = (ind < (DATA_REQ_BUFFER_CNT - 1)) ? (ind+1) : 0;
 	}
 	nwkPacket[ind].dstAddr = baseStationList[num].addr;
 	nwkPacket[ind].dstEndpoint = APP_ENDPOINT;

@@ -48,7 +48,7 @@ void handleDataRequest(NWK_DataInd_t *packet) {
 		uint8_t ind = 0;
 		while (dataReqBusy[ind]) {
 			SYS_TaskHandler();
-			ind = (ind < (DATA_REQ_BUFFER_CNT - 1) ? (ind+1) : 0;
+			ind = (ind < (DATA_REQ_BUFFER_CNT - 1)) ? (ind+1) : 0;
 		}
 		nwkPacket[ind].dstAddr = baseStationList[connectedBaseStation].addr;
 		nwkPacket[ind].dstEndpoint = APP_ENDPOINT;
@@ -148,7 +148,7 @@ int main(void) {
 		SYS_TaskHandler();
 		updateUI();
 
-		if (sampleCount > 160000) {
+		if (sampleCount > 40000) {
 			if (dataPacket.sampleCount != 0)
 				removeSamples(&dataPacket); // If the last transmitted data has not been acked then first remove the old data.
 			getData(&dataPacket); // Sample new data

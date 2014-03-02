@@ -122,7 +122,7 @@ void updateUI(void) {
 
 void ui_baseStationConnected(void) {
 	LCD_MOVE_TO_CHAR(0,0);
-	writeString("1:  0.0W2:  0.0W", 16);
+	writeString("1:    0W2:    0W", 16);
 
 	currentState = connected;
 	TCNT5 = 0;
