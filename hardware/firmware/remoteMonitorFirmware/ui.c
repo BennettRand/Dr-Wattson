@@ -124,6 +124,14 @@ void updateUI(void) {
 				currentUnit = currentUnit-1;
 			else
 				currentUnit = current;
+
+			LCD_MOVE_TO_CHAR(0,0);
+			if (currentUnit == power)
+				writeString("1:    0W2:    0W", 16);
+			else if (currentUnit == voltage)
+				writeString("1:  0.0V2:  0.0V", 16);
+			else if (currentUnit == current)
+				writeString("1: 0.00A2: 0.00A", 16);
 		}
 		else if (changedButtons == 0b001) {
 			// down
@@ -131,6 +139,14 @@ void updateUI(void) {
 				currentUnit = currentUnit+1;
 			else
 				currentUnit = power;
+
+			LCD_MOVE_TO_CHAR(0,0);
+			if (currentUnit == power)
+				writeString("1:    0W2:    0W", 16);
+			else if (currentUnit == voltage)
+				writeString("1:  0.0V2:  0.0V", 16);
+			else if (currentUnit == current)
+				writeString("1: 0.00A2: 0.00A", 16);
 		}
 		else if (changedButtons == 0b100) {
 			// Disconnect from network
@@ -147,6 +163,7 @@ void ui_baseStationConnected(void) {
 	writeString("1:    0W2:    0W", 16);
 
 	currentState = connected;
+	currentUnit = power;
 	TCNT5 = 0;
 }
 
@@ -177,48 +194,56 @@ void ui_updatePowerValues(dataPacket_t *data){
 			writeString(pwrStr, 5);
 		}
 		else if (currentUnit == voltage) {
-			res = ldiv(int_sqrt((uint32_t)(data->squaredVoltage1/((uint32_t)data->sampleCount)))*deviceCalibration.channel1VoltageScaling,10000000);
-			if (res.rem > (10000000/2))
+			res = ldiv(int_sqrt((uint32_t)(data->squaredVoltage1/((uint32_t)data->sampleCount)))*deviceCalibration.channel1VoltageScaling,1000000);
+			if (res.rem > (1000000/2))
 				res.quot++;
 			ltoa(res.quot, pwrStr, 10);
 			uint8_t len = strlen(pwrStr);
 			LCD_MOVE_TO_CHAR(0, 2);
-			while (len++ < 5)
+			while (len++ < 4)
 				writeChar(' ');
-			writeString(pwrStr, 5);
-			
+			writeString(pwrStr, len-1);
+			writeChar('.');
+			writeChar(pwrStr[len-1]);
+
 			memset(pwrStr, 0, 6);
-			res = ldiv(int_sqrt((uint32_t)(data->squaredVoltage2/((uint32_t)data->sampleCount)))*deviceCalibration.channel2VoltageScaling,10000000);
-			if (res.rem > (10000000/2))
+			res = ldiv(int_sqrt((uint32_t)(data->squaredVoltage2/((uint32_t)data->sampleCount)))*deviceCalibration.channel1VoltageScaling,1000000);
+			if (res.rem > (1000000/2))
 				res.quot++;
-			ltoa(res.quot, pwrStr, 10);	
+			ltoa(res.quot, pwrStr, 10);
 			len = strlen(pwrStr);
 			LCD_MOVE_TO_CHAR(1, 2);
-			while (len++ < 5)
+			while (len++ < 4)
 				writeChar(' ');
-			writeString(pwrStr, 5);
+			writeString(pwrStr, len-1);
+			writeChar('.');
+			writeChar(pwrStr[len-1]);
 		}
 		else if (currentUnit == current) {
-			res = ldiv(int_sqrt((uint32_t)(data->squaredCurrent1/((uint32_t)data->sampleCount)))*deviceCalibration.channel1CurrentScaling,100000000);
-			if (res.rem > (100000000/2))
+			res = ldiv(int_sqrt((uint32_t)(data->squaredCurrent1/((uint32_t)data->sampleCount)))*deviceCalibration.channel1CurrentScaling,1000000);
+			if (res.rem > (1000000/2))
 				res.quot++;
 			ltoa(res.quot, pwrStr, 10);
 			uint8_t len = strlen(pwrStr);
 			LCD_MOVE_TO_CHAR(0, 2);
-			while (len++ < 5)
+			while (len++ < 4)
 				writeChar(' ');
-			writeString(pwrStr, 5);
+			writeString(pwrStr, len-1);
+			writeChar('.');
+			writeChar(pwrStr[len-1]);
 			
 			memset(pwrStr, 0, 6);
-			res = ldiv(int_sqrt((uint32_t)(data->squaredCurrent2/((uint32_t)data->sampleCount)))*deviceCalibration.channel2CurrentScaling,100000000);
-			if (res.rem > (100000000/2))
+			res = ldiv(int_sqrt((uint32_t)(data->squaredCurrent2/((uint32_t)data->sampleCount)))*deviceCalibration.channel2CurrentScaling,1000000);
+			if (res.rem > (1000000/2))
 				res.quot++;
 			ltoa(res.quot, pwrStr, 10);	
 			len = strlen(pwrStr);
 			LCD_MOVE_TO_CHAR(1, 2);
-			while (len++ < 5)
+			while (len++ < 54)
 				writeChar(' ');
 			writeString(pwrStr, 5);
+			writeChar('.');
+			writeChar(pwrStr[len-1]);
 		}
 	}
 }
