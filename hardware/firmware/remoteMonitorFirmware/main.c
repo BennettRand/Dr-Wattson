@@ -26,7 +26,7 @@ uint8_t uart_rx_buf[100];
 static dataPacket_t dataPacket = {.type = data};
 static uint8_t dataSequence = 0;
 
-struct calibData deviceCalibration = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+struct calibData deviceCalibration;
 
 struct lcd_cmd display_cmd_buffer[64];
 
@@ -48,7 +48,7 @@ void handleDataRequest(NWK_DataInd_t *packet) {
 		uint8_t ind = 0;
 		while (dataReqBusy[ind]) {
 			SYS_TaskHandler();
-			ind++;
+			ind = (ind < (DATA_REQ_BUFFER_CNT - 1) ? (ind+1) : 0;
 		}
 		nwkPacket[ind].dstAddr = baseStationList[connectedBaseStation].addr;
 		nwkPacket[ind].dstEndpoint = APP_ENDPOINT;
@@ -114,7 +114,6 @@ int main(void) {
 	PHY_SetRxState(true);
 	NWK_OpenEndpoint(APP_ENDPOINT, rfReceivePacket);
 	PHY_SetTxPower(0);
-	//uart_init_port(uart_baud_115200, uart_tx_buf, 100, uart_rx_buf, 100); // Init uart
 
 	// Read eeprom data
 	eeprom_read_block(&deviceCalibration, (void*)8, sizeof(deviceCalibration));
@@ -150,10 +149,11 @@ int main(void) {
 		updateUI();
 
 		if (sampleCount > 160000) {
-			removeSamples(&dataPacket);
-			getData(&dataPacket);
-			removeSamples(&dataPacket);
-			ui_updatePowerValues(dataPacket.powerData1, dataPacket.powerData2, dataPacket.sampleCount);
+			if (dataPacket.sampleCount != 0)
+				removeSamples(&dataPacket); // If the last transmitted data has not been acked then first remove the old data.
+			getData(&dataPacket); // Sample new data
+			ui_updatePowerValues(dataPacket.powerData1, dataPacket.powerData2, dataPacket.sampleCount); // Update display
+			removeSamples(&dataPacket); // Get rid of these samples now
 		}
 		
 		if (TCNT3 > 640) {

@@ -159,5 +159,6 @@ void removeSamples(dataPacket_t *pkt) {
 	currentSum[0] -= pkt->squaredCurrent1;
 	currentSum[1] -= pkt->squaredCurrent2;
 	#endif
+	pkt->sampleCount = 0;
 }
 
