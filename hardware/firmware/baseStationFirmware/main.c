@@ -19,9 +19,9 @@
 static NWK_DataReq_t txPacket[DATA_REQ_BUFFER_CNT];
 static bool dataReqBusy[DATA_REQ_BUFFER_CNT];
 
-uint8_t uart_tx_buf[100];
-uint8_t uart_rx_buf[100];
-uint8_t packet_buf[100];
+uint8_t uart_tx_buf[512];
+uint8_t uart_rx_buf[512];
+uint8_t packet_buf[128];
 
 static void packetTxConf(NWK_DataReq_t *req) {
 	dataReqBusy[req - txPacket] = false;
@@ -51,7 +51,7 @@ int main(void) {
 	NWK_OpenEndpoint(APP_ENDPOINT, rfReceivePacket);
 	PHY_SetTxPower(0);
 
-	uart_init_port(uart_baud_38400, uart_tx_buf, 100, uart_rx_buf, 100); // Init uart
+	uart_init_port(uart_baud_115200, uart_tx_buf, 512, uart_rx_buf, 512); // Init uart
 
 	// Configure onboard LED as output
 	DDRB |= 1<<4;
