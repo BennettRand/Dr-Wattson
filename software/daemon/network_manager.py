@@ -36,28 +36,32 @@ def call_b(data):
 def commit_power(data):
 	conn = psycopg2.connect(database = "wattson", host = "localhost", user = "root", password = "means swim of stream")
 	cur = conn.cursor()
-	sample_insert = "INSERT INTO sample VALUES (DEFAULT, to_timestamp(%s), to_timestamp(%s), %s, %s, %s, %s, %s, %s, %s, %s);"
-	f = open('err.out','a')
-	f.write(time.asctime()+'\n')
-	f.write(str(conn)+'\n')
-	f.flush()
+	sample_insert_statement = "INSERT INTO sample VALUES "
+	sample_insert_format = "(DEFAULT, to_timestamp(%s), to_timestamp(%s), %s, %s, %s, %s, %s, %s, %s, %s)"
+	# f = open('err.out','a')
+	# f.write(time.asctime()+'\n')
+	# f.write(str(conn)+'\n')
+	# f.flush()
+	inserts = []
 	try:
 		if data != None:
 			for d in data:
 				for t in data[d]['power']:
-					cur.execute(sample_insert,(t['t'],t['t'],d,t['v_1'],t['v_2'],t['i_1'],t['i_2'],t['p_1'],t['p_2'],t['f']))
+					inserts.append(cur.mogrify(sample_insert_format,(t['t'],t['t'],d,t['v_1'],t['v_2'],t['i_1'],t['i_2'],t['p_1'],t['p_2'],t['f'])))
+			query = sample_insert_statement+',\n'.join(inserts)+";"
+			cur.execute(query)
 			conn.commit()
 	except Exception as e:
-		f.write(str(e)+'\n')
-		f.flush()
-		f.close()
+		# f.write(str(e)+'\n')
+		# f.flush()
+		# f.close()
 		cur.close()
 		conn.close()
 		return None
 	else:
 		cur.close()
 		conn.close()
-		f.close()
+		# f.close()
 		return data
 
 def empty_power():
@@ -156,9 +160,8 @@ def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):
 			ser.write(data_request_h + data_readers.data_req_p.pack(3, req_seq%256))
 			req_seq += 1
 			last_sent_r = time.time()
-		if time.time()-last_db_commit >= 2:
+		if time.time()-last_db_commit >= 10:
 			data = copy.deepcopy(devices)
-			print "Spawn DB sync"
 			commit_p.apply_async(commit_power, args=(data,),callback=call_b)
 			empty_power()
 			last_db_commit = time.time()
