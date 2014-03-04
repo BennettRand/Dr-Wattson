@@ -23,7 +23,8 @@ static uint16_t rx_buffer_start;    /**< Beginning position of data in the recei
 static uint16_t rx_buffer_end;	    /**< Ending position of data in the receive buffer */
 static bool currently_transmitting; /**< True if the port is currently transmitting, set false when the buffer is emptied */
 
-ISR(USART_TX_vect) {
+ISR(USART_TX_vect, ISR_NOBLOCK) {
+	USART_UCSRA |= (1<<TXC1);
 	if (tx_buffer_start != tx_buffer_end) {
 		/* There is actually data to send, so increment the start position and send that byte. Make sure to handle wrap arounds*/ 
 		currently_transmitting = true; 
