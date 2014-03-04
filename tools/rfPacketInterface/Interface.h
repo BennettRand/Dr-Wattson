@@ -10,6 +10,8 @@
 #include <QFileDialog>
 #include <QDir>
 
+#include <unistd.h>
+
 #include <string.h>
 
 #define EXTENDED_DATA_PACKET
@@ -50,6 +52,12 @@ private slots:
 
     void on_saveDataButton_clicked();
 
+    void on_autoDataRequestCheckbox_toggled(bool checked);
+
+    void timerEvent(QTimerEvent *event);
+
+    void on_datatRequestSpinBox_valueChanged(int arg1);
+
 private:
     Ui::Widget *ui;
     QSerialPort *port;
@@ -57,6 +65,7 @@ private:
     QList<QSerialPortInfo> portList;
     PacketTableModel tableModel;
     void transmitRawData(void* data, uint8_t size, int32_t address, bool panBroadcast);
+    int timerID;
 
 };
 

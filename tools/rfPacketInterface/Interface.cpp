@@ -19,11 +19,19 @@ Widget::Widget(QWidget *parent) :
     ui->tableView->setColumnWidth(0, 140);
     ui->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
+    timerID = startTimer(1000);
+    ui->datatRequestSpinBox->setValue(1000);
 }
 
 Widget::~Widget()
 {
     delete ui;
+}
+
+void Widget::timerEvent(QTimerEvent *event) {
+    if (port->isOpen() && ui->autoDataRequestCheckbox->isChecked()) {
+        ui->sendDataRrequest->click();
+    }
 }
 
 void Widget::dataReceived()
@@ -75,7 +83,7 @@ void Widget::on_connectButton_clicked(bool checked)
         port->setPort(portList.at(ui->portCombo->currentIndex()));
         if (port->open(QIODevice::ReadWrite))
         {
-            port->setBaudRate(QSerialPort::Baud38400);
+            port->setBaudRate(QSerialPort::Baud115200);
             port->setDataBits(QSerialPort::Data8);
             port->setDataErrorPolicy(QSerialPort::IgnorePolicy);
             port->setFlowControl(QSerialPort::NoFlowControl);
@@ -295,4 +303,16 @@ void Widget::on_saveDataButton_clicked()
 {
     QString filename = QFileDialog::getSaveFileName(this,"Save Data",QDir::homePath());
     tableModel.writeDataFile(filename);
+}
+
+void Widget::on_autoDataRequestCheckbox_toggled(bool checked)
+{
+    if (checked  == true)
+        ui->autoAckDataCheckbox->setChecked(true);
+}
+
+void Widget::on_datatRequestSpinBox_valueChanged(int arg1)
+{
+    killTimer(timerID);
+    timerID = startTimer(arg1);
 }

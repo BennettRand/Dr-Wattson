@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>938</width>
-    <height>659</height>
+    <height>663</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -467,7 +467,7 @@
         </property>
        </spacer>
       </item>
-      <item row="11" column="1">
+      <item row="12" column="1">
        <spacer name="verticalSpacer_2">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -497,6 +497,13 @@
         </property>
        </widget>
       </item>
+      <item row="9" column="0" colspan="2">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Data Ack:</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="2">
        <widget class="QPushButton" name="sendBaconPacket">
         <property name="text">
@@ -518,29 +525,22 @@
         </property>
        </widget>
       </item>
-      <item row="8" column="0" colspan="2">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Data Ack:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="0" colspan="3">
+      <item row="8" column="0" colspan="3">
        <widget class="Line" name="line_6">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
-      <item row="9" column="1">
-       <widget class="QSpinBox" name="dataAckSeqNumber">
-        <property name="maximum">
-         <number>255</number>
+      <item row="10" column="2">
+       <widget class="QPushButton" name="sendDataAck">
+        <property name="text">
+         <string>Send</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="1">
-       <widget class="QSpinBox" name="dataReqSeqNumber">
+      <item row="10" column="1">
+       <widget class="QSpinBox" name="dataAckSeqNumber">
         <property name="maximum">
          <number>255</number>
         </property>
@@ -553,17 +553,37 @@
         </property>
        </widget>
       </item>
-      <item row="9" column="2">
-       <widget class="QPushButton" name="sendDataAck">
-        <property name="text">
-         <string>Send</string>
+      <item row="6" column="1">
+       <widget class="QSpinBox" name="dataReqSeqNumber">
+        <property name="maximum">
+         <number>255</number>
         </property>
        </widget>
       </item>
-      <item row="10" column="1" colspan="2">
+      <item row="11" column="1" colspan="2">
        <widget class="QCheckBox" name="autoAckDataCheckbox">
         <property name="text">
          <string>Auto Ack Data</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QCheckBox" name="autoDataRequestCheckbox">
+        <property name="text">
+         <string>Auto Request</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="2">
+       <widget class="QSpinBox" name="datatRequestSpinBox">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>10000</number>
+        </property>
+        <property name="singleStep">
+         <number>0</number>
         </property>
        </widget>
       </item>
@@ -617,6 +637,40 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>portCombo</tabstop>
+  <tabstop>panLineEdit</tabstop>
+  <tabstop>connectButton</tabstop>
+  <tabstop>recanPortsButton</tabstop>
+  <tabstop>rxASCIIButton</tabstop>
+  <tabstop>rxHexButton</tabstop>
+  <tabstop>tableView</tabstop>
+  <tabstop>addressEdit</tabstop>
+  <tabstop>panBroadcastCheckbox</tabstop>
+  <tabstop>autoRespCheckBox</tabstop>
+  <tabstop>dataEdit</tabstop>
+  <tabstop>asciiRadioButton</tabstop>
+  <tabstop>hexRadioButton</tabstop>
+  <tabstop>transmitButton</tabstop>
+  <tabstop>saveDataButton</tabstop>
+  <tabstop>packetDataEdit</tabstop>
+  <tabstop>followDataCheckbox</tabstop>
+  <tabstop>voltage1ScalingSpinbox</tabstop>
+  <tabstop>current1ScalingSpinbox</tabstop>
+  <tabstop>voltage2ScalingSpinbox</tabstop>
+  <tabstop>current2ScalingSpinbox</tabstop>
+  <tabstop>linePeriodScalingSpinbox</tabstop>
+  <tabstop>networkNameEdit</tabstop>
+  <tabstop>sendBaconPacket</tabstop>
+  <tabstop>sendConnectionAck</tabstop>
+  <tabstop>dataReqSeqNumber</tabstop>
+  <tabstop>sendDataRrequest</tabstop>
+  <tabstop>autoDataRequestCheckbox</tabstop>
+  <tabstop>datatRequestSpinBox</tabstop>
+  <tabstop>dataAckSeqNumber</tabstop>
+  <tabstop>sendDataAck</tabstop>
+  <tabstop>autoAckDataCheckbox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
