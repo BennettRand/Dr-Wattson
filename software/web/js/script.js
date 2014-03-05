@@ -266,6 +266,9 @@ function drawSparks()
 	for (var p = 0; p < plugs.length; p++)
 	{
 		// console.log(plugs[p]);
+		while (plugs[p].firstChild) {
+			plugs[p].removeChild(plugs[p].firstChild);
+		}
 		plugs[p].remove();
 	}
 	for (var i=0;i<dList.length;i++)
