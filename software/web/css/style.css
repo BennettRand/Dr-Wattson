@@ -150,6 +150,26 @@ a
 	border-radius: 1em;
 }
 
+/* Make the scroll bar not tiny (only works in webkit)*/
+::-webkit-scrollbar {
+    width: 40px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #dfdfdf;
+    border-width: 1px;
+    border-color: #949494;
+    border-style: solid;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #d3d3d3;
+    border-radius: 9px;
+    border-width: 1px;
+    border-color: #949494;
+    border-style: solid;
+}
+
 /*font-family: 'Michroma', sans-serif;
 font-family: 'Open Sans', sans-serif;
 font-family: 'Ubuntu', sans-serif;*/
