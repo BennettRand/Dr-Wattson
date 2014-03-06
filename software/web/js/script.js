@@ -1,13 +1,10 @@
-var devices = $("#devices")[0];//document.getElementById("devices");
-var details = $("#details")[0];//document.getElementById("details");
+//  devices = $("#devices")[0];//document.getElementById("devices");
+//  details = $("#details")[0];//document.getElementById("details");
+ days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+ months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
-var detailsPlot = 0;
-
-$.jqplot.config.defaultHeight = ($(window).height()/2)-50;
-
-var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-
+ var detailsPlot;
+ 
 function drawChart(ele, id)
 {
 	$(ele).sparkline(powerFor(id),
@@ -38,7 +35,7 @@ function appendDevice(name1, id1, name2, id2)
 	plug.setAttribute("id1",id1);
 	plug.setAttribute("name2",name2);
 	plug.setAttribute("id2",id2);
-	devices.appendChild(plug);
+	$("#devices")[0].appendChild(plug);
 	
 	
 	link1 = document.createElement("a");
@@ -90,14 +87,14 @@ function appendDevice(name1, id1, name2, id2)
 
 function closeDetails()
 {
-	devices.style.height = "90%";
-	details.style.height = "0";
+	$("#devices")[0].style.height = "90%";
+	$("#details")[0].style.height = "0";
 }
 
 function openDetails(name,id)
 {
-	devices.style.height = "50%";
-	details.style.height = "50%";
+	$("#devices")[0].style.height = "50%";
+	$("#details")[0].style.height = "50%";
 	$("#devName")[0].innerHTML = "Device: "+name;
 	$("#devMAC")[0].innerHTML = "MAC: "+id.toString();
 }
@@ -108,7 +105,7 @@ function dateToStr(d)
 	timeString += d.getDate().toString()+" ";
 	timeString += d.getFullYear().toString()+" ";
 	
-	var currentHour = d.getHours()%12;
+	 currentHour = d.getHours()%12;
 	if (currentHour == 0){currentHour = 12;}
 	timeString += (currentHour%12).toString()+":";
 	
@@ -126,7 +123,10 @@ function detailsFor(name, id, arr)
 	closeDetails();
 	setTimeout("openDetails(\""+name+"\","+id.toString()+");",250);
 	
-	$("#chartArea")[0].innerHTML =  '';
+	// $("#chartArea")[0].innerHTML =  '';
+	while ($("#chartArea")[0].firstChild) {
+		$("#chartArea")[0].removeChild($("#chartArea")[0].firstChild);
+	}
 	
 	detailsPlot = $.jqplot('chartArea', arr,
 	{
@@ -228,9 +228,9 @@ function getDetailsFor(name, id)
 
 function powerFor(id)
 {
-	var start = id;
-	var arr = [];
-	for (var x = 0; x<200; x++)
+	 start = id;
+	 arr = [];
+	for ( x = 0; x<200; x++)
 	{
 		arr.push(start);
 		start += ((Math.random()*0.5)-0.25);
@@ -241,9 +241,9 @@ function powerFor(id)
 
 function getTotals()
 {
-	var v = 120+((Math.random()*2)-1);
-	var i = ((Math.random()*100));
-	var p = v*i;
+	 v = 120+((Math.random()*2)-1);
+	 i = ((Math.random()*100));
+	 p = v*i;
 	
 	return {voltage:v,power:p,current:i};
 }
@@ -263,7 +263,7 @@ function drawSparks()
 	
 	$("#loading")[0].style.visibility="visible";
 	plugs = $(".plug")
-	for (var p = 0; p < plugs.length; p++)
+	for ( p = 0; p < plugs.length; p++)
 	{
 		// console.log(plugs[p]);
 		while (plugs[p].firstChild) {
@@ -271,7 +271,7 @@ function drawSparks()
 		}
 		plugs[p].remove();
 	}
-	for (var i=0;i<dList.length;i++)
+	for ( i=0;i<dList.length;i++)
 	{
 		appendDevice(dList[i].name1,dList[i].id1,dList[i].name2,dList[i].id2);
 	}
@@ -280,14 +280,14 @@ function drawSparks()
 
 function clockTick()
 {
-	var d=new Date();
-	var timeString = "";
+	 d=new Date();
+	 timeString = "";
 	timeString += days[d.getDay()]+" ";
 	timeString += months[d.getMonth()]+" ";
 	timeString += d.getDate().toString()+" ";
 	// timeString += d.getFullYear().toString()+" ";
 	
-	var currentHour = d.getHours()%12;
+	 currentHour = d.getHours()%12;
 	if (currentHour == 0){currentHour = 12;}
 	timeString += (currentHour%12).toString()+":";
 	
@@ -305,7 +305,7 @@ function clockTick()
 
 function powerCounts()
 {
-	var tPower = getTotals();
+	 tPower = getTotals();
 	
 	$("#averageVoltage")[0].innerHTML = "Voltage: "+(Math.round(tPower.voltage * 100) / 100).toString()+" V";
 	
@@ -314,6 +314,26 @@ function powerCounts()
 	$("#totalPower")[0].innerHTML = "Power: "+Math.round(tPower.power).toString()+" W";
 }
 
+// function resizeJqplot()
+// {
+	height = ($(window).height()/2)-50;
+	$.jqplot.config.defaultHeight = height;
+	// if(detailsPlot != undefined)
+	// {
+		// detailsPlot.replot( { clear: true, resetAxes: ['yaxis','y2axis','y3axis'] } );
+	// }
+	// console.log("resize");
+// }
+
+// window.onresize = function(){
+	// resizeJqplot();
+// };
+
+// $(window).resize(function() {
+	// detailsPlot.replot( { resetAxes: true } );
+// });
+
+// resizeJqplot()
 drawSparks();
 powerCounts();
 clockTick();
