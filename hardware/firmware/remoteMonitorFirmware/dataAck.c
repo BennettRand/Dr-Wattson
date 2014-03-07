@@ -23,7 +23,11 @@ int16_t adcSampleData[4];
 
 uint8_t cycle_cnt = 0;
 
+#if (BOARD_REV == 1)
 ISR(PCINT0_vect) { // Data ready triggered
+#elif (BOARD_REV == 2)
+ISR(INT1_vect) {
+#endif
 	readData(adcSampleData,4);
 	adcSampleData[0] -= deviceCalibration.channel1VoltageOffset;
 	adcSampleData[2] -= deviceCalibration.channel1CurrentOffset;
@@ -40,7 +44,9 @@ ISR(PCINT0_vect) { // Data ready triggered
 	newCurrentSum[1] += (int64_t)(((int32_t)adcSampleData[3]) * ((int32_t)adcSampleData[3]));
 	#endif
 	
+	#if (BOARD_REV == 1)
 	PCIFR = (1<<PCIF0); // Need to clear the pin change interrupt flag as we leave to clear out the rising edge interrupt on drdy.
+	#endif
 }
 
 ISR(INT0_vect) {
@@ -75,12 +81,22 @@ ISR(INT0_vect) {
 
 	cycle_cnt++;
 	if (cycle_cnt == 2) { // Skip a cycle
+		#if (BOARD_REV == 1)
 		PCICR &= ~1;
 		PCIFR = (1<<PCIF0);
+		#elif (BOARD_REV == 2)
+		EIMSK &= ~(1<<INT1);
+		EIFR = (1<<INTF1);
+		#endif
 	}
 	else if (cycle_cnt == 3) { // Re-enable adc
+		#if (BOARD_REV == 1)
 		PCICR |= 1;
 		PCIFR = (1<<PCIF0);
+		#elif (BOARD_REV == 2)
+		EIMSK |= (1<<INT1);
+		EIFR = (1<<INTF1);
+		#endif
 		cycle_cnt = 0;
 	}
 }
@@ -98,8 +114,13 @@ void initDataAck() {
 	_delay_us(100);
 
 	// Configure data ready interrupt
+	#if (BOARD_REV == 1)
 	DDRB &= ~(1<<4);
 	PCMSK0 = 1<<4;
+	#elif (BOARD_REV == 2)
+	DDRD &= ~(1<<1);
+	EICRA |= (1<<ISC11);
+	#endif
 
 	// Configure zero cross interrupt
 	EICRA |= (1<<ISC01) | (1<<ISC00);
@@ -111,8 +132,12 @@ void initDataAck() {
 }
 
 void stopDataAck() {
-	EIMSK &= ~(1<<0);
+	EIMSK &= ~(1<<INT0);
+	#if (BOARD_REV == 1)
 	PCICR &= ~1;
+	#elif (BOARD_REV == 2)
+	EIMSK &= ~(1<<INT1);
+	#endif
 	_delay_us(100);
 	sendCommand(CMD_STOP);
 	_delay_us(100);
@@ -128,7 +153,11 @@ void startDataAck() {
 	sendCommand(CMD_RDATAC);
 	_delay_us(100);
 	EIMSK |= 1<<0;
+	#if (BOARD_REV == 1)
 	PCICR |= 1;
+	#elif (BOARD_REV == 2)
+	EIMSK |= (1<<INT1);
+	#endif
 }
 
 bool dataReady() {
