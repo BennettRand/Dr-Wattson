@@ -57,6 +57,9 @@ def application(environ, start_response):
 		data = get_data(0)
 		output = json.dumps(data)
 		
+	if environ['PATH_INFO'] == "/devices":
+		data = get_devices()
+		output = json.dumps(data)
 	else:
 		output = json.dumps(environ, skipkeys=True, default=lambda obj: 'N/A')
 	

@@ -2,12 +2,17 @@ import sys
 import platform
 import os
 import signal
+import subprocess
 from multiprocessing import Process, freeze_support
 
 config = {}
+children = []
 
 def handler(signum,frame):
 	print "Ctrl-C"
+	for c in children:
+		print "Killing child",c.pid
+		c.kill()
 	quit(-1)
 
 def test_deps(deps):
@@ -43,6 +48,9 @@ def load_cfg():
 		print len(config.options("Server")), "options in Server"
 		if len(config.options("Server")) != 3:
 			raise ConfigParser.Error("Server != 3")
+		print len(config.options("Logs")), "options in Logs"
+		if len(config.options("Logs")) != 3:
+			raise ConfigParser.Error("Logs != 3")
 	except ConfigParser.Error as e:
 		print e
 		print "-----Bad INI----------------------------"
@@ -66,7 +74,7 @@ def test_db():
 	return
 
 def test_serial():
-	global config
+	# global config
 	import serial
 	print "-----Checking Serial--------------------"
 	try:
@@ -85,20 +93,35 @@ def test_serial():
 	return
 
 def start_server():
-	signal.signal(signal.SIGINT,handler)
+	global config
 	print "Server Starting..."
+	os.chdir('./server')
+	f = open(config.get("Logs","http_log"),'w+')
+	fe = open(config.get("Logs","http_log")+".err",'w+')
+	svr = subprocess.Popen(["python","minimal_server.py"], stdout=f, stderr=fe)
+	children.append(svr)
+	os.chdir('..')
 	return
 	
 	
 def start_network():
-	signal.signal(signal.SIGINT,handler)
+	global config
 	print "Network Manager Starting..."
+	os.chdir('./daemon')
+	if platform.system() == "Windows":
+		ser_s = config.get("Serial","windows_device")
+	else:
+		ser_s = config.get("Serial","posix_device")
+	nwk = subprocess.Popen(["python","network_manager.py",ser_s])
+	children.append(nwk)
+	os.chdir('..')
 	return
 
 def main(argv = sys.argv, argc=len(sys.argv)):
-	deps = ['sys','os','json','random','time','psycopg2','itertools','paste','SimpleHTTPServer','SocketServer','signal','platform','multiprocessing','serial','math','copy','ConfigParser']
-	server_p = Process(target=start_server)
-	network_p = Process(target=start_network)
+	deps = ['sys','os','json','random','time','psycopg2','itertools','paste','SimpleHTTPServer','SocketServer','signal','platform','multiprocessing','serial','math','copy','ConfigParser','subprocess']
+	# server_p = Process(target=start_server)
+	# network_p = Process(target=start_network)
+	signal.signal(signal.SIGINT,handler)
 	
 	test_deps(deps)
 	
@@ -106,8 +129,21 @@ def main(argv = sys.argv, argc=len(sys.argv)):
 	test_db()
 	test_serial()
 	
-	server_p.start()
-	network_p.start()
+	start_server()
+	start_network()
+	
+	c_count = len(children)
+	
+	while c_count > 0:
+		for c in children:
+			s = c.poll()
+			if s != None:
+				print c.pid, "Died"
+				c.wait()
+				c_count -= 1
+	
+	# server_p.start()
+	# network_p.start()
 	return
 
 if __name__ == "__main__":
