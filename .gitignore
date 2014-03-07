@@ -1,0 +1,4 @@
+#Log Files
+*.log
+*.log.err
+
