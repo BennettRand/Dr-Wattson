@@ -2,3 +2,6 @@
 *.log
 *.log.err
 
+# Python files
+*.pyc
+
