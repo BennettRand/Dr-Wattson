@@ -15,20 +15,38 @@ bool transmitting = false;
 bool waiting = true;
 
 
+#if (BOARD_REV == 1)
 ISR(PCINT0_vect) { // Data ready triggered
+#elif (BOARD_REV == 2)
+ISR(INT1_vect) {
+#endif
 	readData(&(inputBuffer[sampleCount++][0]),4);
+	#if (BOARD_REV == 1)
 	PCIFR = (1<<PCIF0); // Need to clear the pin change interrupt flag as we leave to clear out the rising edge interrupt on drdy.
+	#endif
 }
 
 ISR(INT0_vect) {
 	if ((sampleCount > 300) && (transmitting == false) && (waiting == false)) {
 		// We should probably stop sampling now
+		#if (BOARD_REV == 1)
 		PCICR &= ~1;
 		PCIFR = (1<<PCIF0);
+		#elif (BOARD_REV == 2)
+		EIMSK &= ~(1<<INT1);
+		EIFR = (1<<INTF1);
+		#endif
 		transmitting = true;
 	}
-	if ((transmitting == false) && (waiting == false))
+	if ((transmitting == false) && (waiting == false)) {
+		#if (BOARD_REV == 1)
 		PCICR |= 1;
+		PCIFR = (1<<PCIF0);
+		#elif (BOARD_REV == 2)
+		EIMSK |= (1<<INT1);
+		EIFR = (1<<INTF1);
+		#endif
+	}
 }
 
 int main(void) {
@@ -43,12 +61,16 @@ int main(void) {
 	writeRegisters(0x05, registers, 8);
 
 	// Configure data ready interrupt
+	#if (BOARD_REV == 1)
 	DDRB &= ~(1<<4);
 	PCMSK0 = 1<<4;
+	#elif (BOARD_REV == 2)
+	DDRD &= ~(1<<1);
+	EICRA |= (1<<ISC11);
+	#endif
 
 	// Configure zero cross interrupt
 	EICRA |= (1<<ISC01) | (1<<ISC00);
-	DDRE |= 1<<2 | 1<<3;
 
 	sendCommand(CMD_START);
 	sendCommand(CMD_RDATAC);
