@@ -19,7 +19,7 @@ Widget::Widget(QWidget *parent) :
     ui->tableView->setColumnWidth(0, 140);
     ui->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-    timerID = startTimer(1000);
+    //timerID = startTimer(1000);
     ui->datatRequestSpinBox->setValue(1000);
 }
 
