@@ -28,12 +28,19 @@ ISR(PCINT0_vect) { // Data ready triggered
 #elif (BOARD_REV == 2)
 ISR(INT1_vect) {
 #endif
-	readData(adcSampleData,4);
+	readData(adcSampleData,3);
+	#if (BOARD_REV == 1)
 	adcSampleData[0] -= deviceCalibration.channel1VoltageOffset;
 	adcSampleData[2] -= deviceCalibration.channel1CurrentOffset;
 	adcSampleData[3] -= deviceCalibration.channel2CurrentOffset;
+	#elif (BOARD_REV == 2)
+	adcSampleData[0] -= deviceCalibration.channel1CurrentOffset;
+	adcSampleData[1] -= deviceCalibration.channel2CurrentOffset;
+	adcSampleData[2] -= deviceCalibration.channel2VoltageOffset;
+	#endif
 	
 	newSampleCount++;
+	#if (BOARD_REV == 1)
 	newPowerSum[0] += (int64_t)(((int32_t)adcSampleData[0]) * ((int32_t)adcSampleData[2]));
 	newPowerSum[1] += (int64_t)(((int32_t)adcSampleData[0]) * ((int32_t)adcSampleData[3]));
 
@@ -42,6 +49,17 @@ ISR(INT1_vect) {
 	newVoltageSum[1] += (int64_t)(((int32_t)adcSampleData[0]) * ((int32_t)adcSampleData[0]));
 	newCurrentSum[0] += (int64_t)(((int32_t)adcSampleData[2]) * ((int32_t)adcSampleData[2]));
 	newCurrentSum[1] += (int64_t)(((int32_t)adcSampleData[3]) * ((int32_t)adcSampleData[3]));
+	#endif
+	#elif (BOARD_REV == 2)
+	newPowerSum[0] += (int64_t)(((int32_t)adcSampleData[2]) * ((int32_t)adcSampleData[0]));
+	newPowerSum[1] += (int64_t)(((int32_t)adcSampleData[2]) * ((int32_t)adcSampleData[1]));
+
+	#ifdef EXTENDED_DATA_PACKET
+	newVoltageSum[0] += (int64_t)(((int32_t)adcSampleData[2]) * ((int32_t)adcSampleData[2]));
+	newVoltageSum[1] += (int64_t)(((int32_t)adcSampleData[2]) * ((int32_t)adcSampleData[2]));
+	newCurrentSum[0] += (int64_t)(((int32_t)adcSampleData[0]) * ((int32_t)adcSampleData[0]));
+	newCurrentSum[1] += (int64_t)(((int32_t)adcSampleData[1]) * ((int32_t)adcSampleData[1]));
+	#endif
 	#endif
 	
 	#if (BOARD_REV == 1)
