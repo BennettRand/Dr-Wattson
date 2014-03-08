@@ -17,6 +17,28 @@ def signExtend16(val):
 	else :
 		return val
 
+boardRev = 0
+boardRev = int(raw_input("Enter board revision you are calibrating: "))
+if (boardRev != 1) and (boardRev != 2) :
+	print "Invalid board revision: " + str(boardRev)
+	exit
+
+
+v1_index = 0
+i1_index = 0
+v2_index = 0
+i2_index = 0
+if (boardRev == 1) :
+	v1_index = 1
+	v2_index = 1
+	i1_index = 3
+	i2_index = 4
+if (boardRev == 2) :
+	v1_index = 3
+	v2_index = 3
+	i1_index = 1
+	i2_index = 2
+
 print "Reading existing calibration/configuration information..."
 proc = subprocess.Popen(["avrdude", "-patmega256rfr2", "-Pusb", "-cavrisp2", "-q", "-q", "-Ueeprom:r:.oldcal.bin:r"], stdin=sys.stdin, stdout=sys.stdout)
 proc.wait()
@@ -114,10 +136,10 @@ if not (yn.startswith('s')) :
 	IsquareSum = 0
 	rowcount = 0
 	for row in reader:
-		Vsum += int(row[1])
-		VsquareSum += int(row[1])*int(row[1])
-		Isum += int(row[3])
-		IsquareSum += int(row[3])*int(row[3])
+		Vsum += int(row[v1_index])
+		VsquareSum += int(row[v1_index])*int(row[v1_index])
+		Isum += int(row[i1_index])
+		IsquareSum += int(row[i1_index])*int(row[i1_index])
 		rowcount += 1
 
 	voltageOffset1 = int(round(Vsum/rowcount))
@@ -150,10 +172,10 @@ if not (yn.startswith('s')) :
 	IsquareSum = 0
 	rowcount = 0
 	for row in reader:
-		Vsum += int(row[1])
-		VsquareSum += int(row[1])*int(row[1])
-		Isum += int(row[4])
-		IsquareSum += int(row[4])*int(row[4])
+		Vsum += int(row[v2_index])
+		VsquareSum += int(row[v2_index])*int(row[v2_index])
+		Isum += int(row[i2_index])
+		IsquareSum += int(row[i2_index])*int(row[i2_index])
 		rowcount += 1
 	
 	voltageOffset2 = int(round(Vsum/rowcount))
