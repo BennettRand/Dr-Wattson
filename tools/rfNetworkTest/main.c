@@ -39,7 +39,7 @@ int main(void) {
 	SYS_Init(); // Init Atmel Lightweight Mesh stack
 
 	SYS_TaskHandler(); // Call the system task handler once before we configure the radio
-	NWK_SetAddr(2);
+	NWK_SetAddr(4);
 	NWK_SetPanId(1); // Default PAN ID will be 0, can be changed using the set PAN command
 	PHY_SetChannel(APP_CHANNEL);
 	//NWK_SetSecurityKey(APP_SECURITY_KEY);
@@ -47,17 +47,17 @@ int main(void) {
 	NWK_OpenEndpoint(APP_ENDPOINT, rfReceivePacket);
 	PHY_SetTxPower(0);
 
-	uart_init_port(uart_baud_38400, uart_tx_buf, 100, uart_rx_buf, 100); // Init uart
+	uart_init_port(uart_baud_115200, uart_tx_buf, 100, uart_rx_buf, 100); // Init uart
 
 	// Configure onboard LED as output
-	DDRB |= 1<<4;
-	PORTB |= 1<<4;
+	//DDRB |= 1<<4;
+	//PORTB |= 1<<4;
 
 	// Configure analog switch for antenna
-	DDRG |= 1<<1;
-	DDRF |= 1<<2;
-	PORTG |= 1<<1;
-	PORTF &= ~(1<<2);
+	//DDRG |= 1<<1;
+	//DDRF |= 1<<2;
+	//PORTG |= 1<<1;
+	//PORTF &= ~(1<<2);
 
 	char dat[100];
 	uint8_t len;
