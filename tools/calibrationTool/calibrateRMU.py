@@ -99,7 +99,10 @@ if (networkValid) :
 
 print "Loading Calibration Firmware..."
 # program calibration firmware onto DUT
-proc = subprocess.Popen(["avrdude", "-patmega256rfr2", "-Pusb", "-cavrisp2", "-Uflash:w:calibrationTool.hex:i"], stdin=sys.stdin, stdout=sys.stdout)
+if (boardRev == 1) :
+	proc = subprocess.Popen(["avrdude", "-patmega256rfr2", "-Pusb", "-cavrisp2", "-Uflash:w:calibrationTool_v1.hex:i"], stdin=sys.stdin, stdout=sys.stdout)
+if (boardRev == 2) :
+	proc = subprocess.Popen(["avrdude", "-patmega256rfr2", "-Pusb", "-cavrisp2", "-Uflash:w:calibrationTool_v2.hex:i"], stdin=sys.stdin, stdout=sys.stdout)
 proc.wait()
 if (proc.returncode != 0) :
 	# If this failed, try to write the old firmware back and exit
