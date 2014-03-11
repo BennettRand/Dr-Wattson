@@ -172,8 +172,12 @@ void ui_updatePowerValues(dataPacket_t *data){
 		char pwrStr[6] = {0,0,0,0,0,0};
 		ldiv_t res;
 		if (currentUnit == power) {
-			res = ldiv(((((data->powerData1*((int64_t)deviceCalibration.channel1VoltageScaling))/1000000)*((int64_t)deviceCalibration.channel1CurrentScaling))/data->sampleCount),10000000);
-			if (res.rem > (10000000/2))
+			#if (BOARD_REV == 1)
+			res = ldiv(((((data->powerData1/10000000)*((int64_t)deviceCalibration.channel1VoltageScaling))*((int64_t)deviceCalibration.channel1CurrentScaling))/data->sampleCount),1000000);
+			#elif (BOARD_REV == 2)
+			res = ldiv(((((data->powerData1/10000000)*((int64_t)deviceCalibration.channel2VoltageScaling))*((int64_t)deviceCalibration.channel1CurrentScaling))/data->sampleCount),1000000);
+			#endif
+			if (res.rem > (1000000/2))
 				res.quot++;
 			ltoa(res.quot, pwrStr, 10);
 			uint8_t len = strlen(pwrStr);
@@ -183,8 +187,12 @@ void ui_updatePowerValues(dataPacket_t *data){
 			writeString(pwrStr, 5);
 			
 			memset(pwrStr, 0, 6);
-			res = ldiv(((((data->powerData2*((int64_t)deviceCalibration.channel2VoltageScaling))/1000000)*((int64_t)deviceCalibration.channel2CurrentScaling))/data->sampleCount),10000000);
-			if (res.rem > (10000000/2))
+			#if (BOARD_REV == 1)
+			res = ldiv(((((data->powerData2/10000000)*((int64_t)deviceCalibration.channel1VoltageScaling))*((int64_t)deviceCalibration.channel2CurrentScaling))/data->sampleCount),1000000);
+			#elif (BOARD_REV == 2)
+			res = ldiv(((((data->powerData2/10000000)*((int64_t)deviceCalibration.channel2VoltageScaling))*((int64_t)deviceCalibration.channel2CurrentScaling))/data->sampleCount),1000000);
+			#endif
+			if (res.rem > (1000000/2))
 				res.quot++;
 			ltoa(res.quot, pwrStr, 10);	
 			len = strlen(pwrStr);
@@ -194,7 +202,11 @@ void ui_updatePowerValues(dataPacket_t *data){
 			writeString(pwrStr, 5);
 		}
 		else if (currentUnit == voltage) {
+			#if (BOARD_REV == 1)
 			res = ldiv(int_sqrt((uint32_t)(data->squaredVoltage1/((uint32_t)data->sampleCount)))*deviceCalibration.channel1VoltageScaling,100000);
+			#elif (BOARD_REV == 2)
+			res = ldiv(int_sqrt((uint32_t)(data->squaredVoltage1/((uint32_t)data->sampleCount)))*deviceCalibration.channel2VoltageScaling,100000);
+			#endif
 			if (res.rem > (100000/2))
 				res.quot++;
 			ltoa(res.quot, pwrStr, 10);
@@ -208,7 +220,11 @@ void ui_updatePowerValues(dataPacket_t *data){
 			writeChar(pwrStr[len-1]);
 
 			memset(pwrStr, 0, 6);
+			#if (BOARD_REV == 1)
 			res = ldiv(int_sqrt((uint32_t)(data->squaredVoltage2/((uint32_t)data->sampleCount)))*deviceCalibration.channel1VoltageScaling,100000);
+			#elif (BOARD_REV == 2)
+			res = ldiv(int_sqrt((uint32_t)(data->squaredVoltage2/((uint32_t)data->sampleCount)))*deviceCalibration.channel2VoltageScaling,100000);
+			#endif
 			if (res.rem > (100000/2))
 				res.quot++;
 			ltoa(res.quot, pwrStr, 10);
