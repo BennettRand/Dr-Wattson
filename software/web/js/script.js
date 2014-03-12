@@ -334,6 +334,24 @@ function powerCounts()
 // });
 
 // resizeJqplot()
+
+var refresh;
+
+function t_refresh (timeoutPeriod)
+{
+	if(refresh != undefined)
+	{
+		console.log("Clear previous");
+		clearTimeout(refresh);
+	}
+	refresh = setTimeout(function(){window.location.reload(true);},timeoutPeriod); 
+	console.log("Timeout set");
+}
+
+t_refresh(59000);
+window.onclick=function(){t_refresh(59000);}; //Bandage, not fix
+console.log(window.onclick);
+
 drawSparks();
 powerCounts();
 clockTick();
