@@ -8,11 +8,15 @@ import psycopg2
 from multiprocessing import Pool, freeze_support
 import signal
 import copy
+import ConfigParser
 
 sys.path.append('../lib')
 
 
 import data_readers
+
+config = ConfigParser.SafeConfigParser()
+config.read("../cfg.ini")
 
 pan = sum([ord(x) for x in platform.node()]) % 65536
 
@@ -125,10 +129,20 @@ def power_dict(d,t):
 
 def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):
 	
+	sys.stdout = open(config.get("Logs","network_log"),'w+')
+	sys.stderr = open(config.get("Logs","network_log")+".err",'w+')
+	
 	global ser
 	global devices
 	
-	ser = serial.Serial(args[1], 38400, timeout = .01)
+	if platform.system() == "Windows":
+		ser_s = config.get("Serial","windows_device")
+	else:
+		ser_s = config.get("Serial","posix_device")
+	
+	print "Connected to",conn
+	
+	ser = serial.Serial(ser_s, config.getint("Serial","baud"), timeout = config.getfloat("Serial","timeout"))
 	
 	req_seq = 0
 	
@@ -212,7 +226,6 @@ if __name__ == "__main__":
 	global devices
 	devices = {}
 	conn = psycopg2.connect(database = "wattson", host = "localhost", user = "root", password = "means swim of stream")
-	print "Connected to",conn
 	g_cur = conn.cursor()
 	if platform.system() == "Windows":
 		freeze_support()

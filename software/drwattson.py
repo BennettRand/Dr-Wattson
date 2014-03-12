@@ -96,9 +96,7 @@ def start_server():
 	global config
 	print "Server Starting..."
 	os.chdir('./server')
-	f = open(config.get("Logs","http_log"),'w+')
-	fe = open(config.get("Logs","http_log")+".err",'w+')
-	svr = subprocess.Popen(["python","minimal_server.py"], stdout=f, stderr=fe)
+	svr = subprocess.Popen(["python","minimal_server.py"])
 	children.append(svr)
 	os.chdir('..')
 	return
