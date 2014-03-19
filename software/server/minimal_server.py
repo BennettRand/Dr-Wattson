@@ -21,16 +21,16 @@ def handler(signum,frame):
 
 def serve_wsgi():
 	signal.signal(signal.SIGINT,handler)
-	sys.stdout = open(config.get("Logs","wsgi_log"),'w+')
-	sys.stderr = open(config.get("Logs","wsgi_log")+".err",'w+')
+	# sys.stdout = open(config.get("Logs","wsgi_log"),'w+')
+	# sys.stderr = open(config.get("Logs","wsgi_log")+".err",'w+')
 	print "WSGI Starting..."
 	paste.httpserver.serve(testapp.application, port=config.getint("Server","wsgi_port"), protocol_version = "HTTP/1.1", socket_timeout = 10000, use_threadpool = True, threadpool_workers = 10, daemon_threads=True)
 	
 def serve_http():
 	signal.signal(signal.SIGINT,handler)
 	os.chdir("../web")
-	sys.stdout = open(config.get("Logs","http_log"),'w+')
-	sys.stderr = open(config.get("Logs","http_log")+".err",'w+')
+	# sys.stdout = open(config.get("Logs","http_log"),'w+')
+	# sys.stderr = open(config.get("Logs","http_log")+".err",'w+')
 	Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
 	httpd = SocketServer.TCPServer(("", config.getint("Server","http_port")), Handler)
 	print "HTTP Starting..."

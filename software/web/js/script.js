@@ -50,7 +50,7 @@ function appendDevice(name1, id1, name2, id2)
 	theDiv1.appendChild(spark1);
 	
 	link1.setAttribute("href", "javascript:void(0)");
-	link1.setAttribute("onClick", "getDetailsFor(\""+name1+"\", "+id1.toString()+");");
+	link1.setAttribute("onClick", "getDetailsFor(\""+name1+"\", \""+id1.toString()+"\");");
 	
 	theDiv1.setAttribute("class","device");
 	
@@ -73,7 +73,7 @@ function appendDevice(name1, id1, name2, id2)
 	theDiv2.appendChild(spark2);
 	
 	link2.setAttribute("href", "javascript:void(0)");
-	link2.setAttribute("onClick", "getDetailsFor(\""+name2+"\", "+id2.toString()+");");
+	link2.setAttribute("onClick", "getDetailsFor(\""+name2+"\", \""+id2.toString()+"\");");
 	
 	theDiv2.setAttribute("class","device");
 	
@@ -82,7 +82,7 @@ function appendDevice(name1, id1, name2, id2)
 	text2.appendChild(document.createTextNode(placeholder));
 	
 	spark2.setAttribute("class", "bgChart");
-	drawChart(spark2, id1);
+	drawChart(spark2, id2);
 }
 
 function closeDetails()
@@ -121,7 +121,7 @@ function dateToStr(d)
 function detailsFor(name, id, arr)
 {
 	closeDetails();
-	setTimeout("openDetails(\""+name+"\","+id.toString()+");",250);
+	setTimeout("openDetails(\""+name+"\",\""+id+"\");",250);
 	
 	// $("#chartArea")[0].innerHTML =  '';
 	while ($("#chartArea")[0].firstChild) {
@@ -228,7 +228,7 @@ function getDetailsFor(name, id)
 
 function powerFor(id)
 {
-	 start = id;
+	 start = 5;
 	 arr = [];
 	for ( x = 0; x<200; x++)
 	{
@@ -262,20 +262,23 @@ function drawSparks()
 		{"name1":"Sit","id1":9,"name2":"Amet","id2":10}];
 	
 	$("#loading")[0].style.visibility="visible";
-	plugs = $(".plug")
-	for ( p = 0; p < plugs.length; p++)
+	$.getJSON("http://"+document.location.host+":8080/devices",{}, function(data)
 	{
-		// console.log(plugs[p]);
-		while (plugs[p].firstChild) {
-			plugs[p].removeChild(plugs[p].firstChild);
+		plugs = $(".plug")
+		for ( p = 0; p < plugs.length; p++)
+		{
+			// console.log(plugs[p]);
+			while (plugs[p].firstChild) {
+				plugs[p].removeChild(plugs[p].firstChild);
+			}
+			plugs[p].remove();
 		}
-		plugs[p].remove();
-	}
-	for ( i=0;i<dList.length;i++)
-	{
-		appendDevice(dList[i].name1,dList[i].id1,dList[i].name2,dList[i].id2);
-	}
-	$("#loading")[0].style.visibility="hidden";
+		for ( i=0;i<data.length;i++)
+		{
+			appendDevice(data[i].name1,data[i].id1,data[i].name2,data[i].id2);
+		}
+		$("#loading")[0].style.visibility="hidden";
+	});
 }
 
 function clockTick()
@@ -341,16 +344,16 @@ function t_refresh (timeoutPeriod)
 {
 	if(refresh != undefined)
 	{
-		console.log("Clear previous");
+		// console.log("Clear previous");
 		clearTimeout(refresh);
 	}
 	refresh = setTimeout(function(){window.location.reload(true);},timeoutPeriod); 
-	console.log("Timeout set");
+	// console.log("Timeout set");
 }
 
 t_refresh(59000);
 window.onclick=function(){t_refresh(59000);}; //Bandage, not fix
-console.log(window.onclick);
+// console.log(window.onclick);
 
 drawSparks();
 powerCounts();
