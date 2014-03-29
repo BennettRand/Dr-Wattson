@@ -38,41 +38,48 @@ void Widget::dataReceived()
 {
     inbuffer.append(port->readAll());
 
-    if (inbuffer.at(0) == 0)
-        inbuffer = inbuffer.right(inbuffer.size() - 1);
-
-    if ((inbuffer.at(0) + sizeof(rxHeader_t)) <= inbuffer.size()) {
-        rxHeader_t packetHeader;
-        memcpy(&packetHeader, inbuffer.data(), sizeof(rxHeader_t));
-        inbuffer = inbuffer.right(inbuffer.size() - sizeof(rxHeader_t));
-        QByteArray data = inbuffer.left(packetHeader.size);
-        inbuffer = inbuffer.right(inbuffer.size() - packetHeader.size);
-
-        tableModel.addData(packetHeader, data, QDateTime::currentDateTime());
-        ui->tableView->scrollToBottom();
-
-        if (ui->followDataCheckbox->isChecked())
-        {
-            ui->tableView->selectRow(tableModel.rowCount(QModelIndex())-1);
-            on_tableView_clicked(tableModel.index(tableModel.rowCount(QModelIndex())-1,4));
+    while (true) {
+        if (inbuffer.at(0) == 0) {
+            inbuffer = inbuffer.right(inbuffer.size() - 1);
         }
 
-        if (ui->autoRespCheckBox->isChecked())
-        {
-            txHeader_t txPacketHeader;
-            txPacketHeader.destAddr = packetHeader.sourceAddr;
-            txPacketHeader.command = sendPacket;
-            txPacketHeader.size = 13 + packetHeader.size;
-            port->write((char*)(&txPacketHeader), sizeof(txPacketHeader));
-            port->write("Got message: ", 13);
-            port->write(data);
-        }
+        if ((inbuffer.at(0) + sizeof(rxHeader_t)) <= inbuffer.size()) {
+            rxHeader_t packetHeader;
+            memcpy(&packetHeader, inbuffer.data(), sizeof(rxHeader_t));
+            inbuffer = inbuffer.right(inbuffer.size() - sizeof(rxHeader_t));
+            QByteArray data = inbuffer.left(packetHeader.size);
+            inbuffer = inbuffer.right(inbuffer.size() - packetHeader.size);
 
-        if ((ui->autoAckDataCheckbox->isChecked()) && (data[0] == 4) && (data.length() == sizeof(dataPacket_t))) {
-            dataPacket_t *pkt = (dataPacket_t*)data.data();
-            ui->dataAckSeqNumber->setValue(pkt->dataSequence);
-            ui->sendDataAck->clicked();
+            tableModel.addData(packetHeader, data, QDateTime::currentDateTime());
+            ui->tableView->scrollToBottom();
+
+            if (ui->followDataCheckbox->isChecked())
+            {
+                ui->tableView->selectRow(tableModel.rowCount(QModelIndex())-1);
+                on_tableView_clicked(tableModel.index(tableModel.rowCount(QModelIndex())-1,4));
+            }
+
+            if (ui->autoRespCheckBox->isChecked())
+            {
+                txHeader_t txPacketHeader;
+                txPacketHeader.destAddr = packetHeader.sourceAddr;
+                txPacketHeader.command = sendPacket;
+                txPacketHeader.size = 13 + packetHeader.size;
+                port->write((char*)(&txPacketHeader), sizeof(txPacketHeader));
+                port->write("Got message: ", 13);
+                port->write(data);
+            }
+
+            if ((ui->autoAckDataCheckbox->isChecked()) && (data[0] == 4) && (data.length() == sizeof(dataPacket_t))) {
+                dataPacket_t *pkt = (dataPacket_t*)data.data();
+                ui->dataAckSeqNumber->setValue(pkt->dataSequence);
+                ui->sendDataAck->clicked();
+            }
+            if (inbuffer.size() == 0)
+                break;
         }
+        else
+            break;
     }
 }
 
