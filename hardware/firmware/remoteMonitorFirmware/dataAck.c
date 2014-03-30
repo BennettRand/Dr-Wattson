@@ -179,11 +179,12 @@ void startDataAck() {
 }
 
 bool dataReady() {
+	return true;
 	return sampleCount >= 3;
 }
 
 void getData(dataPacket_t *pkt) {
-	pkt->sampleCount = sampleCount;
+	/*pkt->sampleCount = sampleCount;
 	pkt->powerData1 = powerSum[0];
 	pkt->powerData2 = powerSum[1];
 	#ifdef EXTENDED_DATA_PACKET
@@ -192,6 +193,16 @@ void getData(dataPacket_t *pkt) {
 	pkt->squaredVoltage2 = voltageSum[1];
 	pkt->squaredCurrent1 = currentSum[0];
 	pkt->squaredCurrent2 = currentSum[1];
+	#endif	*/
+	pkt->sampleCount = 8000;
+	pkt->powerData1 = 0xFFFFFFFFFFFF;
+	pkt->powerData2 = 0xFFFFFFFFFFFF;
+	#ifdef EXTENDED_DATA_PACKET
+	pkt->linePeriod = 0xFF00;
+	pkt->squaredVoltage1 = 0;//voltageSum[0];
+	pkt->squaredVoltage2 = 9;//voltageSum[1];
+	pkt->squaredCurrent1 = 9;//currentSum[0];
+	pkt->squaredCurrent2 = 9;//currentSum[1];
 	#endif	
 }
 
