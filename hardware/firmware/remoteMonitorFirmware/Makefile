@@ -115,4 +115,9 @@ program: $(BUILD_DIR)/$(TARGET).hex
 	#$(ATPROGRAM) -t $(PROG_INTERFACE) -i $(PROG_PROTOCOL) -d $(DEVICE) -s $(SERIAL_NUMBER) program -c -fl -f $(CURDIR)/$(BUILD_DIR)/$(TARGET).elf
 	$(AVRDUDE) -p $(DEVICE) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) -U flash:w:$(BUILD_DIR)/$(TARGET).hex
 
+fuses:
+	$(AVRDUDE) -p $(DEVICE) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) -U hfuse:w:0xF8:m
+	$(AVRDUDE) -p $(DEVICE) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) -U efuse:w:0xD7:m
+	$(AVRDUDE) -p $(DEVICE) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) -U lfuse:w:0xFB:m
+
 -include $(wildcard $(BUILD_DIR)/*.d)
