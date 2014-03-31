@@ -17,7 +17,6 @@
 #define USART_UCSRC   UCSR1C
 
 #define APP_ENDPOINT              1
-#define APP_FLUSH_TIMER_INTERVAL  20
 
 #define APP_CHANNEL             0x08i
 
