@@ -30,6 +30,7 @@ Widget::~Widget()
 
 void Widget::timerEvent(QTimerEvent *event) {
     if (port->isOpen() && ui->autoDataRequestCheckbox->isChecked()) {
+        ui->addressEdit->setText("FFFF");
         ui->sendDataRrequest->click();
     }
 }
@@ -72,6 +73,7 @@ void Widget::dataReceived()
 
             if ((ui->autoAckDataCheckbox->isChecked()) && (data[0] == 4) && (data.length() == sizeof(dataPacket_t))) {
                 dataPacket_t *pkt = (dataPacket_t*)data.data();
+                ui->addressEdit->setText(QString().setNum(packetHeader.sourceAddr,16));
                 ui->dataAckSeqNumber->setValue(pkt->dataSequence);
                 ui->sendDataAck->clicked();
             }
