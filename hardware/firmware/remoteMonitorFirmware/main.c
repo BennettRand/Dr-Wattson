@@ -139,7 +139,7 @@ int main(void) {
 	initLCD(display_cmd_buffer, 64);
 	initUI();
 
-	TCCR3B |= (1<<CS30);
+	TCCR0B |= (1<<CS01);
 
 	sei();
 	startDataAck();
@@ -156,9 +156,9 @@ int main(void) {
 			removeSamples(&dataPacket); // Get rid of these samples now
 		}
 		
-		if (TCNT3 > 640) {
+		if (TCNT0 > 80) {
 			serviceLCD();
-			TCNT3 = 0;
+			TCNT0 = 0;
 		}
 	}
 }
