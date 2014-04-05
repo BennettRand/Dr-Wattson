@@ -64,10 +64,10 @@ extern struct calibData deviceCalibration;
 
 #define NWK_BUFFERS_AMOUNT                  32
 #define NWK_DUPLICATE_REJECTION_TABLE_SIZE  10
-#define NWK_DUPLICATE_REJECTION_TTL         3000 // ms
+#define NWK_DUPLICATE_REJECTION_TTL         250 // ms
 #define NWK_ROUTE_TABLE_SIZE                100
 #define NWK_ROUTE_DEFAULT_SCORE             3
-#define NWK_ACK_WAIT_TIME                   1000 // ms
+#define NWK_ACK_WAIT_TIME                   500 // ms
 
 #define NWK_ENABLE_ROUTING
 //#define NWK_ENABLE_SECURITY
