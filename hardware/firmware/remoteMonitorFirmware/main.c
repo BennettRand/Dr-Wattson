@@ -19,6 +19,7 @@
 NWK_DataReq_t nwkPacket[DATA_REQ_BUFFER_CNT];
 bool dataReqBusy[DATA_REQ_BUFFER_CNT];
 uint8_t retransmit_cnt[DATA_REQ_BUFFER_CNT];
+uint16_t retransmit_time[DATA_REQ_BUFFER_CNT];
 
 static dataPacket_t dataPacket = {.type = data};
 static uint8_t dataSequence = 0;
@@ -29,10 +30,13 @@ struct lcd_cmd display_cmd_buffer[64];
 
 void packetTxConf(NWK_DataReq_t *req) {
 	retransmit_cnt[req - nwkPacket]++;
-	if ((req->status != NWK_SUCCESS_STATUS) && (req->status != NWK_NO_ROUTE_STATUS) && (retransmit_cnt[req-nwkPacket] < 10))
-		NWK_DataReq(req);
-		
-	dataReqBusy[req - nwkPacket] = false;
+	if ((req->status != NWK_SUCCESS_STATUS) && (req->status != NWK_NO_ROUTE_STATUS) && (retransmit_cnt[req-nwkPacket] < 10)) {
+		retransmit_time[req-nwkPacket] = TCNT3 + 32 + (rand()/(RAND_MAX/(NWK_ACK_WAIT_TIME*15)));
+	}
+	else {
+		dataReqBusy[req - nwkPacket] = false;
+		retransmit_time[req - nwkPacket] = 0;
+	}
 }
 
 void handleDataRequest(NWK_DataInd_t *packet) {
@@ -116,6 +120,9 @@ int main(void) {
 	NWK_OpenEndpoint(APP_ENDPOINT, rfReceivePacket);
 	PHY_SetTxPower(0);
 
+	// Seed the pseudorandom number generator
+	srand(eeprom_read_word((uint16_t*)0));
+
 	// Read eeprom data
 	eeprom_read_block(&deviceCalibration, (void*)8, sizeof(deviceCalibration));
 	if (eeprom_read_byte((uint8_t*)26)) { // There is valid data in the network information struct
@@ -140,6 +147,7 @@ int main(void) {
 	initUI();
 
 	TCCR0B |= (1<<CS01);
+	TCCR3B |= (1<<CS32) | (1<<CS30);
 
 	sei();
 	startDataAck();
@@ -160,6 +168,21 @@ int main(void) {
 			serviceLCD();
 			TCNT0 = 0;
 		}
+
+		TCCR3B &= ~((1<<CS32) | (1<<CS30));
+		for (uint8_t cnt = 0; cnt < DATA_REQ_BUFFER_CNT; cnt++) {
+			if (dataReqBusy[cnt] && (retransmit_time[cnt] != 0)) {
+				if (retransmit_time[cnt] <= TCNT3) {
+					dataPacket.requestSequence += 1;
+					NWK_DataReq(&(nwkPacket[cnt]));
+					retransmit_time[cnt] = 0;
+				}
+				else
+					retransmit_time[cnt] -= TCNT3;
+			}
+		}
+		TCNT3 = 0;
+		TCCR3B |= (1<<CS32) | (1<<CS30);
 	}
 }
 
