@@ -46,7 +46,7 @@ ISR(INT1_vect) {
 
 	#ifdef EXTENDED_DATA_PACKET
 	newVoltageSum[0] += (int64_t)(((int32_t)adcSampleData[0]) * ((int32_t)adcSampleData[0]));
-	newVoltageSum[1] += (int64_t)(((int32_t)adcSampleData[0]) * ((int32_t)adcSampleData[0]));
+	newVoltageSum[1] = newVoltageSum[0];
 	newCurrentSum[0] += (int64_t)(((int32_t)adcSampleData[2]) * ((int32_t)adcSampleData[2]));
 	newCurrentSum[1] += (int64_t)(((int32_t)adcSampleData[3]) * ((int32_t)adcSampleData[3]));
 	#endif
@@ -56,7 +56,7 @@ ISR(INT1_vect) {
 
 	#ifdef EXTENDED_DATA_PACKET
 	newVoltageSum[0] += (int64_t)(((int32_t)adcSampleData[2]) * ((int32_t)adcSampleData[2]));
-	newVoltageSum[1] += (int64_t)(((int32_t)adcSampleData[2]) * ((int32_t)adcSampleData[2]));
+	newVoltageSum[1] = newVoltageSum[0];
 	newCurrentSum[0] += (int64_t)(((int32_t)adcSampleData[0]) * ((int32_t)adcSampleData[0]));
 	newCurrentSum[1] += (int64_t)(((int32_t)adcSampleData[1]) * ((int32_t)adcSampleData[1]));
 	#endif
@@ -146,7 +146,6 @@ void initDataAck() {
 
 	// Configure period counter
 	TCCR1B = (1<<CS11);
-		
 }
 
 void stopDataAck() {
