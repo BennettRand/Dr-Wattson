@@ -18,6 +18,7 @@
 
 NWK_DataReq_t nwkPacket[DATA_REQ_BUFFER_CNT];
 bool dataReqBusy[DATA_REQ_BUFFER_CNT];
+uint8_t retransmit_cnt[DATA_REQ_BUFFER_CNT];
 
 static dataPacket_t dataPacket = {.type = data};
 static uint8_t dataSequence = 0;
@@ -27,6 +28,10 @@ struct calibData deviceCalibration;
 struct lcd_cmd display_cmd_buffer[64];
 
 void packetTxConf(NWK_DataReq_t *req) {
+	retransmit_cnt[req - nwkPacket]++;
+	if ((req->status != NWK_SUCCESS_STATUS) && (req->status != NWK_NO_ROUTE_STATUS) && (retransmit_cnt[req-nwkPacket] < 10))
+		NWK_DataReq(req);
+		
 	dataReqBusy[req - nwkPacket] = false;
 }
 
@@ -55,6 +60,7 @@ void handleDataRequest(NWK_DataInd_t *packet) {
 		nwkPacket[ind].confirm = packetTxConf;
 		NWK_DataReq(&(nwkPacket[ind]));
 		dataReqBusy[ind] = true;
+		retransmit_cnt[ind] = 0;
 		ui_updatePowerValues(&dataPacket);
 	}
 }
@@ -134,7 +140,7 @@ int main(void) {
 		sendConnectionRequest(0, &deviceCalibration);
 	}	
 
-	initDataAck();
+	//initDataAck();
 	initLCD(display_cmd_buffer, 64);
 	initUI();
 
