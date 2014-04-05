@@ -109,7 +109,7 @@ int main(void) {
 
 	SYS_TaskHandler(); // Call the system task handler once before we configure the radio
 	NWK_SetAddr(eeprom_read_word((uint16_t*)0));
-	NWK_SetPanId(1); // Default PAN ID will be 0, can be changed using the set PAN command
+	NWK_SetPanId(0); // Default PAN ID will be 0, can be changed using the set PAN command
 	PHY_SetChannel(APP_CHANNEL);
 	//NWK_SetSecurityKey(APP_SECURITY_KEY);
 	PHY_SetRxState(true);
@@ -132,28 +132,23 @@ int main(void) {
 			baseStationList[cnt].name[16] = ' ';
 			baseStationList[cnt].name[17] = ' ';
 		}
-	baseStationList[0].PAN_ID = 0;
-	baseStationList[0].rssi = 1;
-	baseStationList[0].addr = 2;
-	baseStationList[0].nameLen = 0;
-	baseStationListLength = 1;
 		sendConnectionRequest(0, &deviceCalibration);
 	}	
 
-	//initDataAck();
+	initDataAck();
 	initLCD(display_cmd_buffer, 64);
 	initUI();
 
 	TCCR3B |= (1<<CS30);
 
 	sei();
-	//startDataAck();
+	startDataAck();
 
 	while (1) {
 		SYS_TaskHandler();
-		//updateUI();
+		updateUI();
 
-	/*	if (sampleCount > 40000) {
+		if (sampleCount > 40000) {
 			if (dataPacket.sampleCount != 0)
 				removeSamples(&dataPacket); // If the last transmitted data has not been acked then first remove the old data.
 			getData(&dataPacket); // Sample new data
@@ -164,7 +159,7 @@ int main(void) {
 		if (TCNT3 > 640) {
 			serviceLCD();
 			TCNT3 = 0;
-		}*/
+		}
 	}
 }
 
