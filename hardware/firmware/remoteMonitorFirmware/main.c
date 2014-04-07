@@ -31,7 +31,7 @@ struct lcd_cmd display_cmd_buffer[64];
 void packetTxConf(NWK_DataReq_t *req) {
 	retransmit_cnt[req - nwkPacket]++;
 	if ((req->status != NWK_SUCCESS_STATUS) && (req->status != NWK_NO_ROUTE_STATUS) && (retransmit_cnt[req-nwkPacket] < 10)) {
-		retransmit_time[req-nwkPacket] = TCNT3 + 32 + (rand()/(RAND_MAX/(NWK_ACK_WAIT_TIME*15)));
+		retransmit_time[req-nwkPacket] = TCNT3 + 15 + (rand()/(RAND_MAX/(64*retransmit_cnt[req - nwkPacket])));
 	}
 	else {
 		dataReqBusy[req - nwkPacket] = false;
