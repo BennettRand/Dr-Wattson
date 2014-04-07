@@ -150,12 +150,12 @@ function detailsFor(name, id, arr)
 			label:"Voltage",
 			yaxis:"yaxis"
 		},
-		{
+		/*{
 			// Don't show a line, just show markers.
 			// Make the markers 7 pixels with an 'x' style
 			label:"Current",
 			yaxis:"y2axis"
-		},
+		},*/
 		{
 			// Use (open) circlular markers.
 			label:"Power",
@@ -180,19 +180,21 @@ function detailsFor(name, id, arr)
 			padMax:0,
 			renderer:$.jqplot.DateAxisRenderer,
 			tickOptions:{
-				formatString:'%#m-%#d\n%I:%M:%S %p'
+				formatString:'%s'//'%#m-%#d\n%I:%M:%S %p'
 			}
 		},
 		yaxis: {
-			label:'V'
+			label:'V',
+			min: 100,
+			max: 140
 		},
-		y2axis: {
+		/*y2axis: {
 			label:'A',
 			min:0
-		},
+		},*/
 		y3axis: {
 			label:'W',
-			min:0
+			min:0.05
 		}
 	},
 	highlighter: {
@@ -261,7 +263,7 @@ function drawSparks()
 		{"name1":"Ipsum","id1":7,"name2":"Dolor","id2":8},
 		{"name1":"Sit","id1":9,"name2":"Amet","id2":10}];
 	
-	$("#loading")[0].style.visibility="visible";
+	// $("#loading")[0].style.visibility="visible";
 	$.getJSON("http://"+document.location.host+":8080/devices",{}, function(data)
 	{
 		plugs = $(".plug")
@@ -277,7 +279,7 @@ function drawSparks()
 		{
 			appendDevice(data[i].name1,data[i].id1,data[i].name2,data[i].id2);
 		}
-		$("#loading")[0].style.visibility="hidden";
+		// $("#loading")[0].style.visibility="hidden";
 	});
 }
 
@@ -351,8 +353,8 @@ function t_refresh (timeoutPeriod)
 	// console.log("Timeout set");
 }
 
-t_refresh(59000);
-window.onclick=function(){t_refresh(59000);}; //Bandage, not fix
+// t_refresh(59000);
+// window.onclick=function(){t_refresh(59000);}; //Bandage, not fix
 // console.log(window.onclick);
 
 drawSparks();
