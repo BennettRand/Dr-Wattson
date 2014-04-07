@@ -58,7 +58,7 @@ void handleDataRequest(NWK_DataInd_t *packet) {
 		nwkPacket[ind].dstAddr = baseStationList[connectedBaseStation].addr;
 		nwkPacket[ind].dstEndpoint = APP_ENDPOINT;
 		nwkPacket[ind].srcEndpoint = APP_ENDPOINT;
-		nwkPacket[ind].options = 0;
+		nwkPacket[ind].options = NWK_OPT_ACK_REQUEST;
 		nwkPacket[ind].data = (uint8_t *)(&dataPacket);
 		nwkPacket[ind].size = sizeof(dataPacket_t);
 		nwkPacket[ind].confirm = packetTxConf;
