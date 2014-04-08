@@ -42,7 +42,7 @@ def commit_power(data):
 	cur = conn.cursor()
 	sample_insert_statement = "INSERT INTO sample VALUES "
 	sample_insert_format = "(DEFAULT, to_timestamp(%s), to_timestamp(%s), %s, %s, %s, %s, %s, %s, %s, %s)"
-	# f = open('err.out','a')
+	f = open(config.get("Logs","network_log")+".err",'w+')
 	# f.write(time.asctime()+'\n')
 	# f.write(str(conn)+'\n')
 	# f.flush()
@@ -56,9 +56,9 @@ def commit_power(data):
 			cur.execute(query)
 			conn.commit()
 	except Exception as e:
-		# f.write(str(e)+'\n')
-		# f.flush()
-		# f.close()
+		f.write(str(e)+'\n')
+		f.flush()
+		f.close()
 		cur.close()
 		conn.close()
 		return None
@@ -129,8 +129,8 @@ def power_dict(d,t):
 
 def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):
 	
-	sys.stdout = open(config.get("Logs","network_log"),'w+')
-	sys.stderr = open(config.get("Logs","network_log")+".err",'w+')
+	# sys.stdout = open(config.get("Logs","network_log"),'w+')
+	# sys.stderr = open(config.get("Logs","network_log")+".err",'w+')
 	
 	global ser
 	global devices
@@ -194,6 +194,7 @@ def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):
 				print "Connection request from", addr_to_mac(rx_h_data[1])
 				
 				add_device(rx_h_data[1], g_cur)
+				conn.commit()
 				
 				devices[addr_to_mac(rx_h_data[1])] = {}
 				devices[addr_to_mac(rx_h_data[1])]['calib'] = calib_dict(conn_r)

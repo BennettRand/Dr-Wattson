@@ -24,7 +24,8 @@ def get_data(id):
 	devs = cur.fetchone()
 	data = devs[0]
 	
-	query = "SELECT til,v_1,v_2,i_1,i_2,p_1,p_2,f FROM sample WHERE device_mac='"+data+"' ORDER BY til DESC LIMIT 120;"
+	# query = "SELECT til,v_1,v_2,i_1,i_2,p_1,p_2,f FROM sample WHERE device_mac='"+data+"' AND til > now() - interval '2 hour' ORDER BY til DESC;"
+	query = "SELECT til,v_1,v_2,i_1,i_2,p_1,p_2,f FROM sample WHERE device_mac='"+data+"' ORDER BY til DESC LIMIT 1000;"
 	
 	cur.execute(query)
 	
@@ -42,7 +43,8 @@ def get_data(id):
 	cur.close()
 	conn.close()
 	
-	return [v_arr,i_arr,p_arr]
+	# return [v_arr,i_arr,p_arr]
+	return [v_arr,p_arr]
 	
 def get_devices():
 	# {"name1":"Foo","id1":1,"name2":"Bar","id2":2}
