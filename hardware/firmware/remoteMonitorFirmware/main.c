@@ -31,7 +31,7 @@ struct lcd_cmd display_cmd_buffer[64];
 void packetTxConf(NWK_DataReq_t *req) {
 	retransmit_cnt[req - nwkPacket]++;
 	if ((req->status != NWK_SUCCESS_STATUS) && (req->status != NWK_NO_ROUTE_STATUS) && (retransmit_cnt[req-nwkPacket] < 10)) {
-		retransmit_time[req-nwkPacket] = TCNT3 + 15 + (rand()/(RAND_MAX/(64*retransmit_cnt[req - nwkPacket])));
+		retransmit_time[req-nwkPacket] = TCNT3 + 15 + (rand()/(RAND_MAX/(128*retransmit_cnt[req - nwkPacket])));
 	}
 	else {
 		dataReqBusy[req - nwkPacket] = false;
@@ -62,9 +62,9 @@ void handleDataRequest(NWK_DataInd_t *packet) {
 		nwkPacket[ind].data = (uint8_t *)(&dataPacket);
 		nwkPacket[ind].size = sizeof(dataPacket_t);
 		nwkPacket[ind].confirm = packetTxConf;
-		NWK_DataReq(&(nwkPacket[ind]));
 		dataReqBusy[ind] = true;
-		retransmit_cnt[ind] = 0;
+		retransmit_cnt[ind] = 1;
+		retransmit_time[ind] = TCNT3 + 5 + (rand()/(RAND_MAX/(128*retransmit_cnt[ind]))); // Retransmit the packet at a random time in the future
 		ui_updatePowerValues(&dataPacket);
 	}
 }
@@ -92,6 +92,7 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 		break;
 	case dataRequest:
 		handleDataRequest(ind);
+		return false;
 		break;
 	case dataAck:
 		handleDataAck(ind);
@@ -173,7 +174,6 @@ int main(void) {
 		for (uint8_t cnt = 0; cnt < DATA_REQ_BUFFER_CNT; cnt++) {
 			if (dataReqBusy[cnt] && (retransmit_time[cnt] != 0)) {
 				if (retransmit_time[cnt] <= TCNT3) {
-					dataPacket.requestSequence += 1;
 					NWK_DataReq(&(nwkPacket[cnt]));
 					retransmit_time[cnt] = 0;
 				}
