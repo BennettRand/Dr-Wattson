@@ -127,27 +127,20 @@ def power_dict(d,t):
 	
 	return ret
 
-def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):
-	
-	# sys.stdout = open(config.get("Logs","network_log"),'w+')
-	# sys.stderr = open(config.get("Logs","network_log")+".err",'w+')
-	
+def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):=
 	global ser
 	global devices
 	
+	#Confirm PostgreSQL connection.
+	print "Connected to",conn
+	
+	#What OS am I on?
 	if platform.system() == "Windows":
 		ser_s = config.get("Serial","windows_device")
 	else:
 		ser_s = config.get("Serial","posix_device")
 	
-	print "Connected to",conn
-	
-	ser = serial.Serial(ser_s, config.getint("Serial","baud"), timeout = config.getfloat("Serial","timeout"))
-	
-	req_seq = 0
-	
-	setPAN = data_readers.tx_h.pack(0, 2, pan)
-	
+	#Create commonly used serial packets.
 	beacon = data_readers.tx_h.pack(data_readers.beacon_p.size, 1, 0xFFFF)
 	beacon += data_readers.beacon_p.pack(0, pan, platform.node())
 	
@@ -156,70 +149,80 @@ def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):
 	cold_start = data_readers.tx_h.pack(data_readers.cold_start_p.size, 0, 0xFFFF)
 	cold_start += data_readers.cold_start_p.pack(6)
 	
+	#Open serial port to mesh network controller.
+	ser = serial.Serial(ser_s, config.getint("Serial","baud"), timeout = config.getfloat("Serial","timeout"))
+	
+	#Set the PAN of the mesh network controller.
+	setPAN = data_readers.tx_h.pack(0, 2, pan)
 	ser.write(setPAN)
 	
+	#Soft-restart all listening power monitors.
 	ser.write(cold_start)
 	
-	req_seq += 1
+	#Initialize some timers and counters.
+	req_seq = 1
 	last_sent_b = 0
 	last_sent_r = 0
 	last_db_commit = 0
 	
+	#All ready!
 	print "Initialized on:", pan
+	
 	while True:
-		if time.time()-last_sent_b >= 10:
+		if time.time()-last_sent_b >= 10:		#Every 10 seconds, tell the controller to broadcast a beacon.
 			ser.write(beacon)
 			last_sent_b = time.time()
-		if time.time()-last_sent_r >= 1:
+		if time.time()-last_sent_r >= 1:		#Every second, request data from all listening monitors.
 			ser.write(data_request_h + data_readers.data_req_p.pack(3, req_seq%256))
 			req_seq += 1
 			last_sent_r = time.time()
-		if time.time()-last_db_commit >= 10:
-			data = copy.deepcopy(devices)
-			commit_p.apply_async(commit_power, args=(data,),callback=call_b)
-			empty_power()
+		if time.time()-last_db_commit >= 10:	#Every 10 seconds, commit all existing data to the PostgreSQL DB.
+			data = copy.deepcopy(devices)		#Windows passed a dictionary as a deepcopy, Linux did not. This fixes that.
+			commit_p.apply_async(commit_power, args=(data,),callback=call_b)	#Makes a process from an existing worker pool call 'commit_power'
+																				#with the argument 'data'. Calls 'call_b' when done.
+			empty_power()						#Empties the 'devices' dictionary cleanly.
 			last_db_commit = time.time()
 		
-		if ser.inWaiting() >= 4:
+		if ser.inWaiting() >= 4:				#Make sure there is at least a header in the serial buffer.
 			
 			read_in = ser.read(4)
-			rx_h_data = data_readers.rx_h.unpack(read_in)
+			rx_h_data = data_readers.rx_h.unpack(read_in)	#Extract the header.
 			
-			while ser.inWaiting() < rx_h_data[0]: pass
-			payload = ser.read(rx_h_data[0])
-			type = data_readers.type.unpack_from(payload)[0]
+			while ser.inWaiting() < rx_h_data[0]: pass		#Wait for the rest of the expected packet.
+			payload = ser.read(rx_h_data[0])				#Read it.
+			type = data_readers.type.unpack_from(payload)[0]#What type is it?
 			
-			if type == 1:
+			if type == 1:									#Connection request.
 				conn_r = data_readers.conn_req_p.unpack(payload)
 				print "Connection request from", addr_to_mac(rx_h_data[1])
 				
-				add_device(rx_h_data[1], g_cur)
+				add_device(rx_h_data[1], g_cur)				#Add device to database, if it does not exist.
 				conn.commit()
 				
-				devices[addr_to_mac(rx_h_data[1])] = {}
+				devices[addr_to_mac(rx_h_data[1])] = {}		#Add device to data dictionary.
 				devices[addr_to_mac(rx_h_data[1])]['calib'] = calib_dict(conn_r)
 				devices[addr_to_mac(rx_h_data[1])]['power'] = []
 				
-				header = data_readers.tx_h.pack(data_readers.conn_ack_p.size,0,rx_h_data[1])
+				header = data_readers.tx_h.pack(data_readers.conn_ack_p.size,0,rx_h_data[1])	#Acknowledge connection
 				
 				packet = data_readers.conn_ack_p.pack(2)
 				
 				ser.write(header+packet)
 				print "Accepted", addr_to_mac(rx_h_data[1])
-			elif type == 4:
+			elif type == 4:									#Power data
 				data_e_p = data_readers.data_e_p.unpack(payload)
 				print "Data received from", addr_to_mac(rx_h_data[1])
 				
-				if addr_to_mac(rx_h_data[1]) in devices:
+				if addr_to_mac(rx_h_data[1]) in devices:	#Put the received data into the power data dictionary.
 					devices[addr_to_mac(rx_h_data[1])]['power'].append(power_dict(addr_to_mac(rx_h_data[1]), data_e_p))
 					
-					header = data_readers.tx_h.pack(data_readers.data_ack_p.size,0,rx_h_data[1])
+					header = data_readers.tx_h.pack(data_readers.data_ack_p.size,0,rx_h_data[1])	#Ack data
 					
 					packet = data_readers.data_ack_p.pack(5,data_e_p[2])
 					
 					ser.write(header+packet)
 			else:
-				print payload
+				print payload								#Unknown, just print it.
 	
 	
 
