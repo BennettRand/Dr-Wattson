@@ -51,8 +51,15 @@ void Widget::dataReceived()
             QByteArray data = inbuffer.left(packetHeader.size);
             inbuffer = inbuffer.right(inbuffer.size() - packetHeader.size);
 
+			bool atBottom = false;
+			if (ui->tableView->verticalScrollBar()->value() > (ui->tableView->verticalScrollBar()->maximum() - 
+			                                                   (ui->tableView->verticalScrollBar()->maximum() - ui->tableView->verticalScrollBar()->minimum())*0.1))
+				atBottom = true;
+
             tableModel.addData(packetHeader, data, QDateTime::currentDateTime());
-            ui->tableView->scrollToBottom();
+
+			if (atBottom)			
+	            ui->tableView->scrollToBottom();
 
             if (ui->followDataCheckbox->isChecked())
             {
