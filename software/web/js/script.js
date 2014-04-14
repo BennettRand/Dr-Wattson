@@ -221,7 +221,8 @@ function getDetailsFor(name, id)
 		crossDomain: true
 	});*/
 	$("#loading")[0].style.visibility="visible";
-	$.getJSON("http://"+document.location.host+":8080/detail",{id:id}, function(data){
+	// $.getJSON("http://"+document.location.host+":8080/detail",{id:id}, function(data){
+	$.getJSON("http://"+document.location.host+"/api/detail",{id:id}, function(data){
 		
 		detailsFor(name, id, data);
 		$("#loading")[0].style.visibility="hidden";
@@ -264,7 +265,8 @@ function drawSparks()
 		{"name1":"Sit","id1":9,"name2":"Amet","id2":10}];
 	
 	// $("#loading")[0].style.visibility="visible";
-	$.getJSON("http://"+document.location.host+":8080/devices",{}, function(data)
+	$.getJSON("http://"+document.location.host+"/api/devices",{}, function(data)
+	// $.getJSON("http://"+document.location.host+":8080/devices",{}, function(data)
 	{
 		plugs = $(".plug")
 		for ( p = 0; p < plugs.length; p++)
