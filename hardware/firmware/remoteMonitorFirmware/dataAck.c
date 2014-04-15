@@ -199,7 +199,7 @@ void removeSamples(dataPacket_t *pkt) {
 	powerSum[0] -= pkt->powerData1;
 	powerSum[1] -= pkt->powerData2;
 	#ifdef EXTENDED_DATA_PACKET
-	linePeriod -= pkt->linePeriod;
+	linePeriod = 0;
 	voltageSum[0] -= pkt->squaredVoltage1;
 	voltageSum[1] -= pkt->squaredVoltage2;
 	currentSum[0] -= pkt->squaredCurrent1;
