@@ -6,7 +6,7 @@ import itertools
 import datetime
 
 def dt_to_epoch(d):
-	return (d-datetime.datetime(1970,1,1)).total_seconds()
+	return (d-datetime.datetime(1969,12,31,17)).total_seconds()
 	
 def sparkline(id):
 	
@@ -49,7 +49,7 @@ def sparkline(id):
 	p_arr = []
 	
 	for d in devs:
-		epoch = dt_to_epoch(d[0])
+		epoch = int(dt_to_epoch(d[0]))
 		p_arr.append(round(float(d[1+offset]),2))
 	
 	cur.close()
@@ -83,13 +83,13 @@ def get_data(id):
 	
 	devs = cur.fetchall()
 	v_arr = []
-	i_arr = []
+	# i_arr = []
 	p_arr = []
 	
 	for d in devs:
-		epoch = dt_to_epoch(d[0])
+		epoch = int(dt_to_epoch(d[0])*1000)
 		v_arr.append([epoch, round(float(d[1+offset]),2)])
-		i_arr.append([epoch, round(float(d[3+offset]),2)])
+		# i_arr.append([epoch, round(float(d[3+offset]),2)])
 		p_arr.append([epoch, round(float(d[5+offset]),2)])
 	
 	cur.close()

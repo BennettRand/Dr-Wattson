@@ -190,7 +190,7 @@ function detailsFor(name, id, arr)
 			padMax:0,
 			renderer:$.jqplot.DateAxisRenderer,
 			tickOptions:{
-				formatString:'%s'//'%#m-%#d\n%I:%M:%S %p'
+				formatString:'%#m-%#d\n%I:%M:%S %p'//'%s'
 			}
 		},
 		yaxis: {
