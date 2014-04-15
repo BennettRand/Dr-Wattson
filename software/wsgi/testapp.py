@@ -7,7 +7,59 @@ import datetime
 
 def dt_to_epoch(d):
 	return (d-datetime.datetime(1970,1,1)).total_seconds()
-
+	
+def sparkline(id):
+	
+	if id[-1] == 'a': offset = 0
+	elif id[-1] == 'b': offset = 1
+	else: return []
+	
+	query = "SELECT mac FROM device WHERE id="+id[:-1]+";"
+	
+	conn = psycopg2.connect(database = 'wattson', host = 'localhost', user = 'root', password = 'means swim of stream')
+	cur = conn.cursor()
+	
+	cur.execute(query)
+	
+	devs = cur.fetchone()
+	
+	if devs == None:
+		return query
+	
+	data = devs[0]
+	
+	# query = "SELECT til,v_1,v_2,i_1,i_2,p_1,p_2,f FROM sample WHERE device_mac='"+data+"' AND til > now() - interval '1 hour' ORDER BY til ASC;"
+	# query = "SELECT til,p_1,p_2 FROM sample WHERE device_mac='"+data+"' AND til > now() - interval '1 hour' ORDER BY til ASC;"
+	
+	query = """
+	SELECT t.*
+	FROM (
+	  SELECT til,p_1,p_2,row_number() OVER(ORDER BY til ASC) AS row
+	  FROM sample 
+	  WHERE device_mac='{0}' AND til > now() - interval '1 hour' 
+	  ORDER BY til ASC
+	) t
+	WHERE (t.row % 10) = 0;
+	""".format(data)
+	
+	n=time.time()
+	cur.execute(query)
+	
+	devs = cur.fetchall()
+	p_arr = []
+	
+	for d in devs:
+		epoch = dt_to_epoch(d[0])
+		p_arr.append(round(float(d[1+offset]),2))
+	
+	cur.close()
+	conn.close()
+	
+	t_taken=time.time()-n
+	
+	# return [v_arr,i_arr,p_arr]
+	return p_arr
+	
 def get_data(id):
 	
 	if id[-1] == 'a': offset = 0
@@ -88,8 +140,16 @@ def application(environ, start_response):
 	elif environ['PATH_INFO'] == "/devices":
 		data = get_devices()
 		output = json.dumps(data)
+		
+	elif environ['PATH_INFO'] == "/spark":
+		data = sparkline(query['id'])
+		output = json.dumps(data)
+		
 	else:
-		output = json.dumps([environ,query], skipkeys=True, default=lambda obj: 'N/A')
+		status = "400 Bad Request"
+		output = json.dumps({}, skipkeys=True, default=lambda obj: 'N/A')
+		
+		# output = json.dumps([environ,query], skipkeys=True, default=lambda obj: 'N/A')
 	
 	response_headers = [('Content-type', 'application/json'),
 						('Content-Length', str(len(output))),
