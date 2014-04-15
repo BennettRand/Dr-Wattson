@@ -134,19 +134,23 @@ if not (yn.startswith('s')) :
 	
 	reader = csv.reader(StringIO.StringIO(data))
 	Vsum = 0
-	VsquareSum = 0
 	Isum = 0
-	IsquareSum = 0
 	rowcount = 0
 	for row in reader:
 		Vsum += int(row[v1_index])
-		VsquareSum += int(row[v1_index])*int(row[v1_index])
 		Isum += int(row[i1_index])
-		IsquareSum += int(row[i1_index])*int(row[i1_index])
 		rowcount += 1
 
 	voltageOffset1 = int(round(Vsum/rowcount))
 	currentOffset1 = int(round(Isum/rowcount))
+
+
+	VsquareSum = 0
+	IsquareSum = 0
+	for row in reader:
+		VsquareSum += (int(row[v1_index]) - voltageOffset1)*(int(row[v1_index]) - voltageOffset1)
+		IsquareSum += (int(row[i1_index]) - currentOffset1)*(int(row[i1_index]) - currentOffset1)
+
 	voltageScaling1 = int(round((float(Vin)/math.sqrt(VsquareSum/rowcount))*1000000))
 	currentScaling1 = int(round((float(Iin)/math.sqrt(IsquareSum/rowcount))*10000000))
 else:
@@ -170,19 +174,22 @@ if not (yn.startswith('s')) :
 	Iin = raw_input("    Enter calibration current for port 2: ")
 	reader = csv.reader(StringIO.StringIO(data))
 	Vsum = 0
-	VsquareSum = 0
 	Isum = 0
-	IsquareSum = 0
 	rowcount = 0
 	for row in reader:
 		Vsum += int(row[v2_index])
-		VsquareSum += int(row[v2_index])*int(row[v2_index])
 		Isum += int(row[i2_index])
-		IsquareSum += int(row[i2_index])*int(row[i2_index])
 		rowcount += 1
 	
 	voltageOffset2 = int(round(Vsum/rowcount))
 	currentOffset2 = int(round(Isum/rowcount))
+
+	VsquareSum = 0
+	IsquareSum = 0
+	for row in reader:
+		VsquareSum += (int(row[v2_index]) - voltageOffset2)*(int(row[v2_index]) - voltageOffset2)
+		IsquareSum += (int(row[i2_index]) - currentOffset2)*(int(row[i2_index]) - currentOffset2)
+	
 	voltageScaling2 = int(round((float(Vin)/math.sqrt(VsquareSum/rowcount))*1000000))
 	currentScaling2 = int(round((float(Iin)/math.sqrt(IsquareSum/rowcount))*10000000))
 else:
