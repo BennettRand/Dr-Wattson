@@ -140,10 +140,24 @@ a
 
 .bgChart
 {
-	z-index: -1;
 	width: 98%;
 	height: 75%;
 	margin-left: 0;
+	float:left;
+}
+
+.power
+{
+	display:inline-block;
+	position: relative;
+	z-index: 1;
+	width: 98%;
+	height: 75%;
+	text-align:center;
+	float: left;
+	color: rgba(0,0,0,0.5);
+	font-size:40px;
+	line-height:94px;
 }
 
 .third
@@ -169,7 +183,7 @@ a
 	visibility:hidden;
 	text-align: center;
 	background-color: rgba(255,255,255,.75);
-	z-index: 1;
+	z-index: 5;
 	position:absolute;
 	top:0;
 	bottom:0;

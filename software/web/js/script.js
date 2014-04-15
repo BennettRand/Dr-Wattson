@@ -7,27 +7,35 @@
  
 function drawChart(ele, id)
 {
-	$(ele).sparkline(powerFor(id),
-	{width: '100%',
-	height: '100%',
-	type: 'line',
-	lineColor: '#444',
-	fillColor: '#888',
-	spotColor: false,
-	minSpotColor: false,
-	maxSpotColor: false,
-	highlightSpotColor: false,
-	highlightLineColor: '#444',
-	chartRangeMin: 0,
-	chartRangeMax: 10,
-	chartRangeClip: true,
-	normalRangeColor: '#c0c0c0',
-	drawNormalOnTop: false});
+	$.getJSON("http://"+document.location.host+"/api/spark",{id:id}, function(data){
+		$(ele).sparkline(data,
+		{width: '100%',
+		height: '100%',
+		type: 'line',
+		lineColor: '#444',
+		fillColor: '#888',
+		spotColor: false,
+		minSpotColor: false,
+		maxSpotColor: false,
+		highlightSpotColor: false,
+		highlightLineColor: '#444',
+		chartRangeMin: 0,
+		chartRangeClip: true,
+		normalRangeColor: '#c0c0c0',
+		disableInteraction: true,
+		drawNormalOnTop: false});
+		latest = data[data.length-1];
+		if(latest === undefined)
+		{
+			return;
+		}
+		ele.parentElement.children[2].textContent = latest.toString()+"W";
+	});
 }
 
 function appendDevice(name1, id1, name2, id2)
 {
-	placeholder = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque semper.";
+	placeholder = "N/A";
 	
 	plug = document.createElement("div");
 	plug.setAttribute("class","plug");
@@ -41,13 +49,14 @@ function appendDevice(name1, id1, name2, id2)
 	link1 = document.createElement("a");
 	theDiv1 = document.createElement("div");
 	header1 = document.createElement("h3");
-	text1 = document.createElement("p");
+	text1 = document.createElement("h2");
 	spark1 = document.createElement("div");
 	
 	plug.appendChild(link1);
 	link1.appendChild(theDiv1);
 	theDiv1.appendChild(header1);
 	theDiv1.appendChild(spark1);
+	theDiv1.appendChild(text1).setAttribute("class","power");
 	
 	link1.setAttribute("href", "javascript:void(0)");
 	link1.setAttribute("onClick", "getDetailsFor(\""+name1+"\", \""+id1.toString()+"\");");
@@ -64,13 +73,14 @@ function appendDevice(name1, id1, name2, id2)
 	link2 = document.createElement("a");
 	theDiv2 = document.createElement("div");
 	header2 = document.createElement("h3");
-	text2 = document.createElement("p");
+	text2 = document.createElement("h2");
 	spark2 = document.createElement("div");
 	
 	plug.appendChild(link2);
 	link2.appendChild(theDiv2);
 	theDiv2.appendChild(header2);
 	theDiv2.appendChild(spark2);
+	theDiv2.appendChild(text2).setAttribute("class","power");
 	
 	link2.setAttribute("href", "javascript:void(0)");
 	link2.setAttribute("onClick", "getDetailsFor(\""+name2+"\", \""+id2.toString()+"\");");
@@ -363,7 +373,7 @@ drawSparks();
 powerCounts();
 clockTick();
 
-setInterval(clockTick,1000);
-setInterval(powerCounts,1000);
-setInterval(drawSparks,10000);
+setInterval(clockTick,30000);
+// setInterval(powerCounts,10000);
+setInterval(drawSparks,30000);
 // setInterval(drawCharts,1000);
