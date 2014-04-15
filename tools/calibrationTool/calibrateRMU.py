@@ -120,6 +120,8 @@ except :
 
 # Collect calibration information
 
+Imoff = float(raw_input("    Enter current meter offset: "))
+
 yn = raw_input("    Connect AC load to port 1. Press enter when ready (enter s to skip).")
 if not (yn.startswith('s')) :
 	ser.write("s")
@@ -128,7 +130,7 @@ if not (yn.startswith('s')) :
 	while (s[0] != 'd') :
 		data += s
 		s = ser.readline()
-	
+	print data;
 	Vin = raw_input("    Enter calibration voltage for port 1: ")
 	Iin = raw_input("    Enter calibration current for port 1: ")
 	
@@ -145,6 +147,7 @@ if not (yn.startswith('s')) :
 	currentOffset1 = int(round(Isum/rowcount))
 
 
+	reader = csv.reader(StringIO.StringIO(data))
 	VsquareSum = 0
 	IsquareSum = 0
 	for row in reader:
@@ -152,7 +155,7 @@ if not (yn.startswith('s')) :
 		IsquareSum += (int(row[i1_index]) - currentOffset1)*(int(row[i1_index]) - currentOffset1)
 
 	voltageScaling1 = int(round((float(Vin)/math.sqrt(VsquareSum/rowcount))*1000000))
-	currentScaling1 = int(round((float(Iin)/math.sqrt(IsquareSum/rowcount))*10000000))
+	currentScaling1 = int(round(((float(Iin)-Imoff)/math.sqrt(IsquareSum/rowcount))*10000000))
 else:
 	voltageOffset1    = old_voltageOffset1
 	currentOffset1    = old_currentOffset1
@@ -169,7 +172,8 @@ if not (yn.startswith('s')) :
 	while (s[0] != 'd') :
 		data += s
 		s = ser.readline()
-	
+
+	print data	
 	Vin = raw_input("    Enter calibration voltage for port 2: ")
 	Iin = raw_input("    Enter calibration current for port 2: ")
 	reader = csv.reader(StringIO.StringIO(data))
@@ -184,6 +188,7 @@ if not (yn.startswith('s')) :
 	voltageOffset2 = int(round(Vsum/rowcount))
 	currentOffset2 = int(round(Isum/rowcount))
 
+	reader = csv.reader(StringIO.StringIO(data))
 	VsquareSum = 0
 	IsquareSum = 0
 	for row in reader:
@@ -191,7 +196,7 @@ if not (yn.startswith('s')) :
 		IsquareSum += (int(row[i2_index]) - currentOffset2)*(int(row[i2_index]) - currentOffset2)
 	
 	voltageScaling2 = int(round((float(Vin)/math.sqrt(VsquareSum/rowcount))*1000000))
-	currentScaling2 = int(round((float(Iin)/math.sqrt(IsquareSum/rowcount))*10000000))
+	currentScaling2 = int(round(((float(Iin)-Imoff)/math.sqrt(IsquareSum/rowcount))*10000000))
 else:
 	voltageOffset2    = old_voltageOffset2
 	currentOffset2    = old_currentOffset2
