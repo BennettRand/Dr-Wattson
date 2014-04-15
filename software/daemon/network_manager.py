@@ -127,7 +127,7 @@ def power_dict(d,t):
 	
 	return ret
 
-def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):=
+def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):
 	global ser
 	global devices
 	
@@ -174,6 +174,8 @@ def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):=
 			last_sent_b = time.time()
 		if time.time()-last_sent_r >= 1:		#Every second, request data from all listening monitors.
 			ser.write(data_request_h + data_readers.data_req_p.pack(3, req_seq%256))
+			for d in devices:
+				devices[d]['last_seen'][req_seq%256] = 1
 			req_seq += 1
 			last_sent_r = time.time()
 		if time.time()-last_db_commit >= 10:	#Every 10 seconds, commit all existing data to the PostgreSQL DB.
@@ -202,6 +204,7 @@ def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):=
 				devices[addr_to_mac(rx_h_data[1])] = {}		#Add device to data dictionary.
 				devices[addr_to_mac(rx_h_data[1])]['calib'] = calib_dict(conn_r)
 				devices[addr_to_mac(rx_h_data[1])]['power'] = []
+				devices[addr_to_mac(rx_h_data[1])]['last_seen'] = [0]*256
 				
 				header = data_readers.tx_h.pack(data_readers.conn_ack_p.size,0,rx_h_data[1])	#Acknowledge connection
 				
@@ -211,16 +214,24 @@ def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):=
 				print "Accepted", addr_to_mac(rx_h_data[1])
 			elif type == 4:									#Power data
 				data_e_p = data_readers.data_e_p.unpack(payload)
-				print "Data received from", addr_to_mac(rx_h_data[1])
 				
-				if addr_to_mac(rx_h_data[1]) in devices:	#Put the received data into the power data dictionary.
-					devices[addr_to_mac(rx_h_data[1])]['power'].append(power_dict(addr_to_mac(rx_h_data[1]), data_e_p))
-					
-					header = data_readers.tx_h.pack(data_readers.data_ack_p.size,0,rx_h_data[1])	#Ack data
-					
-					packet = data_readers.data_ack_p.pack(5,data_e_p[2])
-					
-					ser.write(header+packet)
+				r_sequence = data_e_p[1]
+				sequence = data_e_p[2]
+				
+				#Put the received data into the power data dictionary.
+				if addr_to_mac(rx_h_data[1]) in devices:
+					if devices[addr_to_mac(rx_h_data[1])]['last_seen'][r_sequence] == 0:
+						print "Ignored",addr_to_mac(rx_h_data[1])
+					else:
+						print "Data received from", addr_to_mac(rx_h_data[1])
+						devices[addr_to_mac(rx_h_data[1])]['power'].append(power_dict(addr_to_mac(rx_h_data[1]), data_e_p))
+						
+						header = data_readers.tx_h.pack(data_readers.data_ack_p.size,0,rx_h_data[1])	#Ack data
+						
+						packet = data_readers.data_ack_p.pack(5,sequence)
+						
+						devices[addr_to_mac(rx_h_data[1])]['last_seen'][r_sequence] = 0
+						ser.write(header+packet)
 			else:
 				print payload								#Unknown, just print it.
 	
