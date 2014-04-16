@@ -42,7 +42,7 @@ def commit_power(data):
 	cur = conn.cursor()
 	sample_insert_statement = "INSERT INTO sample VALUES "
 	sample_insert_format = "(DEFAULT, to_timestamp(%s), to_timestamp(%s), %s, %s, %s, %s, %s, %s, %s, %s)"
-	f = open(config.get("Logs","network_log")+".err",'w+')
+	#f = open(config.get("Logs","network_log")+".err",'w+')
 	# f.write(time.asctime()+'\n')
 	# f.write(str(conn)+'\n')
 	# f.flush()
@@ -55,10 +55,11 @@ def commit_power(data):
 			query = sample_insert_statement+',\n'.join(inserts)+";"
 			cur.execute(query)
 			conn.commit()
+
 	except Exception as e:
-		f.write(str(e)+'\n')
-		f.flush()
-		f.close()
+		#f.write(str(e)+'\n')
+		#f.flush()
+		#f.close()
 		cur.close()
 		conn.close()
 		return None
