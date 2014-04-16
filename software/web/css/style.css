@@ -159,6 +159,10 @@ a
 	color: rgba(0,0,0,0.5);
 	font-size:40px;
 	line-height:94px;
+	text-shadow: 1px 1px 0px rgba(255,255,255,0.5),
+	-1px 1px 0px rgba(255,255,255,0.5),
+	1px -1px 0px rgba(255,255,255,0.5),
+	-1px -1px 0px rgba(255,255,255,0.5);
 }
 
 .third
