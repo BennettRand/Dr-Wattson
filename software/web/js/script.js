@@ -5,6 +5,8 @@
 
  var detailsPlot;
  
+ var segs = 1;
+ 
 function drawChart(ele, id)
 {
 	$.getJSON("http://"+document.location.host+"/api/spark",{id:id}, function(data){
@@ -231,8 +233,10 @@ function getDetailsFor(name, id)
 		crossDomain: true
 	});*/
 	$("#loading")[0].style.visibility="visible";
+	$("#details")[0].dname = name;
+	$("#details")[0].did = id;
 	// $.getJSON("http://"+document.location.host+":8080/detail",{id:id}, function(data){
-	$.getJSON("http://"+document.location.host+"/api/detail",{id:id}, function(data){
+	$.getJSON("http://"+document.location.host+"/api/detail",{id:id,segs:segs}, function(data){
 		
 		detailsFor(name, id, data);
 		$("#loading")[0].style.visibility="hidden";
@@ -370,7 +374,7 @@ function t_refresh (timeoutPeriod)
 // console.log(window.onclick);
 
 drawSparks();
-powerCounts();
+//powerCounts();
 clockTick();
 
 setInterval(clockTick,30000);

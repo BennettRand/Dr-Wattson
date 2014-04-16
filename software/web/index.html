@@ -41,6 +41,12 @@
 			<div id="details-title">
 				<h2 class = "left">Details</h2><div class = "left"><h4 id="devName"></h4><h4 id="devMAC"></div></h4>
 				<a href = "javascript:void(0)" onClick = "closeDetails();"><h1 class = "right">X</h1></a>
+				<a href = "javascript:void(0)" onClick = "segs = 1;getDetailsFor($('#details')[0].dname, $('#details')[0].did);"><h2 class = "right">10M</h2></a>
+				<a href = "javascript:void(0)" onClick = "segs = 3;getDetailsFor($('#details')[0].dname, $('#details')[0].did);"><h2 class = "right">30M</h2></a>
+				<a href = "javascript:void(0)" onClick = "segs = 6;getDetailsFor($('#details')[0].dname, $('#details')[0].did);"><h2 class = "right">1H</h2></a>
+				<a href = "javascript:void(0)" onClick = "segs = 72;getDetailsFor($('#details')[0].dname, $('#details')[0].did);"><h2 class = "right">12H</h2></a>
+				<a href = "javascript:void(0)" onClick = "segs = 144;getDetailsFor($('#details')[0].dname, $('#details')[0].did);"><h2 class = "right">1D</h2></a>
+				<a href = "javascript:void(0)" onClick = "segs = 1008;getDetailsFor($('#details')[0].dname, $('#details')[0].did);"><h2 class = "right">1W</h2></a>
 			</div>
 			<div id = "chartArea" style = "height:100%;">
 			</div>

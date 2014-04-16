@@ -113,7 +113,7 @@ a
 .right
 {
 	float:right;
-	padding-left: 3px;
+	padding-left: 10px;
 }
 
 .plug
@@ -140,8 +140,9 @@ a
 
 .bgChart
 {
-	width: 98%;
-	height: 75%;
+	position: absolute;
+	width: 220px;
+	height: 96px;
 	margin-left: 0;
 	float:left;
 }
@@ -149,10 +150,10 @@ a
 .power
 {
 	display:inline-block;
-	position: relative;
+	position: absolute;
 	z-index: 1;
-	width: 98%;
-	height: 75%;
+	width: 220px;
+	height: 96px;
 	text-align:center;
 	float: left;
 	color: rgba(0,0,0,0.5);
