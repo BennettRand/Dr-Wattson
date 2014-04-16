@@ -185,7 +185,7 @@ if not (yn.startswith('s')) :
 		Isum += int(row[i2_index])
 		rowcount += 1
 	
-	voltageOffset2 = int(round(Vsum/rowcount))
+	voltageOffset2 = voltageOffset1 = int(round(Vsum/rowcount))
 	currentOffset2 = int(round(Isum/rowcount))
 
 	reader = csv.reader(StringIO.StringIO(data))
@@ -195,12 +195,12 @@ if not (yn.startswith('s')) :
 		VsquareSum += (int(row[v2_index]) - voltageOffset2)*(int(row[v2_index]) - voltageOffset2)
 		IsquareSum += (int(row[i2_index]) - currentOffset2)*(int(row[i2_index]) - currentOffset2)
 	
-	voltageScaling2 = int(round((float(Vin)/math.sqrt(VsquareSum/rowcount))*1000000))
+	voltageScaling2 = voltageScaling1 = int(round((float(Vin)/math.sqrt(VsquareSum/rowcount))*1000000))
 	currentScaling2 = int(round(((float(Iin)-Imoff)/math.sqrt(IsquareSum/rowcount))*10000000))
 else:
-	voltageOffset2    = old_voltageOffset2
+	voltageOffset2    = voltageOffset1 = old_voltageOffset2
 	currentOffset2    = old_currentOffset2
-	voltageScaling2   = old_voltageScaling2
+	voltageScaling2   = voltageScaling1 = old_voltageScaling2
 	currentScaling2   = old_currentScaling2
 
 ser.close()
