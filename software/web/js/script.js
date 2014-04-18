@@ -5,6 +5,8 @@
 
  var detailsPlot;
  
+ var segs = 1;
+ 
 function drawChart(ele, id)
 {
 	$.getJSON("http://"+document.location.host+"/api/spark",{id:id}, function(data){
@@ -138,82 +140,89 @@ function detailsFor(name, id, arr)
 		$("#chartArea")[0].removeChild($("#chartArea")[0].firstChild);
 	}
 	
-	detailsPlot = $.jqplot('chartArea', arr,
+	if (arr[0].length == 0)
 	{
-	title:'Power Data For '+name,
-	// Set default options on all series, turn on smoothing.
-	seriesDefaults: {
-		rendererOptions: {
-			smooth: true
-		},
-		markerOptions: { 
-			lineWidth:2,
-			size:0
-		},
-		shadow:false
-	},
-	// Series options are specified as an array of objects, one object
-	// for each series.
-	series:[
+		$("#chartArea")[0].innerHTML="<h1>No Data</h1>"
+	}
+	else
+	{
+		detailsPlot = $.jqplot('chartArea', arr,
 		{
-			// Change our line width and use a diamond shaped marker.
-			label:"Voltage",
-			yaxis:"yaxis"
+		title:'Power Data For '+name,
+		// Set default options on all series, turn on smoothing.
+		seriesDefaults: {
+			rendererOptions: {
+				smooth: true
+			},
+			markerOptions: { 
+				lineWidth:2,
+				size:0
+			},
+			shadow:false
 		},
-		/*{
-			// Don't show a line, just show markers.
-			// Make the markers 7 pixels with an 'x' style
-			label:"Current",
-			yaxis:"y2axis"
-		},*/
-		{
-			// Use (open) circlular markers.
-			label:"Power",
-			yaxis:"y3axis"
-		}
-	],
-	legend:{
-		show:true,
-		location:'nw'
-	},
-	axesDefaults: {
-		useSeriesColor:true,
-		rendererOptions: {
-			alignTicks: true
+		// Series options are specified as an array of objects, one object
+		// for each series.
+		series:[
+			{
+				// Change our line width and use a diamond shaped marker.
+				label:"Voltage",
+				yaxis:"yaxis"
+			},
+			/*{
+				// Don't show a line, just show markers.
+				// Make the markers 7 pixels with an 'x' style
+				label:"Current",
+				yaxis:"y2axis"
+			},*/
+			{
+				// Use (open) circlular markers.
+				label:"Power",
+				yaxis:"y3axis"
+			}
+		],
+		legend:{
+			show:true,
+			location:'nw'
 		},
-		shadow:false
-	},
-	axes: {
-		xaxis: {
-			label:'Time',
-			padMin:0,
-			padMax:0,
-			renderer:$.jqplot.DateAxisRenderer,
-			tickOptions:{
-				formatString:'%#m-%#d\n%I:%M:%S %p'//'%s'
+		axesDefaults: {
+			useSeriesColor:true,
+			rendererOptions: {
+				alignTicks: true
+			},
+			shadow:false
+		},
+		axes: {
+			xaxis: {
+				label:'Time',
+				padMin:0,
+				padMax:0,
+				renderer:$.jqplot.DateAxisRenderer,
+				tickOptions:{
+					formatString:'%#m-%#d\n%I:%M:%S %p'//'%s'
+				}
+			},
+			yaxis: {
+				label:'V',
+				min: 100,
+				max: 140
+			},
+			/*y2axis: {
+				label:'A',
+				min:0
+			},*/
+			y3axis: {
+				label:'W',
+				min:0.05
 			}
 		},
-		yaxis: {
-			label:'V',
-			min: 100,
-			max: 140
-		},
-		/*y2axis: {
-			label:'A',
-			min:0
-		},*/
-		y3axis: {
-			label:'W',
-			min:0.05
+		highlighter: {
+			show: true,
+			sizeAdjust: 7.5,
+			tooltipFormatString:'%.2f',
+			tooltipAxes: 'y'
 		}
-	},
-	highlighter: {
-		show: true,
-		sizeAdjust: 7.5,
-		tooltipFormatString:'%.2f',
-		tooltipAxes: 'y'
+		});
 	}
-	});
 	
 }
 
@@ -231,8 +240,10 @@ function getDetailsFor(name, id)
 		crossDomain: true
 	});*/
 	$("#loading")[0].style.visibility="visible";
+	$("#details")[0].dname = name;
+	$("#details")[0].did = id;
 	// $.getJSON("http://"+document.location.host+":8080/detail",{id:id}, function(data){
-	$.getJSON("http://"+document.location.host+"/api/detail",{id:id}, function(data){
+	$.getJSON("http://"+document.location.host+"/api/detail",{id:id,segs:segs}, function(data){
 		
 		detailsFor(name, id, data);
 		$("#loading")[0].style.visibility="hidden";
@@ -370,7 +381,7 @@ function t_refresh (timeoutPeriod)
 // console.log(window.onclick);
 
 drawSparks();
-powerCounts();
+//powerCounts();
 clockTick();
 
 setInterval(clockTick,30000);

@@ -62,7 +62,7 @@ a
 	border-bottom: 1px solid black;
 	width: 100%;
 	position:fixed;
-	z-index:1;
+	z-index:5;
 	height:50px;
 	top: 0px;
 }
@@ -112,8 +112,13 @@ a
 
 .right
 {
+	z-index:1;
+	position:relative;
 	float:right;
-	padding-left: 3px;
+	padding-left: 10px;
+	height: 40px;
+	width: 40px;
+	padding-top: 5px;
 }
 
 .plug
@@ -140,8 +145,9 @@ a
 
 .bgChart
 {
-	width: 98%;
-	height: 75%;
+	position: absolute;
+	width: 220px;
+	height: 96px;
 	margin-left: 0;
 	float:left;
 }
@@ -149,15 +155,19 @@ a
 .power
 {
 	display:inline-block;
-	position: relative;
+	position: absolute;
 	z-index: 1;
-	width: 98%;
-	height: 75%;
+	width: 220px;
+	height: 96px;
 	text-align:center;
 	float: left;
 	color: rgba(0,0,0,0.5);
 	font-size:40px;
 	line-height:94px;
+	text-shadow: 1px 1px 0px rgba(255,255,255,0.5),
+	-1px 1px 0px rgba(255,255,255,0.5),
+	1px -1px 0px rgba(255,255,255,0.5),
+	-1px -1px 0px rgba(255,255,255,0.5);
 }
 
 .third

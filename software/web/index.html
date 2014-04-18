@@ -40,11 +40,35 @@
 		<div id="details">
 			<div id="details-title">
 				<h2 class = "left">Details</h2><div class = "left"><h4 id="devName"></h4><h4 id="devMAC"></div></h4>
-				<a href = "javascript:void(0)" onClick = "closeDetails();"><h1 class = "right">X</h1></a>
+				<a href = "javascript:void(0)" onClick = "closeDetails();">
+					<img class="right" src="exit.png"/>
+				</a>
+				<a href = "javascript:void(0)" onClick = "segs = 1;getDetailsFor($('#details')[0].dname, $('#details')[0].did);">
+					<img class="right" src="time.png"/>
+				</a>
+				<a href = "javascript:void(0)" onClick = "segs = 3;getDetailsFor($('#details')[0].dname, $('#details')[0].did);">
+					<img class="right" src="time.png"/>
+				</a>
+				<a href = "javascript:void(0)" onClick = "segs = 6;getDetailsFor($('#details')[0].dname, $('#details')[0].did);">
+					<img class="right" src="time.png"/>
+				</a>
+				<a href = "javascript:void(0)" onClick = "segs = 72;getDetailsFor($('#details')[0].dname, $('#details')[0].did);">
+					<img class="right" src="day.png"/>
+				</a>
+				<a href = "javascript:void(0)" onClick = "segs = 144;getDetailsFor($('#details')[0].dname, $('#details')[0].did);">
+					<img class="right" src="day.png"/>
+				</a>
+				<a href = "javascript:void(0)" onClick = "segs = 1008;getDetailsFor($('#details')[0].dname, $('#details')[0].did);">
+					<img class="right" src="day.png"/>
+				</a>
+				<a href = "javascript:void(0)" onClick = "settingsFor();">
+					<img class="right" src="gear.png"/>
+				</a>
 			</div>
 			<div id = "chartArea" style = "height:100%;">
 			</div>
 		</div>
 		<script type="text/javascript" src="js/script.js"></script>
+		designed by Johan H. W. Basberg from the Noun Project
 	</body>
 </html>
