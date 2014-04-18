@@ -21,6 +21,11 @@ bool dataReqBusy[DATA_REQ_BUFFER_CNT];
 uint8_t retransmit_cnt[DATA_REQ_BUFFER_CNT];
 uint16_t retransmit_time[DATA_REQ_BUFFER_CNT];
 
+dataRequestPacket_t datRequest;
+bool receivedDataRequest;
+
+bool receivedColdStart;
+
 static dataPacket_t dataPacket = {.type = data};
 static uint8_t dataSequence = 0;
 
@@ -39,15 +44,10 @@ void packetTxConf(NWK_DataReq_t *req) {
 	}
 }
 
-void handleDataRequest(NWK_DataInd_t *packet) {
-	if (packet->size != sizeof(dataRequestPacket_t))
-		return; // Packet wrong size, just throw it out
-
+void handleDataRequest() {
 	if (dataReady()) {
-		dataRequestPacket_t *reqPacket = (dataRequestPacket_t*)packet->data;
-	
 		dataSequence += 1;
-		dataPacket.requestSequence = reqPacket->requestSequence;
+		dataPacket.requestSequence = datRequest.requestSequence;
 		getData(&dataPacket);
 	
 		uint8_t ind = 0;
@@ -91,15 +91,17 @@ static bool rfReceivePacket(NWK_DataInd_t *ind) {
 		}
 		break;
 	case dataRequest:
-		handleDataRequest(ind);
+		if (ind->size != sizeof(dataRequestPacket_t))
+			break;
+		memcpy(&datRequest, ind->data, sizeof(dataRequestPacket_t));
+		receivedDataRequest = true;
 		return false;
 		break;
 	case dataAck:
 		handleDataAck(ind);
 		break;
 	case coldStart:
-		sendConnectionRequest(connectedBaseStation, &deviceCalibration);
-		ui_baseStationDisconnected();
+		receivedColdStart = true;
 		break;
 	default:
 		break;
@@ -155,6 +157,18 @@ int main(void) {
 
 	while (1) {
 		SYS_TaskHandler();
+
+		if (receivedDataRequest) {
+			handleDataRequest();
+			receivedDataRequest = false;
+		}
+
+		if (receivedColdStart) {
+			sendConnectionRequest(connectedBaseStation, &deviceCalibration);
+			ui_baseStationDisconnected();
+			receivedColdStart = false;
+		}
+
 		updateUI();
 
 		if (sampleCount > 40000) {
@@ -171,14 +185,16 @@ int main(void) {
 		}
 
 		TCCR3B &= ~((1<<CS32) | (1<<CS30));
-		for (uint8_t cnt = 0; cnt < DATA_REQ_BUFFER_CNT; cnt++) {
-			if (dataReqBusy[cnt] && (retransmit_time[cnt] != 0)) {
-				if (retransmit_time[cnt] <= TCNT3) {
-					NWK_DataReq(&(nwkPacket[cnt]));
-					retransmit_time[cnt] = 0;
+		if (TCNT3 != 0) {
+			for (uint8_t cnt = 0; cnt < DATA_REQ_BUFFER_CNT; cnt++) {
+				if (dataReqBusy[cnt] && (retransmit_time[cnt] != 0)) {
+					if (retransmit_time[cnt] <= TCNT3) {
+						NWK_DataReq(&(nwkPacket[cnt]));
+						retransmit_time[cnt] = 0;
+					}
+					else
+						retransmit_time[cnt] -= TCNT3;
 				}
-				else
-					retransmit_time[cnt] -= TCNT3;
 			}
 		}
 		TCNT3 = 0;
