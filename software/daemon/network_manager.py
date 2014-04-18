@@ -32,7 +32,7 @@ def init_worker():
 def call_b(data):
 	if data != None:
 		for d in data:
-			print len(data[d]['power']),
+			print d,len(data[d]['power'])
 	else:
 		print "None",
 	print "Done",time.asctime()
@@ -110,6 +110,9 @@ def calib_dict(t):
 	return ret
 	
 def power_dict(d,t):
+	if t[3] == 0:
+		return None
+	
 	ret = {}
 	
 	# print t
@@ -222,10 +225,11 @@ def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):
 				#Put the received data into the power data dictionary.
 				if addr_to_mac(rx_h_data[1]) in devices:
 					if devices[addr_to_mac(rx_h_data[1])]['last_seen'][r_sequence] == 0:
-						print "Ignored",addr_to_mac(rx_h_data[1])
+						print "!",addr_to_mac(rx_h_data[1])[-2:],
 					else:
-						print "Data received from", addr_to_mac(rx_h_data[1])
-						devices[addr_to_mac(rx_h_data[1])]['power'].append(power_dict(addr_to_mac(rx_h_data[1]), data_e_p))
+						print addr_to_mac(rx_h_data[1])[-2:],
+						d = power_dict(addr_to_mac(rx_h_data[1]), data_e_p)
+						if d!= None: devices[addr_to_mac(rx_h_data[1])]['power'].append(d)
 						
 						header = data_readers.tx_h.pack(data_readers.data_ack_p.size,0,rx_h_data[1])	#Ack data
 						

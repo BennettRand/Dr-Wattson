@@ -1,6 +1,7 @@
 #Log Files
 *.log
 *.log.err
+collected.json
 
 # Python files
 *.pyc
