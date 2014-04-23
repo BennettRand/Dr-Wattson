@@ -5,7 +5,7 @@ BUILD_DIR = build
 DEVICE = atmega256rfr2
 TARGET = baseStationFirmware
 
-STACK_PATH = ../LwMesh_1_1_1/
+STACK_PATH = ../LwMesh_1_2_1/
 
 ATPROGRAM = "C:\Program Files (x86)\Atmel\Atmel Studio 6.1\atbackend\atprogram.exe"
 #SERIAL_NUMBER = ATML1784030200003343
@@ -38,7 +38,7 @@ LDFLAGS += -mmcu=atmega256rfr2
 
 INCLUDES += \
   -I$(STACK_PATH)/hal/atmega256rfr2/inc \
-  -I$(STACK_PATH)/phy/atmega256rfr2/inc \
+  -I$(STACK_PATH)/phy/atmegarfr2/inc \
   -I$(STACK_PATH)/nwk/inc \
   -I$(STACK_PATH)/sys/inc \
   -I../megaDrivers \
@@ -49,7 +49,7 @@ SRCS += \
   ../megaDrivers/uart.c \
   $(STACK_PATH)/hal/atmega256rfr2/src/hal.c \
   $(STACK_PATH)/hal/atmega256rfr2/src/halTimer.c \
-  $(STACK_PATH)/phy/atmega256rfr2/src/phy.c \
+  $(STACK_PATH)/phy/atmegarfr2/src/phy.c \
   $(STACK_PATH)/nwk/src/nwk.c \
   $(STACK_PATH)/nwk/src/nwkDataReq.c \
   $(STACK_PATH)/nwk/src/nwkSecurity.c \
@@ -64,9 +64,9 @@ SRCS += \
   $(STACK_PATH)/sys/src/sysEncrypt.c \
 
 DEFINES += \
-  -DPHY_ATMEGA256RFR2 \
+  -DPHY_ATMEGARFR2 \
   -DHAL_ATMEGA256RFR2 \
-  -DPLATFORM_XPLAINED_PRO \
+  -DPLATFORM_XPLAINED_PRO_ATMEGA256RFR2 \
   -DF_CPU=16000000
 
 #DEFINES += -DUSE_STDIO
