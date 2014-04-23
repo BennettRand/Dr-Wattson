@@ -5,49 +5,35 @@
 		<!--<link href='http://fonts.googleapis.com/css?family=Michroma|Open+Sans|Ubuntu:400,700,500' rel='stylesheet' type='text/css'>-->
 		<link href='css/style.css' rel='stylesheet' type='text/css'/>
 		<script type="text/javascript" src="js/jquery.min.js"></script>
-		<script type="text/javascript" src="js/jquery.sparkline.min.js"></script>
-		<script type="text/javascript" src="jqplot/jquery.jqplot.min.js"></script>
-		<script type="text/javascript" src="jqplot/plugins/jqplot.highlighter.min.js"></script>
-		<script type="text/javascript" src="jqplot/plugins/jqplot.canvasTextRenderer.min.js"></script>
-		<script type="text/javascript" src="jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
-		<script type="text/javascript" src="jqplot/plugins/jqplot.dateAxisRenderer.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="jqplot/jquery.jqplot.min.css" />
-		<title>Dr. Wattson</title>
+		<title>Settings</title>
 	</head>
 	<body>
 		<div id="title-bar">
 			<div class="third">
-				<h1>Dr. Wattson</h1>
+				<h1>Settings</h1>
 			</div>
 			<div class="third">
-				<!--<div class="third">
-					<h3 class="left" id="totalPower">Power:</h3>
-				</div>
-				<div class="third">
-					<h3 class="left" id="totalCurrent">Current:</h3>
-				</div>
-				<div class="third">
-					<h3 class="left" id="averageVoltage">Voltage:</h3>
-				</div>-->
+				<h2>Plug: 6</h2>
 			</div>
 			<div class="third">
-				<h2 id="dateTime"></h2>
 			</div>
 		</div>
 		<div id="devices">
-		<div id="loading"><h1>Loading...</h1></div>
+			<div id="loading"><h1>Loading...</h1></div>
+			<div class="plug">
+				<div class="device">
+					<input type="text" id="topname" class="name" value="N/A"/>
+				</div>
+				<div class="device">
+					<input type="text" id="botname" class="name" value="N/A"/>
+				</div>
+			</div>
 		</div>
 		<div id="details">
 			<div id="details-title">
 				<h2 class = "left">Details</h2><div class = "left"><h4 id="devName"></h4><h4 id="devMAC"></div></h4>
 				<a href = "javascript:void(0)" onClick = "closeDetails();">
 					<img class="right" src="exit.png"/>
-				</a>
-				<a href = "javascript:void(0)" onClick = "getDetailsFor($('#details')[0].dname, $('#details')[0].did);">
-					<img class="right" src="right.png"/>
-				</a>
-				<a href = "javascript:void(0)" onClick = "getDetailsFor($('#details')[0].dname, $('#details')[0].did);">
-					<img class="right" src="left.png"/>
 				</a>
 				<a href = "javascript:void(0)" onClick = "segs = 1;getDetailsFor($('#details')[0].dname, $('#details')[0].did);">
 					<img class="right" src="time.png"/>
@@ -74,7 +60,6 @@
 			<div id = "chartArea" style = "height:100%;">
 			</div>
 		</div>
-		<script type="text/javascript" src="js/script.js"></script>
-		Icons designed by Johan H. W. Basberg and Jardson A. from the Noun Project
+		designed by Johan H. W. Basberg from the Noun Project
 	</body>
 </html>

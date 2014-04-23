@@ -342,6 +342,11 @@ function powerCounts()
 	$("#totalPower")[0].innerHTML = "Power: "+Math.round(tPower.power).toString()+" W";
 }
 
+function settingsFor()
+{
+	window.location = "http://"+document.location.host+"/settings.html?id=" + $('#details')[0].did;
+}
+
 // function resizeJqplot()
 // {
 	height = ($(window).height()/2)-50;

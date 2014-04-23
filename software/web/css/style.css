@@ -205,6 +205,19 @@ a
 	border-radius: 1em;
 }
 
+input.name
+{
+	font-family: 'Ubuntu',sans-serif;
+	display: block;
+	background-color: rgb(221, 221, 221);
+	border: 1px dashed #444;
+	padding: 0.1%;
+	font-weight: 700;
+	font-size: 1.17em;
+	width: 95%;
+	margin: 2px auto;
+}
+
 /* Make the scroll bar not tiny (only works in webkit)*/
 ::-webkit-scrollbar {
 		width: 40px;
