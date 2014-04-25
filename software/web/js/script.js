@@ -29,6 +29,7 @@ function drawChart(ele, id)
 		latest = data[data.length-1];
 		if(latest === undefined)
 		{
+			ele.parentElement.children[2].textContent = "No Data";
 			return;
 		}
 		ele.parentElement.children[2].textContent = latest.toString()+"W";
@@ -37,7 +38,7 @@ function drawChart(ele, id)
 
 function appendDevice(name1, id1, name2, id2)
 {
-	placeholder = "N/A";
+	placeholder = "...";
 	
 	plug = document.createElement("div");
 	plug.setAttribute("class","plug");
