@@ -6,7 +6,10 @@ Widget::Widget(QWidget *parent) :
     ui(new Ui::Widget)
 {
     ui->setupUi(this);
-    ui->webView->setUrl(QUrl("http://penultimate-sandbox.com:9000"));
+    if (qApp->arguments().size() > 1)
+        ui->webView->setUrl(QUrl(qApp->arguments().last()));
+    else
+        ui->webView->setUrl(QUrl("http://localhost"));
     fullscreen = true;
 }
 

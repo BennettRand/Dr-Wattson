@@ -28,11 +28,6 @@
    </property>
    <item row="0" column="0">
     <widget class="QWebView" name="webView">
-     <property name="url">
-      <url>
-       <string>http://penultimate-sandbox.com:9000/</string>
-      </url>
-     </property>
     </widget>
    </item>
   </layout>
