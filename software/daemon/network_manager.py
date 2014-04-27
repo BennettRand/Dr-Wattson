@@ -110,7 +110,7 @@ def calib_dict(t):
 	return ret
 	
 def power_dict(d,t):
-	if t[3] == 0:
+	if t[3] == 0 or t[6] == 0:
 		return None
 	
 	ret = {}
