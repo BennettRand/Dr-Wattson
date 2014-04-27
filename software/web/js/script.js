@@ -6,6 +6,7 @@
  var detailsPlot;
  
  var segs = 1;
+ var offset = 0;
  
 function drawChart(ele, id)
 {
@@ -104,31 +105,41 @@ function closeDetails()
 	$("#details")[0].style.height = "0";
 }
 
-function openDetails(name,id)
-{
-	$("#devices")[0].style.height = "50%";
-	$("#details")[0].style.height = "50%";
-	$("#devName")[0].innerHTML = "Device: "+name;
-	$("#devMAC")[0].innerHTML = "MAC: "+id.toString();
-}
-
 function dateToStr(d)
 {
-	timeString = (d.getMonth()+1).toString()+" ";
+	timeString = "";
+	timeString += days[d.getDay()]+" ";
+	timeString += months[d.getMonth()]+" ";
 	timeString += d.getDate().toString()+" ";
-	timeString += d.getFullYear().toString()+" ";
+	// timeString += d.getFullYear().toString()+" ";
 	
 	 currentHour = d.getHours()%12;
 	if (currentHour == 0){currentHour = 12;}
 	timeString += (currentHour%12).toString()+":";
 	
-	if(d.getMinutes() < 10){timeString += "0"+d.getMinutes().toString()+":";}
-	else{timeString += d.getMinutes().toString()+":";}
+	if(d.getMinutes() < 10){timeString += "0"+d.getMinutes().toString()+" ";}
+	else{timeString += d.getMinutes().toString()+" ";}
 	
-	if(d.getSeconds() < 10){timeString += "0"+d.getSeconds().toString()+" ";}
-	else{timeString += d.getSeconds().toString()+" ";}
+	// if(d.getSeconds() < 10){timeString += "0"+d.getSeconds().toString()+" ";}
+	// else{timeString += d.getSeconds().toString()+" ";}
+	
+	if(d.getHours() < 12){timeString += "AM";}
+	else{timeString += "PM";}
 	
 	return timeString;
+}
+
+function openDetails(name,id)
+{
+	$("#devices")[0].style.height = "50%";
+	$("#details")[0].style.height = "50%";
+	$("#devName").text("Device: "+name);
+	$("#timescale").text(
+		dateToStr(new Date(0, 0, 0, 0, -(10*(offset+segs)), 0, (new Date().getTime())))
+		+" to "+
+		dateToStr(new Date(0, 0, 0, 0, -(10*(offset)), 0, ((new Date().getTime()))))
+	);
+	// $("#devMAC")[0].innerHTML = "MAC: "+id.toString();
 }
 
 function detailsFor(name, id, arr)
@@ -244,7 +255,7 @@ function getDetailsFor(name, id)
 	$("#details")[0].dname = name;
 	$("#details")[0].did = id;
 	// $.getJSON("http://"+document.location.host+":8080/detail",{id:id}, function(data){
-	$.getJSON("http://"+document.location.host+"/api/detail",{id:id,segs:segs}, function(data){
+	$.getJSON("http://"+document.location.host+"/api/detail",{id:id,segs:segs,t_offset:offset}, function(data){
 		
 		detailsFor(name, id, data);
 		$("#loading")[0].style.visibility="hidden";
@@ -309,8 +320,8 @@ function drawSparks()
 
 function clockTick()
 {
-	 d=new Date();
-	 timeString = "";
+	d=new Date();
+	timeString = "";
 	timeString += days[d.getDay()]+" ";
 	timeString += months[d.getMonth()]+" ";
 	timeString += d.getDate().toString()+" ";
