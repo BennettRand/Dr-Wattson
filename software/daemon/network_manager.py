@@ -145,20 +145,16 @@ def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):
 		ser_s = config.get("Serial","posix_device")
 	
 	#Create commonly used serial packets.
-	beacon = data_readers.tx_h.pack(data_readers.beacon_p.size, 1, 0xFFFF)
+	beacon = data_readers.tx_h.pack(data_readers.beacon_p.size, 1, pan, 0xFFFF)
 	beacon += data_readers.beacon_p.pack(0, pan, platform.node())
 	
-	data_request_h = data_readers.tx_h.pack(data_readers.data_req_p.size, 0, 0xFFFF)
+	data_request_h = data_readers.tx_h.pack(data_readers.data_req_p.size, 0, pan, 0xFFFF)
 	
-	cold_start = data_readers.tx_h.pack(data_readers.cold_start_p.size, 0, 0xFFFF)
+	cold_start = data_readers.tx_h.pack(data_readers.cold_start_p.size, 0, pan, 0xFFFF)
 	cold_start += data_readers.cold_start_p.pack(6)
 	
 	#Open serial port to mesh network controller.
 	ser = serial.Serial(ser_s, config.getint("Serial","baud"), timeout = config.getfloat("Serial","timeout"))
-	
-	#Set the PAN of the mesh network controller.
-	setPAN = data_readers.tx_h.pack(0, 2, pan)
-	ser.write(setPAN)
 	
 	#Soft-restart all listening power monitors.
 	ser.write(cold_start)
@@ -210,7 +206,7 @@ def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):
 				devices[addr_to_mac(rx_h_data[1])]['power'] = []
 				devices[addr_to_mac(rx_h_data[1])]['last_seen'] = [0]*256
 				
-				header = data_readers.tx_h.pack(data_readers.conn_ack_p.size,0,rx_h_data[1])	#Acknowledge connection
+				header = data_readers.tx_h.pack(data_readers.conn_ack_p.size,0,pan,rx_h_data[1])	#Acknowledge connection
 				
 				packet = data_readers.conn_ack_p.pack(2)
 				
@@ -231,7 +227,7 @@ def main(commit_p, conn, g_cur, argc = len(sys.argv), args = sys.argv):
 						d = power_dict(addr_to_mac(rx_h_data[1]), data_e_p)
 						if d!= None: devices[addr_to_mac(rx_h_data[1])]['power'].append(d)
 						
-						header = data_readers.tx_h.pack(data_readers.data_ack_p.size,0,rx_h_data[1])	#Ack data
+						header = data_readers.tx_h.pack(data_readers.data_ack_p.size,0,pan,rx_h_data[1])	#Ack data
 						
 						packet = data_readers.data_ack_p.pack(5,sequence)
 						

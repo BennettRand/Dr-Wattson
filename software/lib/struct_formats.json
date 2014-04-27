@@ -7,7 +7,7 @@
 	"data_e_p": "=BBBIqqHQQQQ",
 	"data_ack_p": "=BB",
 	"rx_h": "=BHb",
-	"tx_h": "=BBH",
+	"tx_h": "=BBHH",
 	"type": "=B",
 	"cold_start_p": "=B"
 }
