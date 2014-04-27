@@ -37,5 +37,6 @@ int uart_rx_data(void *data, uint16_t data_length);
 uint8_t uart_rx_byte(void);
 uint16_t uart_received_bytes(void);
 uint8_t uart_rx_peek(uint16_t byte);
+void uart_rx_flush();
 
 #endif //UART_H

@@ -154,6 +154,10 @@ uint8_t uart_rx_peek(uint16_t byte) {
 	return rx_buffer[(rx_buffer_start + byte) % rx_buffer_size];
 }
 
+void uart_rx_flush(void) {
+	rx_buffer_start = rx_buffer_end;
+}
+
 #ifdef USE_STDIO
 static int _uart_stdio_put_char(char c, FILE *stream) {
 	// Since stdio functions don't convert newlines to cr-lf, and I am lazy and like to only use new lines, check and see if we need to and a carrage return.
