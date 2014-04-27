@@ -164,7 +164,10 @@ int main(void) {
 		}
 
 		if (receivedColdStart) {
-			sendConnectionRequest(connectedBaseStation, &deviceCalibration);
+			if (connectedBaseStation == -1)
+				sendConnectionRequest(0, &deviceCalibration);
+			else
+				sendConnectionRequest(connectedBaseStation, &deviceCalibration);
 			ui_baseStationDisconnected();
 			receivedColdStart = false;
 		}
