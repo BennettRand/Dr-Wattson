@@ -71,7 +71,8 @@ void Widget::dataReceived()
             {
                 txHeader_t txPacketHeader;
                 txPacketHeader.destAddr = packetHeader.sourceAddr;
-                txPacketHeader.command = sendPacket;
+                txPacketHeader.PANBroadcast = 0;
+				txPacketHeader.PAN_ID = ui->panLineEdit->text().toInt(0,16);
                 txPacketHeader.size = 13 + packetHeader.size;
                 port->write((char*)(&txPacketHeader), sizeof(txPacketHeader));
                 port->write("Got message: ", 13);
@@ -106,14 +107,7 @@ void Widget::on_connectButton_clicked(bool checked)
             port->setParity(QSerialPort::NoParity);
             port->setStopBits(QSerialPort::OneStop);
             ui->connectButton->setText("Close Port");
-            uint16_t pan_id = ui->panLineEdit->text().toInt(0,16);
-            txHeader_t packetHeader;
-            packetHeader.destAddr = pan_id;
-            packetHeader.command = setPAN;
-            packetHeader.size = 0;
-
-            port->write((char*)(&packetHeader), sizeof(txHeader_t));
-        }
+		}
         else
         {
             ui->connectButton->setText("Open Port");
@@ -139,12 +133,13 @@ void Widget::on_recanPortsButton_clicked()
 void Widget::on_transmitButton_clicked()
 {
     txHeader_t packetHeader;
+    packetHeader.PAN_ID = ui->panLineEdit->text().toInt(0,16);
     packetHeader.destAddr = ui->addressEdit->text().toInt(0,16);
 
     if (ui->panBroadcastCheckbox->isChecked())
-        packetHeader.command = broadcastPacket;
+        packetHeader.PANBroadcast = 1;
     else
-        packetHeader.command = sendPacket;
+        packetHeader.PANBroadcast = 0;
 
     if (ui->asciiRadioButton->isChecked()) {
         packetHeader.size = ui->dataEdit->toPlainText().length();
@@ -229,6 +224,8 @@ void Widget::on_tableView_clicked(const QModelIndex &index)
         ui->packetDataEdit->appendPlainText(QString("Request Sequence Number: ").append(QString().setNum(pkt->requestSequence)));
         ui->packetDataEdit->appendPlainText(QString("Data Sequence Number: ").append(QString().setNum(pkt->dataSequence)));
         ui->packetDataEdit->appendPlainText(QString("Sample Count: ").append(QString().setNum(pkt->sampleCount)));
+		if (pkt->linePeriod == 0)
+			qDebug()<<"Zero line period detected";
         ui->packetDataEdit->appendPlainText(QString("Raw Line Period: ").append(QString().setNum(pkt->linePeriod)));
         ui->packetDataEdit->appendPlainText(QString("Line Frequency (Hz): ").append(QString().setNum(1.0/(((double)pkt->linePeriod) * ui->linePeriodScalingSpinbox->value()))));
         ui->packetDataEdit->appendPlainText("Channel 1:");
