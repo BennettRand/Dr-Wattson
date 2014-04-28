@@ -64,7 +64,7 @@ def sparkline(id):
 	# return [v_arr,i_arr,p_arr]
 	return p_arr
 	
-def get_data(id, segs='1'):
+def get_data(id, segs='1', t_offset='0'):
 	
 	if id[-1] == 'a': offset = 0
 	elif id[-1] == 'b': offset = 1
@@ -80,9 +80,12 @@ def get_data(id, segs='1'):
 	devs = cur.fetchone()
 	data = devs[0]
 	
-	segs = int(segs) if segs.isdigit() else 1
+	segs = int(segs) if str(segs).isdigit() else 1
 	downscale = math.ceil(segs/6.0)
 	segs = segments_to_string(segs)
+	
+	t_offset = int(t_offset) if str(t_offset).isdigit() else 1
+	t_offset = segments_to_string(t_offset)
 	
 	# query = "SELECT til,v_1,v_2,i_1,i_2,p_1,p_2,f FROM sample WHERE device_mac='"+data+"' AND til > now() - interval '1 hour' ORDER BY til DESC;"
 	# query = "SELECT til,v_1,v_2,i_1,i_2,p_1,p_2,f FROM sample WHERE device_mac='"+data+"' ORDER BY til DESC LIMIT 1000;"
@@ -92,11 +95,13 @@ def get_data(id, segs='1'):
 	FROM (
 	  SELECT til,v_1,v_2,i_1,i_2,p_1,p_2,f,row_number() OVER(ORDER BY til ASC) AS row
 	  FROM sample
-	  WHERE device_mac='{0}' AND til > now() - interval '{1}' 
+	  WHERE device_mac='{0}' AND til BETWEEN ((now() - interval '{3}') - interval '{1}') AND (now() - interval '{3}')
 	  ORDER BY til ASC
 	) t
 	WHERE (t.row % {2}) = 0;
-	""".format(data,segs,downscale)
+	""".format(data,segs,downscale,t_offset)
+	
+	# print segs,t_offset
 	
 	cur.execute(query)
 	
@@ -151,7 +156,7 @@ def application(environ, start_response):
 			query[v[0]] = v[1]
 	
 	if environ['PATH_INFO'] == "/detail":
-		data = get_data(query['id'],query['segs'])
+		data = get_data(query['id'],query['segs'],query['t_offset'])
 		output = json.dumps(data)
 		
 	elif environ['PATH_INFO'] == "/devices":
