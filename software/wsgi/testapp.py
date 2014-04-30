@@ -5,6 +5,7 @@ import psycopg2
 import itertools
 import datetime
 import math
+import urllib
 
 def segments_to_string(n):
 	return "{0} hours {1} minutes".format(n/6, (n%6)*10)
@@ -149,7 +150,7 @@ def change_dev(id, name, desc):
 	conn = psycopg2.connect(database = 'wattson', host = 'localhost', user = 'root', password = 'means swim of stream')
 	cur = conn.cursor()
 	
-	cur.execute(query,(name,desc,id[:-1]))
+	cur.execute(query,(urllib.unquote(name),urllib.unquote(desc),id[:-1]))
 	conn.commit()
 	conn.close()
 	

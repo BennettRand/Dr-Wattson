@@ -115,7 +115,7 @@ function dateToStr(d)
 	
 	 currentHour = d.getHours()%12;
 	if (currentHour == 0){currentHour = 12;}
-	timeString += (currentHour%12).toString()+":";
+	timeString += (currentHour).toString()+":";
 	
 	if(d.getMinutes() < 10){timeString += "0"+d.getMinutes().toString()+" ";}
 	else{timeString += d.getMinutes().toString()+" ";}

@@ -108,6 +108,7 @@ a
 {
 	float:left;
 	padding-right: 3px;
+	width: auto;
 }
 
 .right
@@ -179,7 +180,7 @@ a
 
 #chartArea
 {
-	height: 100%;
+	height: auto;
 	width: 100%;
 }
 
@@ -238,13 +239,18 @@ input.name
 		border-style: solid;
 }
 
+@media screen and (max-width: 1000px)
+{
+	#details-title{height: 100px;}
+	#chartArea{height: 90%;}
+}
+
 @media screen and (max-width: 900px)
 {
 	h1{font-size: 125%;}
 	h2{font-size: 105%;}
 	h3{font-size: 105%;}
 	h4{font-size: 100%;}
-	#details-title{height: 100px;}
 }
 
 @media screen and (max-width: 600px)
@@ -253,6 +259,8 @@ input.name
 	h2{font-size: 100%;}
 	h3{font-size: 100%;}
 	h4{font-size: 100%;}
+	#details-title{height: 150px;}
+	#chartArea{height: 50%;}
 }
 
 /*font-family: 'Michroma', sans-serif;
