@@ -132,10 +132,10 @@ a
 .plug
 {
 	background-color: #DDD;
-	width: 228px;
+	width: 224px;
 	float: left;
-	border: 0;
-	margin: 3px;
+	border: 2px solid black;
+	margin: 5px;
 }
 
 .device
@@ -144,7 +144,7 @@ a
 	width: 224px;
 	height: 126px;
 	border: 1px solid black;
-	margin: 1px;
+	margin: 0px;
 }
 .device *
 {
