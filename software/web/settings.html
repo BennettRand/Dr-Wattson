@@ -6,60 +6,70 @@
 		<link href='css/style.css' rel='stylesheet' type='text/css'/>
 		<script type="text/javascript" src="js/jquery.min.js"></script>
 		<title>Settings</title>
+		<script>
+			query = window.location.search.slice(1);
+			function submit_change()
+			{
+				id = query;
+				name = $("#topname")[0].value;
+				desc = $("#botname")[0].value;
+				$.getJSON("http://"+document.location.host+"/api/change-dev",{id:id,name:name,desc:desc}, function(data)
+				{
+					//console.log(data);
+					location.reload();
+				});
+			}
+		</script>
 	</head>
 	<body>
 		<div id="title-bar">
+			<a href = "/">
+					<img class="left" src="icons/left.png" height="50"/>
+				</a>
 			<div class="third">
 				<h1>Settings</h1>
 			</div>
 			<div class="third">
-				<h2>Plug: 6</h2>
-			</div>
-			<div class="third">
+				<h2 id="plugnum">...</h2>
 			</div>
 		</div>
 		<div id="devices">
 			<div id="loading"><h1>Loading...</h1></div>
 			<div class="plug">
 				<div class="device">
-					<input type="text" id="topname" class="name" value="N/A"/>
+					<input type="text" id="topname" class="name" value="..."/>
 				</div>
 				<div class="device">
-					<input type="text" id="botname" class="name" value="N/A"/>
+					<input type="text" id="botname" class="name" value="..."/>
 				</div>
 			</div>
+			<a href="javascript:void(0)" onClick = "submit_change();"><h1>Save</h1></a>
 		</div>
 		<div id="details">
 			<div id="details-title">
 				<h2 class = "left">Details</h2><div class = "left"><h4 id="devName"></h4><h4 id="devMAC"></div></h4>
 				<a href = "javascript:void(0)" onClick = "closeDetails();">
-					<img class="right" src="exit.png"/>
+					<img class="right" src="icons/exit.png"/>
 				</a>
-				<a href = "javascript:void(0)" onClick = "segs = 1;getDetailsFor($('#details')[0].dname, $('#details')[0].did);">
-					<img class="right" src="time.png"/>
-				</a>
-				<a href = "javascript:void(0)" onClick = "segs = 3;getDetailsFor($('#details')[0].dname, $('#details')[0].did);">
-					<img class="right" src="time.png"/>
-				</a>
-				<a href = "javascript:void(0)" onClick = "segs = 6;getDetailsFor($('#details')[0].dname, $('#details')[0].did);">
-					<img class="right" src="time.png"/>
-				</a>
-				<a href = "javascript:void(0)" onClick = "segs = 72;getDetailsFor($('#details')[0].dname, $('#details')[0].did);">
-					<img class="right" src="day.png"/>
-				</a>
-				<a href = "javascript:void(0)" onClick = "segs = 144;getDetailsFor($('#details')[0].dname, $('#details')[0].did);">
-					<img class="right" src="day.png"/>
-				</a>
-				<a href = "javascript:void(0)" onClick = "segs = 1008;getDetailsFor($('#details')[0].dname, $('#details')[0].did);">
-					<img class="right" src="day.png"/>
-				</a>
-				<a href = "javascript:void(0)" onClick = "settingsFor();">
-					<img class="right" src="gear.png"/>
-				</a>
-			</div>
-			<div id = "chartArea" style = "height:100%;">
 			</div>
 		</div>
-		designed by Johan H. W. Basberg from the Noun Project
+		<script>
+			$.getJSON("http://"+document.location.host+"/api/devices",{}, function(data)
+			{
+				for(i=0; i<data.length; i++)
+				{
+					//console.log(query,data[i].id1, data[i].id2);
+					if(data[i].id1 == query || data[i].id2 == query)
+					{
+						$("#topname").attr('value',data[i].name1);
+						$("#botname").attr('value',data[i].name2);
+						$("#plugnum").text("Address: "+data[i].mac)
+						$("#botname").attr('mac',data[i].mac);
+					}
+				}
+			});
+		</script>
+		Icons designed by Johan H. W. Basberg and Jardson A. from the Noun Project
+		
 	</body>
 </html>

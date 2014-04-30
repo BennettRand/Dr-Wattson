@@ -137,11 +137,24 @@ def get_devices():
 	data = []
 	
 	for d in devs:
-		data.append({"name1": str(d[2]), "id1": str(d[0])+"a", "name2": str(d[3]), "id2": str(d[0])+"b", "mac": d[4]})	
+		data.append({"name1": str(d[2]), "id1": str(d[0])+"a", "name2": str(d[3]), "id2": str(d[0])+"b", "mac": d[4]})
 	cur.close()
 	conn.close()
 	
 	return data
+
+def change_dev(id, name, desc):
+	query = 'UPDATE device SET name = %s, "desc" = %s WHERE id = %s;'
+	
+	conn = psycopg2.connect(database = 'wattson', host = 'localhost', user = 'root', password = 'means swim of stream')
+	cur = conn.cursor()
+	
+	cur.execute(query,(name,desc,id[:-1]))
+	conn.commit()
+	conn.close()
+	
+	
+	return 1
 
 def application(environ, start_response):
 	status = '200 OK'
@@ -165,6 +178,10 @@ def application(environ, start_response):
 		
 	elif environ['PATH_INFO'] == "/spark":
 		data = sparkline(query['id'])
+		output = json.dumps(data)
+		
+	elif environ['PATH_INFO'] == "/change-dev":
+		data = change_dev(query['id'], query['name'], query['desc'])
 		output = json.dumps(data)
 		
 	else:

@@ -108,7 +108,7 @@ function closeDetails()
 function dateToStr(d)
 {
 	timeString = "";
-	timeString += days[d.getDay()]+" ";
+	// timeString += days[d.getDay()]+" ";
 	timeString += months[d.getMonth()]+" ";
 	timeString += d.getDate().toString()+" ";
 	// timeString += d.getFullYear().toString()+" ";
@@ -356,7 +356,7 @@ function powerCounts()
 
 function settingsFor()
 {
-	window.location = "http://"+document.location.host+"/settings.html?id=" + $('#details')[0].did;
+	window.location = "http://"+document.location.host+"/settings.html?" + $('#details')[0].did;
 }
 
 // function resizeJqplot()
