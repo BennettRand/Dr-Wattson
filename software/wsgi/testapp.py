@@ -150,7 +150,7 @@ def change_dev(id, name, desc):
 	conn = psycopg2.connect(database = 'wattson', host = 'localhost', user = 'root', password = 'means swim of stream')
 	cur = conn.cursor()
 	
-	cur.execute(query,(urllib.unquote(name),urllib.unquote(desc),id[:-1]))
+	cur.execute(query,(urllib.unquote_plus(name),urllib.unquote_plus(desc),id[:-1]))
 	conn.commit()
 	conn.close()
 	
