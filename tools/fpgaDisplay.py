@@ -45,9 +45,9 @@ try:
 			query = "SELECT v_2 FROM sample WHERE til IN (SELECT MAX(til) FROM sample GROUP BY device_mac) and (til > now() - INTERVAL '10 seconds');"
 		cur.execute(query)
 		data = cur.fetchone()
-		if (data != None) and len(data) != 0:
+		if (data != None) and (data[0] != None):
 			sum = encode7Seg(data[0])
-			print data
+			print data[0]
 		else:
 			sum = [0xBF]*4
 		os.write(fpga, "".join(chr(val) for val in sum))
